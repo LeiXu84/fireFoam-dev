@@ -1,0 +1,6 @@
+/*greyMeanAbsorptionEmissionSoot/greyMeanAbsorptionEmissionSoot.C*/
+/*greyMeanAbsorptionEmissionIgnSoot/greyMeanAbsorptionEmissionIgnSoot.C*/
+radiationCoupledBaseFF/radiationCoupledBaseFF.C
+greyDiffusiveRadiationFF/greyDiffusiveRadiationFFMixedFvPatchScalarField.C
+
+LIB = $(FOAM_USER_LIBBIN)/libRadiationBCs_FMG

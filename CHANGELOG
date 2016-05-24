@@ -1,0 +1,46 @@
+2016-05-24: Version 16.05.24
+	Upgraded to track OpenFOAM-dev
+
+2015-10-15: Version 15.10.15
+	Fixed bug in Lagrangian particle logging of escaped mass
+
+2015-10-01: Version 15.10.01
+	Implemented dynamic angle sampling to uniformSamplingSpriklerInjection
+	model
+
+2015-09-26: Version 15.09.26
+	Upgraded to OpenFOAM-2.4.x, git hash-id 6067771383352
+
+2015-06-12: Version 15.06.12
+	Removed sampleSize input from uniformSamplingSprinklerInjection model
+
+2014-11-24: Version 1.0.9
+	Updated uniformSamplingSprinklerInjection model
+
+2014-10-23: Version 1.0.8
+	Added uniformSamplingSprinklerInjection example to case directory
+
+2014-09-17: Version 1.0.7
+	Added steckler example to case directory
+
+2014-09-15: Version 1.0.6
+	Added suppression example to case directory
+
+2014-08-28: Version 1.0.5
+	Various bug fixes for sprinkler/nozzle injection models
+
+2014-07-17: Version 1.0.4
+	Added pyrolysis1D example to case directory
+
+2014-06-26: Version 1.0.3
+	Added wallFireSpread2D example to case directory
+
+2014-06-19: Version 1.0.2
+	Fixed broken Allwmake and Allwclean scripts
+
+2014-06-04: Version 1.0.1
+	Renamed lib-dev to lib
+
+2014-06-04: Version 1.0.0
+	Initial commit for github
+
