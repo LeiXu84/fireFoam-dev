@@ -187,6 +187,26 @@ void Foam::patchRtis::findElements(const fvMesh& mesh)
 Foam::patchRtis::patchRtis
 (
     const word& name,
+    const Time& t,
+    const dictionary& dict
+)
+:
+    rtis(name, t, dict)
+{
+    // When constructing probes above it will have called the
+    // probes::findElements (since the virtual mechanism not yet operating).
+    // Not easy to workaround (apart from feeding through flag into constructor)
+    // so clear out any cells found for now.
+    elementList_.clear();
+    faceList_.clear();
+
+    read(dict);
+}
+
+
+Foam::patchRtis::patchRtis
+(
+    const word& name,
     const objectRegistry& obr,
     const dictionary& dict,
     const bool loadFromFiles
@@ -211,7 +231,7 @@ Foam::patchRtis::~patchRtis()
 {}
 
 
-bool Foam::patchRtis::write(const bool postProcess)
+bool Foam::patchRtis::write()
 {
     if (this->size() && prepare())
     {

@@ -150,7 +150,7 @@ protected:
 
             //- Current open files
             HashPtrTable<OFstream> rtiFilePtrs_;
-         
+
             //-RTI related
             scalar RTI_;
             scalar C_;
@@ -170,7 +170,7 @@ protected:
         //- Classify field types, returns the number of fields
         label classifyFields();
 
-        //- Find cells containing rtis
+        //- Find cells and faces containing rtis
         virtual void findElements(const fvMesh&);
 
         //- Classify field type and Open/close file streams,
@@ -277,7 +277,7 @@ public:
         virtual bool read(const dictionary&);
 
         //- Execute, currently does nothing
-        virtual bool execute(const bool postProcess = false);
+        virtual bool execute();
 
         //- Execute at the final time-loop, currently does nothing
         virtual bool end();
@@ -286,7 +286,7 @@ public:
         virtual bool timeSet();
 
         //- Sample and write
-        virtual bool write(const bool postProcess = false);
+        virtual bool write();
 
         //- Read probe file for restart
         typedef Tuple2<scalarList,DynamicList<scalarList> > probeData;
@@ -296,12 +296,10 @@ public:
         bool interpolateProbeData(const probeData& data);
 
         //- Update for changes of mesh
-        virtual void updateMesh(const mapPolyMesh&)
-        {}
+        virtual void updateMesh(const mapPolyMesh&);
 
         //- Update for changes of mesh
-        virtual void movePoints(const polyMesh&)
-        {}
+        virtual void movePoints(const polyMesh&);
 
         //- Update for changes of mesh due to readUpdate
         virtual void readUpdate(const polyMesh::readUpdateState state)

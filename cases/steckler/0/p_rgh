@@ -24,13 +24,11 @@ boundaryField
     top
     {
         type            prghTotalHydrostaticPressure;
-        ph_rghName      ph_rgh;
         value           uniform 0;
     }
     sides
     {
         type            prghTotalHydrostaticPressure;
-        ph_rghName      ph_rgh;
         value           uniform 0;
     }
     base

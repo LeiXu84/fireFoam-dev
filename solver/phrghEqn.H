@@ -19,7 +19,6 @@ if (pimple.dict().lookupOrDefault<bool>("hydrostaticInitialization", false))
     if (equal(runTime.value(), 0))
     {
         p = ph_rgh + rho*gh + pRef;
-
         thermo.correct();
         rho = thermo.rho();
 

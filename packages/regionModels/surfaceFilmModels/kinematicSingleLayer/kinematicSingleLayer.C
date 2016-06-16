@@ -151,6 +151,16 @@ void kinematicSingleLayer::transferPrimaryRegionSourceFields()
     rhoSp_.correctBoundaryConditions();
     USp_.correctBoundaryConditions();
     pSp_.correctBoundaryConditions();
+
+    // update addedMassTotal counter
+    if (time().writeTime())
+    {
+        scalar addedMassTotal = 0.0;
+        outputProperties().readIfPresent("addedMassTotal", addedMassTotal);
+        addedMassTotal += returnReduce(addedMassTotal_, sumOp<scalar>());
+        outputProperties().add("addedMassTotal", addedMassTotal, true);
+        addedMassTotal_ = 0.0;
+    }
 }
 
 

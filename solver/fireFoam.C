@@ -25,8 +25,8 @@ Application
     fireFoam
 
 Description
-    Transient PIMPLE solver for Fires and turbulent diffusion flames with
-    reacting Lagrangian parcels, surface film and pyrolysis modelling.
+    Transient solver for fires and turbulent diffusion flames with reacting
+    particle clouds, surface film and pyrolysis modelling.
 
 \*---------------------------------------------------------------------------*/
 
@@ -50,19 +50,17 @@ Description
 
 int main(int argc, char *argv[])
 {
+    #include "postProcess.H"
+
     #include "setRootCase.H"
     /*#include "printVersion.H"*/
     #include "createTime.H"
     #include "createMesh.H"
-
-    pimpleControl pimple(mesh);
-
+    #include "createControl.H"
     #include "createFields.H"
+    #include "createFieldRefs.H"
+    #include "infoFieldsOutput.H"
     #include "createFvOptions.H"
-    #include "createClouds.H"
-    #include "createSurfaceFilmModel.H"
-    #include "createPyrolysisModel.H"
-    #include "createRadiationModel.H"
     #include "initContinuityErrs.H"
     #include "createTimeControls.H"
     #include "compressibleCourantNo.H"
@@ -77,7 +75,7 @@ int main(int argc, char *argv[])
 
     while (runTime.run())
     {
-        #include "createTimeControls.H"
+        #include "readTimeControls.H"
         #include "compressibleCourantNo.H"
         #include "solidRegionDiffusionNo.H"
         #include "setMultiRegionDeltaT.H"

@@ -141,7 +141,7 @@ void thermoSingleLayerRollPaper::updateRollPaperThermallyThinZone()
             filmTsurface_[cellI] = tempSurfList[cellI];
             filmQnet_[cellI] = tempQ[cellI];
             filmBlockFactor_[cellI] = tempBlock[cellI];
-        filmMassReleaseRate_[cellI] = tempMLR[cellI];
+            filmMassReleaseRate_[cellI] = tempMLR[cellI];
         }
         
     }

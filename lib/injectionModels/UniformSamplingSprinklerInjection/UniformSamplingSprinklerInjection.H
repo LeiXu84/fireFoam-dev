@@ -115,6 +115,9 @@ namespace Foam
         //- Number of parcels to introduce per second []
         const label parcelsPerSecond_;
 
+        //- Coefficient to scale the dv50 diameter []
+        scalar diameterCoefficient_;
+
         //- Momentum efficiency []
         scalar momentumEfficiency_;
 

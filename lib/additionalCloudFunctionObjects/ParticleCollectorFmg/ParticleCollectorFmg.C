@@ -450,7 +450,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     totalTime_ += timeElapsed;
 
     const scalar alpha = (totalTime_ - timeElapsed)/totalTime_;
-    const scalar beta = timeElapsed/totalTime_;
+    const scalar beta = timeElapsed/(totalTime_+VSMALL);
 
     forAll(faces_, faceI)
     {

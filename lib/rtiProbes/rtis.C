@@ -28,6 +28,7 @@ License
 #include "dictionary.H"
 #include "Time.H"
 #include "IOmanip.H"
+#include "mapPolyMesh.H"
 #include <dirent.h>
 #include "IFstream.H"
 #include "IStringStream.H"
@@ -593,7 +594,7 @@ bool Foam::rtis::read(const dictionary& dict)
     return true;
 }
 
-bool Foam::rtis::execute(const bool postProcess)
+bool Foam::rtis::execute()
 {
 
     
@@ -652,7 +653,7 @@ bool Foam::rtis::timeSet()
 }
 
 
-bool Foam::rtis::write(const bool postProcess)
+bool Foam::rtis::write()
 {
     // if (size() && prepare())
     if (size())
@@ -772,6 +773,94 @@ bool Foam::rtis::interpolateProbeData(const probeData& data)
     }
 
     return false;
+}
+
+void Foam::rtis::updateMesh(const mapPolyMesh& mpm)
+{
+    DebugInfo<< "rtis: updateMesh" << endl;
+
+    if (&mpm.mesh() != &mesh_)
+    {
+        return;
+    }
+
+    if (fixedLocations_)
+    {
+        findElements(mesh_);
+    }
+    else
+    {
+        if (debug)
+        {
+            Info<< "rtis: remapping sample locations" << endl;
+        }
+
+        // 1. Update cells
+        {
+            DynamicList<label> elems(elementList_.size());
+
+            const labelList& reverseMap = mpm.reverseCellMap();
+            forAll(elementList_, i)
+            {
+                label celli = elementList_[i];
+                label newCelli = reverseMap[celli];
+                if (newCelli == -1)
+                {
+                    // cell removed
+                }
+                else if (newCelli < -1)
+                {
+                    // cell merged
+                    elems.append(-newCelli - 2);
+                }
+                else
+                {
+                    // valid new cell
+                    elems.append(newCelli);
+                }
+            }
+
+            elementList_.transfer(elems);
+        }
+
+        // 2. Update faces
+        {
+            DynamicList<label> elems(faceList_.size());
+
+            const labelList& reverseMap = mpm.reverseFaceMap();
+            forAll(faceList_, i)
+            {
+                label facei = faceList_[i];
+                label newFacei = reverseMap[facei];
+                if (newFacei == -1)
+                {
+                    // face removed
+                }
+                else if (newFacei < -1)
+                {
+                    // face merged
+                    elems.append(-newFacei - 2);
+                }
+                else
+                {
+                    // valid new face
+                    elems.append(newFacei);
+                }
+            }
+
+            faceList_.transfer(elems);
+        }
+    }
+}
+
+void Foam::rtis::movePoints(const polyMesh& mesh)
+{
+    DebugInfo<< "rtis: movePoints" << endl;
+
+    if (fixedLocations_ && &mesh == &mesh_)
+    {
+        findElements(mesh_);
+    }
 }
 
 

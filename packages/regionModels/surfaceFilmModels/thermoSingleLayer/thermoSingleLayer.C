@@ -535,7 +535,7 @@ thermoSingleLayer::thermoSingleLayer
     (
         IOobject
         (
-            "hsf",
+            "hf",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,

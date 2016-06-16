@@ -37,8 +37,6 @@ volScalarField rho
 );
 
 volScalarField& p = thermo.p();
-const volScalarField& T = thermo.T();
-const volScalarField& psi = thermo.psi();
 
 Info<< "\nReading field U\n" << endl;
 volVectorField U
@@ -160,8 +158,6 @@ volScalarField dpdt
 );
 
 
-#include "infoFieldsOutput.H"
-
 Info<< "Creating field kinetic energy K\n" << endl;
 volScalarField K("K", 0.5*magSqr(U));
 
@@ -192,3 +188,67 @@ volScalarField cp
     thermo.Cp()
 );
 
+singleStepReactingMixture<gasHThermoPhysics>& singleMixture
+(
+    dynamic_cast<singleStepReactingMixture<gasHThermoPhysics>&>
+    (thermo)
+);
+
+// stoichiometric O2 to fuel ratio
+scalar s(singleMixture.s().value());
+
+// stoichiometric air to fuel ratio
+scalar stoicRatio(singleMixture.stoicRatio().value());  
+
+// heat of combustion [J/kg]
+scalar qFuel(singleMixture.qFuel().value());  
+
+label fuelIndex(singleMixture.fuelIndex());
+label inertIndex(singleMixture.inertIndex());
+
+const volScalarField* O2Ptr = &Y[inertIndex]; //dummy ptr when O2 is not available 
+if (thermo.composition().contains("O2")) 
+{
+    O2Ptr = &thermo.composition().Y("O2");
+}
+const volScalarField& O2 = *O2Ptr;
+
+const volScalarField* CO2Ptr = &Y[inertIndex]; //dummy ptr when O2 is not available 
+if (thermo.composition().contains("CO2")) 
+{
+    CO2Ptr = &thermo.composition().Y("CO2");
+}
+const volScalarField& CO2 = *CO2Ptr;
+
+const volScalarField& fu = Y[fuelIndex]; 
+
+scalar YO2Inf = 0.23301; //hardcode for now
+
+// Fuel molecular weight
+scalar Wu_ = singleMixture.speciesData()[fuelIndex].W();
+// Fuel enthalpy of formation
+scalar Hu_ = singleMixture.speciesData()[fuelIndex].hc();
+
+// compute stoichiometric mixture fraction
+scalar ftSt = 1.0 / ( 1.0 + stoicRatio );
+Info << "stoichiometric mixture fraction is = " << ftSt << nl;
+
+
+// create fileds for mixture fraction
+volScalarField ft
+(
+    IOobject
+    (
+        "ft",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::AUTO_WRITE
+    ),
+    (fu*s-O2+YO2Inf)/(s+YO2Inf)
+);
+
+#include "createClouds.H"
+#include "createSurfaceFilmModel.H"
+#include "createPyrolysisModel.H"
+#include "createRadiationModel.H"

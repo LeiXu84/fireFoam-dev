@@ -128,6 +128,14 @@ public:
 
     // Constructors
 
+        //- Construct from Time and dictionary
+        patchRtis
+        (
+            const word& name,
+            const Time& time,
+            const dictionary& dict
+        );
+
         //- Construct for given objectRegistry and dictionary.
         //  Allow the possibility to load fields from files
         patchRtis
@@ -146,7 +154,7 @@ public:
     //- Public members
 
         //- Sample and write
-        virtual bool write(const bool postProcess = false);
+        virtual bool write();
 
         //- Read
         virtual bool read(const dictionary&);

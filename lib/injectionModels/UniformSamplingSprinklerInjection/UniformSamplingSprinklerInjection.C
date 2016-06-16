@@ -81,6 +81,7 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     (
         readScalar(this->coeffDict().lookup("parcelsPerSecond"))
         ),
+    diameterCoefficient_(this->coeffDict().template lookupOrDefault<scalar>("diameterCoefficient",1.0)),
     momentumEfficiency_(this->coeffDict().template lookupOrDefault<scalar>("momentumEfficiency",0.8)),
     // flowRateProfile_
     // (
@@ -223,6 +224,7 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     armDirection_(im.armDirection_),
     parcelDirVec_(im.parcelDirVec_),
     parcelsPerSecond_(im.parcelsPerSecond_),
+    diameterCoefficient_(im.diameterCoefficient_),
     momentumEfficiency_(im.momentumEfficiency_),
     // flowRateProfile_(im.flowRateProfile_),
     tanVec1_(im.tanVec1_),
@@ -1002,6 +1004,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     scalar area = pi*pow(orificeDiameter,2.0)/4.0; // m2
     scalar uJet = mdot/(rhow*area); // m/s
     Info << "uJet: " << uJet << endl;
+    Info << "diameterCoefficient: " << diameterCoefficient_ << endl;
     Info << "momentumEfficiency: " << momentumEfficiency_ << endl;
     velMag_ = uJet*momentumEfficiency_; // account for momentum loss during atomization process
 
@@ -1012,6 +1015,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     Info << "We: " << We << endl;
 
     dv50_ = C*orificeDiameter/pow(We,0.33333); // m
+    dv50_ = diameterCoefficient_*dv50_;
     Info << "dv50: " << dv50_ << endl;
 
     // compute particles per parcel

@@ -224,8 +224,8 @@ void reactingOneDimRollPaper::updatePhiGas()
 
                 phiGasp[faceI] += massInt;
                 const label cell0 = cells[0];
-		phiGasp[faceI] = massReleaseRate_[cell0];
-		phiGaspMax = max(phiGaspMax, phiGasp[faceI]);
+                phiGasp[faceI] = massReleaseRate_[cell0];
+                phiGaspMax = max(phiGaspMax, phiGasp[faceI]);
 
                 if (debug)
                 {
@@ -553,7 +553,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         ),
         regionMesh(),
         dimensionedVector("zero", dimLength/dimTime, vector::zero),
-            zeroGradientFvPatchVectorField::typeName
+        zeroGradientFvPatchVectorField::typeName
     ),
 
     phiPyrolysis_
@@ -567,7 +567,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::NO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass/dimTime, 0.0)
+        dimensionedScalar("zero", dimMass/dimTime, 0.0)
     ),
     
     paperID_
@@ -581,7 +581,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimless, 0.0)
+        dimensionedScalar("zero", dimless, 0.0)
     ),
 
     blockFactor_
@@ -595,8 +595,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass/dimMass, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimMass/dimMass, 0.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     TDelVirginPaper_
@@ -610,8 +610,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimTemperature, 300.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimTemperature, 300.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     Tsurface_
@@ -625,8 +625,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimTemperature, 300.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimTemperature, 300.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     movedPaperDistance_
@@ -640,7 +640,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::NO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimLength, -1.0)
+        dimensionedScalar("zero", dimLength, -1.0)
     ),
 
     massDelaminatedVirginPaper_
@@ -654,7 +654,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass, 0.0)
+        dimensionedScalar("zero", dimMass, 0.0)
     ),
 
     massBurningPaper_
@@ -668,7 +668,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass, 0.0)
+        dimensionedScalar("zero", dimMass, 0.0)
     ),
 
     massReleaseRate_
@@ -682,7 +682,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass/dimTime, 0.0)
+        dimensionedScalar("zero", dimMass/dimTime, 0.0)
     ),
 
     Qnet_
@@ -831,9 +831,9 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             //IOobject::NO_WRITE
             IOobject::AUTO_WRITE
         ),
-            regionMesh(),
+        regionMesh(),
         dimensionedVector("zero", dimLength/dimTime, vector::zero),
-            zeroGradientFvPatchVectorField::typeName
+        zeroGradientFvPatchVectorField::typeName
     ),
 
     phiPyrolysis_
@@ -848,7 +848,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass/dimTime, 0.0)
+        dimensionedScalar("zero", dimMass/dimTime, 0.0)
     ),
 
     paperID_
@@ -862,8 +862,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimless, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimless, 0.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     blockFactor_
@@ -877,8 +877,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass/dimMass, 0.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimMass/dimMass, 0.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     TDelVirginPaper_
@@ -892,8 +892,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimTemperature, 300.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimTemperature, 300.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     Tsurface_
@@ -907,8 +907,8 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimTemperature, 300.0),
-            zeroGradientFvPatchScalarField::typeName
+        dimensionedScalar("zero", dimTemperature, 300.0),
+        zeroGradientFvPatchScalarField::typeName
     ),
 
     movedPaperDistance_
@@ -922,7 +922,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimLength, -1.0)
+        dimensionedScalar("zero", dimLength, -1.0)
     ),
 
     massDelaminatedVirginPaper_
@@ -950,7 +950,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass, 0.0)
+        dimensionedScalar("zero", dimMass, 0.0)
     ),
 
     massReleaseRate_
@@ -964,7 +964,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
-            dimensionedScalar("zero", dimMass, 0.0)
+        dimensionedScalar("zero", dimMass, 0.0)
     ),
 
     Qnet_
@@ -1186,7 +1186,7 @@ void reactingOneDimRollPaper::updateRollPaper()
         const scalarField& QnetFace = Qnet_.boundaryField()[patchI];
 
         typedef regionModels::surfaceFilmModels::surfaceFilmModel 
-	    surfaceFilmModelType;
+        surfaceFilmModelType;
         const regionModels::regionModel& surFilmRegion =
             db().time().lookupObject<regionModels::regionModel>
             ("surfaceFilmProperties");
@@ -1221,6 +1221,12 @@ void reactingOneDimRollPaper::updateRollPaper()
             const vector sf = pp.faceAreas()[faceI];
             const label cell0 = cells[0];
         
+            scalar zmag = sf.z()/mag(sf);
+            // Info << "faceI: " << faceI << " zmag: " << zmag << endl;
+            if(zmag > 0.1)
+            {
+                continue;
+            }
             scalar paperThickness = regionMesh().V()[cell0]/mag(sf);
             scalar cellMass = regionMesh().V()[cell0]*rho_[cell0];
             scalar cellMassCombustible = cellMass*paperToFuelRatio_;
@@ -1230,141 +1236,148 @@ void reactingOneDimRollPaper::updateRollPaper()
             scalar uMoveMax = paperThickness/time().deltaTValue();
             scalar uMove(0.201*uMoveMax);    // Finish moving in 5 time steps
 
-	    // Get thermally-thick surface temperature 
+        // Get thermally-thick surface temperature 
             scalar TsurfaceThick = T()[cell0];
 
             Qnet_[cell0] = QnetFace[faceI];
-	    Qnet_[cell0] = min(Qnet_[cell0], 2e5);
+            Qnet_[cell0] = min(Qnet_[cell0], 2e5);
             QnetMax = max(QnetMax,Qnet_[cell0]);
             QnetMin = min(QnetMin,Qnet_[cell0]);
-	    scalar alphaQ = time().deltaTValue()/(3.0 + time().deltaTValue());
-	    QnetMovingAverage_[cell0] = alphaQ*Qnet_[cell0]
-	        + (1-alphaQ)*QnetMovingAverage_[cell0];
-	    
-	    bool readyToMove(false);
-	    bool paperMoving(false);
-	    bool paperMoved(false);
+            scalar alphaQ = time().deltaTValue()/(3.0 + time().deltaTValue());
+            QnetMovingAverage_[cell0] = alphaQ*Qnet_[cell0]
+                + (1-alphaQ)*QnetMovingAverage_[cell0];
+        
+            bool readyToMove(false);
+            bool paperMoving(false);
+            bool paperMoved(false);
 
-	    if(movedPaperDistance_[cell0] < 0)
-	    {
-		readyToMove = true;
-		paperMoving = false;
-		paperMoved  = false;
-	    }
-	    else if(movedPaperDistance_[cell0] > paperThickness)
-	    {
-		readyToMove = false;
-		paperMoving = false;
-		paperMoved  = true;
-	    }
-	    else
-	    {
-		readyToMove = false;
-		paperMoving = true;
-		paperMoved  = false;
-	    }
+            if(movedPaperDistance_[cell0] < 0)
+            {
+                readyToMove = true;
+                paperMoving = false;
+                paperMoved  = false;
+            }
+            else if(movedPaperDistance_[cell0] > paperThickness)
+            {
+                readyToMove = false;
+                paperMoving = false;
+                paperMoved  = true;
+            }
+            else
+            {
+                readyToMove = false;
+                paperMoving = true;
+                paperMoved  = false;
+            }
 
-	    if(paperMoving)
-	    {
-		movedPaperDistance_[cell0] += uMove*time().deltaTValue();
-	    }
+            if(paperMoving)
+            {
+                movedPaperDistance_[cell0] += uMove*time().deltaTValue();
+            }
 
-	    if(paperMoved)
-	    {
-		forAll(cells, cI)
-		{
-		    Upyrolysis_[cells[cI]] = vector::zero;
-		}
-		movedPaperDistance_[cell0] = -1;
-	    }
+            if(paperMoved)
+            {
+                forAll(cells, cI)
+                {
+                    Upyrolysis_[cells[cI]] = vector::zero;
+                }
+                movedPaperDistance_[cell0] = -1;
+            }
 
-	    if(readyToMove)
-	    {
-		bool del_1D(false); // Thermally-driven delamination
-		bool del_2D(false); // Paper peeling
-		bool haveVirginPaper(false);
-		bool haveBurningPaper(false);
+            if(readyToMove)
+            {
+                bool del_1D(false); // Thermally-driven delamination
+                bool del_2D(false); // Paper peeling
+                bool haveVirginPaper(false);
+                bool haveBurningPaper(false);
 
-		if(massDelaminatedVirginPaper_[cell0] > 0)
-		{
-		    haveVirginPaper = true;
-		}
+                if(massDelaminatedVirginPaper_[cell0] > 0)
+                {
+                    haveVirginPaper = true;
+                }
 
-		if(massBurningPaper_[cell0] > 0)
-		{
-		    haveBurningPaper = true;
-		}
+                if(massBurningPaper_[cell0] > 0)
+                {
+                    haveBurningPaper = true;
+                }
 
-		if(haveVirginPaper) // Heat up vrigin thin paper until ignition
-		{
-		    //scalar qpaper(qExtra[faceI]+QnetMovingAverage_[cell0]);
-		    TDelVirginPaper_[cell0] += (1.0-blockFactor_[cell0])*time().deltaTValue()
-		        *Qnet_[cell0]/paperThermoInertia;
-		    TDelVirginPaper_[cell0] = max(TDelVirginPaper_[cell0],273.15);
-		    if(TDelVirginPaper_[cell0] >= (TcriticalDelamination_ + 1.0))    // Paper is ignited
-		    {
-			paperID_[cell0] ++;
-			massBurningPaper_[cell0] += massDelaminatedVirginPaper_[cell0];
-			massDelaminatedVirginPaper_[cell0] = 0;
-		    }
-		}
-		else	// Allow delamination if no virgin thermall-thin paper exists
-		{
-		    TDelVirginPaper_[cell0] = TsurfaceThick;
+                if(haveVirginPaper) // Heat up vrigin thin paper until ignition
+                {
+                    //scalar qpaper(qExtra[faceI]+QnetMovingAverage_[cell0]);
+                    TDelVirginPaper_[cell0] += (1.0-blockFactor_[cell0])*time().deltaTValue()
+                        *Qnet_[cell0]/paperThermoInertia;
+                    TDelVirginPaper_[cell0] = max(TDelVirginPaper_[cell0],273.15);
+                    if(TDelVirginPaper_[cell0] >= (TcriticalDelamination_ + 1.0))    // Paper is ignited
+                    {
+                        paperID_[cell0] ++;
+                        massBurningPaper_[cell0] += massDelaminatedVirginPaper_[cell0];
+                        massDelaminatedVirginPaper_[cell0] = 0;
+                    }
+                }
+                else    // Allow delamination if no virgin thermall-thin paper exists
+                {
+                    TDelVirginPaper_[cell0] = TsurfaceThick;
 
-		    if(TsurfaceThick > TcriticalDelamination_)
-		    {
-		        del_1D = true;
-		    }
+                    if(TsurfaceThick > TcriticalDelamination_)
+                    {
+                        del_1D = true;
+                    }
 
-		    if(latestThinArea[faceI] > 0.5)
-		    {
-		        del_2D = true;
-		    }
+                    if(latestThinArea[faceI] > 0.5)
+                    {
+                        del_2D = true;
+                    }
 
-		    if(del_1D || del_2D)
-		    {
-			forAll(cells, cI)
-			{
-			    Upyrolysis_[cells[cI]] = uMove*sf/mag(sf);
-			}
-			movedPaperDistance_[cell0] = 0;
-			massDelaminatedVirginPaper_[cell0] = cellMassCombustible;
-		    }
-		}
+                    scalar zmag = sf.z()/mag(sf);
+                    if(zmag > 0.1)
+                    {
+                        del_1D = false;
+                        del_2D = false;
+                    }
 
-		if(haveBurningPaper)
-		{
-		    Tsurface_[cell0] = TcriticalDelamination_;
-		    //blockFactor_[cell0] = blockOfBurningPaper_;
-		    scalar paperLeft = max(0.0, massBurningPaper_[cell0]/cellMassCombustible);
-		    blockFactor_[cell0] = min(1.0, paperLeft);
-		    massReleaseRate_[cell0] = max(0.0, Qnet_[cell0]*mag(sf)/Hpyrolysis_);
-		    scalar dMass = massReleaseRate_[cell0]*time().deltaTValue();
-		    if((massBurningPaper_[cell0]-dMass) > 0)
-		    {
-			massBurningPaper_[cell0] -= dMass;
-		    }
-		    else    // Paper burns out
-		    {
-			massBurningPaper_[cell0] = 0;
-			massReleaseRate_[cell0] = 0;
-		    }
-		}
-		else
-		{
-		    blockFactor_[cell0] = 0;
-		    if(haveVirginPaper)
-		    {
-			Tsurface_[cell0] = TDelVirginPaper_[cell0];
-		    }
-		    else
-		    {
-			Tsurface_[cell0] = TsurfaceThick;
-		    }
-		}
-	    }
-	}
+                    if(del_1D || del_2D)
+                    {
+                        forAll(cells, cI)
+                        {
+                            Upyrolysis_[cells[cI]] = uMove*sf/mag(sf);
+                        }
+                        movedPaperDistance_[cell0] = 0;
+                        massDelaminatedVirginPaper_[cell0] = cellMassCombustible;
+                    }
+                }
+
+                if(haveBurningPaper)
+                {
+                    Tsurface_[cell0] = TcriticalDelamination_;
+                    //blockFactor_[cell0] = blockOfBurningPaper_;
+                    scalar paperLeft = max(0.0, massBurningPaper_[cell0]/cellMassCombustible);
+                    blockFactor_[cell0] = min(1.0, paperLeft);
+                    massReleaseRate_[cell0] = max(0.0, Qnet_[cell0]*mag(sf)/Hpyrolysis_);
+                    scalar dMass = massReleaseRate_[cell0]*time().deltaTValue();
+                    if((massBurningPaper_[cell0]-dMass) > 0)
+                    {
+                        massBurningPaper_[cell0] -= dMass;
+                    }
+                    else    // Paper burns out
+                    {
+                        massBurningPaper_[cell0] = 0;
+                        massReleaseRate_[cell0] = 0;
+                    }
+                }
+                else
+                {
+                    blockFactor_[cell0] = 0;
+                    if(haveVirginPaper)
+                    {
+                        Tsurface_[cell0] = TDelVirginPaper_[cell0];
+                    }
+                    else
+                    {
+                        Tsurface_[cell0] = TsurfaceThick;
+                    }
+                }
+            }
+        }
     }    //for all patches of pyrolysis zone.
 
     reduce(QnetMax,maxOp<scalar>());
