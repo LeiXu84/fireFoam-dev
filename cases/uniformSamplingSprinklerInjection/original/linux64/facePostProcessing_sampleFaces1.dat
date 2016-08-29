@@ -1,7 +1,0 @@
-# Source    : facePostProcessing
-# Face zone : sampleFaces1
-# Faces     : 400
-# Area      : 144
-# Time	mass	massFlowRate
-1	4.57433	4.57433
-2	12.679	8.10465

@@ -65,15 +65,15 @@ functions
 
     HRR
     {
-        type            cellSource;
+        type            volFieldValue;
         //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
         writeControl    timeStep;  //writeTime;
         writeInterval  1;
         log             false;     
-        valueOutput     false;
-        source          all;       //cellZone;
-        sourceName      c0;
+        writeFields     false;
+        regionType      all;       //cellZone;
+        name            c0;
         operation       volIntegrate;
         fields
         (
@@ -90,7 +90,7 @@ functions
         writeInterval  1;
         mode            magnitude;
         log             true;
-        valueOutput     false;
+        writeFields     false;
         fields
         (
             T

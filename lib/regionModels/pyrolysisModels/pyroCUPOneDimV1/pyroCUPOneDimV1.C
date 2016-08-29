@@ -1410,6 +1410,7 @@ void pyroCUPOneDimV1::evolveRegion()
            const Foam::constHTemperatureFvPatchScalarField& TBCBackBnd = refCast<const Foam::constHTemperatureFvPatchScalarField>(TbackBnd);
            const scalarField& TUC = tempUC_.boundaryField()[patchI];
            constHTemperatureFvPatchScalarField& TBCBack = const_cast<constHTemperatureFvPatchScalarField&>(TBCBackBnd);
+           // DEBUGP(TUC.size());
            TBCBack.setTInf(TUC);
 
     }

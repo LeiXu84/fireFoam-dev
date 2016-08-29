@@ -66,12 +66,12 @@ drippingInjection::drippingInjection
             rndGen_
         )
     ),
-    diameter_(owner.regionMesh().nCells(), 0.0)
+    diameter_(owner.regionMesh().nCells(), 0.0) // kvm
 {
-    forAll(diameter_, faceI)
-    {
-        diameter_[faceI] = parcelDistribution_->sample();
-    }
+    forAll(diameter_, faceI) // kvm
+    { // kvm
+        diameter_[faceI] = parcelDistribution_->sample(); // kvm
+    } // kvm
 }
 
 

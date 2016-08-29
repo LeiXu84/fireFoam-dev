@@ -71,7 +71,7 @@ const thermoSingleLayer& liquidFilmThermo::thermoFilm() const
 
 void liquidFilmThermo::initLiquid(const dictionary& dict)
 {
-    if (liquidPtr_ != NULL)
+    if (liquidPtr_ != nullptr)
     {
         return;
     }
@@ -108,13 +108,13 @@ liquidFilmThermo::liquidFilmThermo
 :
     filmThermoModel(typeName, owner, dict),
     name_("unknown_liquid"),
-    liquidPtr_(NULL),
+    liquidPtr_(nullptr),
     ownLiquid_(false),
     useReferenceValues_(readBool(coeffDict_.lookup("useReferenceValues"))),
     pRef_(0.0),
-    TRef_(0.0),
-    Tmin_(-VGREAT),
-    Tmax_(VGREAT)
+    TRef_(0.0), // kvm
+    Tmin_(-VGREAT), // kvm
+    Tmax_(VGREAT) // kvm
 
 {
     initLiquid(coeffDict_);
@@ -124,18 +124,18 @@ liquidFilmThermo::liquidFilmThermo
         coeffDict_.lookup("pRef") >> pRef_;
         coeffDict_.lookup("TRef") >> TRef_;
     }
-    else
-    {
-        if (coeffDict_.readIfPresent("Tmin", Tmin_))
-        {
-            Info<< "    limiting minimum film temperature for property evaluaiton to " << Tmin_ << endl;
-        }
+    else // kvm
+    { // kvm
+        if (coeffDict_.readIfPresent("Tmin", Tmin_)) // kvm
+        { // kvm
+            Info<< "    limiting minimum film temperature for property evaluaiton to " << Tmin_ << endl; // kvm
+        } // kvm
 
-        if (coeffDict_.readIfPresent("Tmax", Tmax_))
-        {
-            Info<< "    limiting maximum film temperature for property evaluation to " << Tmax_ << endl;
-        }
-    }
+        if (coeffDict_.readIfPresent("Tmax", Tmax_)) // kvm
+        { // kvm
+            Info<< "    limiting maximum film temperature for property evaluation to " << Tmax_ << endl; // kvm
+        } // kvm
+    } // kvm
 }
 
 
@@ -288,7 +288,7 @@ tmp<volScalarField> liquidFilmThermo::rho() const
 
         forAll(rho, celli)
         {
-            const scalar Ts = max(min(T[celli],Tmax_),Tmin_);
+            const scalar Ts = max(min(T[celli],Tmax_),Tmin_); // kvm
             rho[celli] = this->rho(p[celli], T[celli]);
         }
     }
@@ -337,8 +337,8 @@ tmp<volScalarField> liquidFilmThermo::mu() const
 
         forAll(mu, celli)
         {
-            const scalar Ts = max(min(T[celli],Tmax_),Tmin_);
-            mu[celli] = this->mu(p[celli], Ts);
+            const scalar Ts = max(min(T[celli],Tmax_),Tmin_); // kvm
+            mu[celli] = this->mu(p[celli], Ts); // kvm
         }
     }
 
@@ -386,8 +386,8 @@ tmp<volScalarField> liquidFilmThermo::sigma() const
 
         forAll(sigma, celli)
         {
-            const scalar Ts = max(min(T[celli],Tmax_),Tmin_);
-            sigma[celli] = this->sigma(p[celli], Ts);
+            const scalar Ts = max(min(T[celli],Tmax_),Tmin_); // kvm
+            sigma[celli] = this->sigma(p[celli], Ts); // kvm
         }
     }
 
@@ -435,8 +435,8 @@ tmp<volScalarField> liquidFilmThermo::Cp() const
 
         forAll(Cp, celli)
         {
-            const scalar Ts = max(min(T[celli],Tmax_),Tmin_);
-            Cp[celli] = this->Cp(p[celli], Ts);
+            const scalar Ts = max(min(T[celli],Tmax_),Tmin_); // kvm
+            Cp[celli] = this->Cp(p[celli], Ts); // kvm
         }
     }
 
@@ -484,8 +484,8 @@ tmp<volScalarField> liquidFilmThermo::kappa() const
 
         forAll(kappa, celli)
         {
-            const scalar Ts = max(min(T[celli],Tmax_),Tmin_);
-            kappa[celli] = this->kappa(p[celli], Ts);
+            const scalar Ts = max(min(T[celli],Tmax_),Tmin_); // kvm
+            kappa[celli] = this->kappa(p[celli], Ts); // kvm
         }
     }
 

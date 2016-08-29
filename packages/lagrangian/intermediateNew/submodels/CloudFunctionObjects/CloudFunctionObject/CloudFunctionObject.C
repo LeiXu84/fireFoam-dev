@@ -24,8 +24,8 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "CloudFunctionObject.H"
-#include "cloud.H"
-#include "Pstream.H"
+#include "cloud.H" // kvm
+#include "Pstream.H" // kvm
 
 // * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * * //
 #define DEBUG(x) {                                              \

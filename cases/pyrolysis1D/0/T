@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 
@@ -26,9 +26,9 @@ boundaryField
 {
     outlet          
     {
-	type		inletOutlet;
-	inletValue	$internalField;
-	value		$internalField;
+        type        inletOutlet;
+        inletValue  $internalField;
+        value       $internalField;
     }
 
     ground           
@@ -38,9 +38,9 @@ boundaryField
 
     side          
     {
-	type		inletOutlet;
-	inletValue	$internalField;
-	value		$internalField;
+        type        inletOutlet;
+        inletValue  $internalField;
+        value       $internalField;
     }
 
     frontAndBack    
@@ -58,7 +58,7 @@ boundaryField
         neighbourFieldRadiativeName none;
         fieldRadiativeName Qr;
         QrIncident      60000;
-        emissivityMode	solidRadiation;
+        emissivityMode  solidRadiation;
         value           $internalField;
 */
     }

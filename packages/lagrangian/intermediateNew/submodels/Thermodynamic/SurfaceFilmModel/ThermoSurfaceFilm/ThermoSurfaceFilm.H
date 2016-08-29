@@ -160,8 +160,8 @@ protected:
             const vector& tanVec1,
             const vector& tanVec2,
             const vector& nf,
-            const vector& dropTan,
-            const scalar& beta
+            const vector& dropTan, // kvm
+            const scalar& beta // kvm
         ) const;
 
 

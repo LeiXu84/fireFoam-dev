@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     #include "createControl.H"
     #include "createFields.H"
     #include "createFieldRefs.H"
-    #include "infoFieldsOutput.H"
+    #include "infoFieldsOutput.H" // fm
     #include "createFvOptions.H"
     #include "initContinuityErrs.H"
     #include "createTimeControls.H"
@@ -118,20 +118,20 @@ int main(int argc, char *argv[])
 
             rho = thermo.rho();
 
-            #include "infoOutput.H"
+            #include "infoOutput.H" // fm
 
         }
 
         runTime.write();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
-            << "  ClockTime = " << runTime.elapsedClockTime() << " s";
+            << "  ClockTime = " << runTime.elapsedClockTime() << " s"; // kvm
 
-        if (runTime.writeTime())
+        if (runTime.writeTime()) // kvm
         {
-            Info<< " +";
+            Info<< " +"; // kvm
         }
-        Info<< nl << endl;
+        Info<< nl << endl; // kvm
 
     }
 

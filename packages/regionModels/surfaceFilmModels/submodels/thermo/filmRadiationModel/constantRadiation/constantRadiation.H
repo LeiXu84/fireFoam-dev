@@ -72,7 +72,7 @@ private:
         scalar absorptivity_;
 
         //- Incident radiation (used for turbulentTemp.. BC)
-        volScalarField Qin_;
+        volScalarField Qin_; // kvm
 
         //- Time start [s]
         const scalar timeStart_;

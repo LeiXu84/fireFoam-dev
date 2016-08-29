@@ -1,3 +1,9 @@
+2016-08-29: Version 16.08.29
+	Upgraded to latest OpenFOAM-dev 
+        commit 12ee01790182eddc3e63ba369ef1e88d2d7739fa
+        Author: Henry Weller <http://cfd.direct>
+        Date:   Thu Aug 25 16:42:08 2016 +0100
+
 2016-06-16: Version 16.06.16
 	Upgraded to latest OpenFOAM-dev
 

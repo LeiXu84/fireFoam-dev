@@ -331,7 +331,7 @@ tmp<Foam::fvVectorMatrix> kinematicSingleLayer::solveMomentum
         InfoInFunction << endl;
     }
 
-    updateSurfaceVelocities();
+    updateSurfaceVelocities(); // kvm
 
     // Momentum
     tmp<fvVectorMatrix> tUEqn
@@ -622,7 +622,7 @@ kinematicSingleLayer::kinematicSingleLayer
             "phi",
             time().timeName(),
             regionMesh(),
-            IOobject::READ_IF_PRESENT,
+            IOobject::READ_IF_PRESENT, // kvm
             IOobject::AUTO_WRITE
         ),
         regionMesh(),
@@ -835,9 +835,9 @@ kinematicSingleLayer::kinematicSingleLayer
 
         correctThermoFields();
 
-        // delta needs to be initialized before deltaRho_ calculation (call bc)
+        // delta needs to be initialized before deltaRho_ calculation (call bc) // kvm
         deltaRho_ == delta_*rho_;
-        // U_ needs to be initialized before phi_ calculation (call bc)
+        // U_ needs to be initialized before phi_ calculation (call bc) // kvm
         surfaceScalarField phi0
         (
             IOobject
@@ -911,7 +911,7 @@ void kinematicSingleLayer::preEvolveRegion()
     //availableMass_ = mass();
     availableMass_ = netMass();
     cloudMassTrans_ == dimensionedScalar("zero", dimMass, 0.0);
-    cloudDiameterTrans_ == dimensionedScalar("zero", dimLength, -1.0);
+    cloudDiameterTrans_ == dimensionedScalar("zero", dimLength, -1.0); // kvm
 }
 
 
@@ -953,8 +953,8 @@ void kinematicSingleLayer::evolveRegion()
     // Update deltaRho_ with new delta_
     deltaRho_ == delta_*rho_;
 
-    // Update film wall and surface velocities
-    updateSurfaceVelocities();
+    // Update film wall and surface velocities // kvm
+    updateSurfaceVelocities(); // kvm
 
     // Reset source terms for next time integration
     resetPrimaryRegionSourceTerms();
@@ -1111,8 +1111,8 @@ void kinematicSingleLayer::info()
 {
     Info<< "\nSurface film: " << type() << endl;
 
-    const scalarField& deltaInternal = delta_.primitiveField();
-    const vectorField& Uinternal = U_.primitiveField();
+    const scalarField& deltaInternal = delta_.primitiveField(); // kvm
+    const vectorField& Uinternal = U_.primitiveField(); // kvm
     scalar addedMassTotal = 0.0;
     outputProperties().readIfPresent("addedMassTotal", addedMassTotal);
     addedMassTotal += returnReduce(addedMassTotal_, sumOp<scalar>());
@@ -1131,11 +1131,11 @@ void kinematicSingleLayer::info()
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> kinematicSingleLayer::Srho() const
+tmp<volScalarField::Internal> kinematicSingleLayer::Srho() const
 {
-    return tmp<DimensionedField<scalar, volMesh>>
+    return tmp<volScalarField::Internal>
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (
@@ -1153,14 +1153,14 @@ tmp<DimensionedField<scalar, volMesh>> kinematicSingleLayer::Srho() const
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> kinematicSingleLayer::Srho
+tmp<volScalarField::Internal> kinematicSingleLayer::Srho
 (
     const label i
 ) const
 {
-    return tmp<DimensionedField<scalar, volMesh>>
+    return tmp<volScalarField::Internal>
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (
@@ -1178,11 +1178,11 @@ tmp<DimensionedField<scalar, volMesh>> kinematicSingleLayer::Srho
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> kinematicSingleLayer::Sh() const
+tmp<volScalarField::Internal> kinematicSingleLayer::Sh() const
 {
-    return tmp<DimensionedField<scalar, volMesh>>
+    return tmp<volScalarField::Internal>
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (

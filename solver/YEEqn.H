@@ -30,14 +30,13 @@ tmp<fv::convectionScheme<scalar>> mvConvection
     // dQ is only for diagnostic purposes.
     // TODO: set dQ = combustoin->dQ(); once OpenCFD updates
     //       greyAbsorptionEmission model in OpenFOAM source
-    dQ = combustion->Sh();
+    dQ = combustion->Sh(); // kvm
 
-    label inertIndex = -1;
     volScalarField Yt(0.0*Y[0]);
 
     forAll(Y, i)
     {
-        if (Y[i].name() != inertSpecie)
+        if (i != inertIndex && composition.active(i))
         {
             volScalarField& Yi = Y[i];
 
@@ -65,13 +64,10 @@ tmp<fv::convectionScheme<scalar>> mvConvection
             Yi.max(0.0);
             Yt += Yi;
         }
-        else
-        {
-            inertIndex = i;
-        }
     }
 
-    Y[inertIndex] == scalar(1) - Yt;
+    // Y[inertIndex] = scalar(1) - Yt;
+    Y[inertIndex] == scalar(1) - Yt; // kvm
     Y[inertIndex].max(0.0);
 
     forAll(Y, i){

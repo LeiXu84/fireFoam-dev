@@ -64,23 +64,23 @@ thermocapillaryForce::~thermocapillaryForce()
 tmp<fvVectorMatrix> thermocapillaryForce::correct(volVectorField& U)
 {
     const volScalarField& sigma = owner_.sigma();
-    const volScalarField& deltaf = owner_.delta();
-    const dimensionedScalar delta0("d0", dimLength, 1e-4);
+    const volScalarField& deltaf = owner_.delta(); // kvm
+    const dimensionedScalar delta0("d0", dimLength, 1e-4); // kvm
 
-    tmp<volScalarField>
-        tRatio(deltaf/delta0);
-    tRatio->min(1.0);
+    tmp<volScalarField> // kvm
+        tRatio(deltaf/delta0); // kvm
+    tRatio->min(1.0); // kvm
 
     tmp<fvVectorMatrix>
         tfvm(new fvVectorMatrix(U, dimForce/dimArea*dimVolume));
 
     // TODO: use estimated surface temperature here instead of mean film temperature
-    tfvm.ref() += fvc::grad(sigma)*tRatio;
+    tfvm.ref() += fvc::grad(sigma)*tRatio; // kvm
 
-    if(owner_.time().outputTime()){
+    if(owner_.time().outputTime()){ // kvm
         // tmp<volVectorField> tGradSigma(fvc::grad(sigma));
         // tGradSigma->write();
-    }
+    } // kvm
 
     return tfvm;
 }

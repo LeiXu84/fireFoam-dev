@@ -23,7 +23,7 @@
 
   \*---------------------------------------------------------------------------*/
 
-#include "UniformSamplingSprinklerInjection.H"
+#include "DetailedSprinklerInjection.H"
 #include "TimeFunction1.H"
 #include "mathematicalConstants.H"
 #include "distributionModel.H"
@@ -55,7 +55,7 @@ using namespace Foam::constant;
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInjection
+Foam::DetailedSprinklerInjection<CloudType>::DetailedSprinklerInjection
 (
     const dictionary& dict,
     CloudType& owner,
@@ -126,23 +126,41 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     activeSprinklerIndex_(-1),
     injectionDeltaT_(0.),
     sampleSize_(0),
+    tableName_("none"),
+    sprinkler_("none"),
+    orientation_("none"),
     nEle_(0),
     nAzi_(0),
-    pressure_(0.),
+    operatingPressure_(0.),
+    tablePressures_(),
     kFactor_(0.),
-    radius_(0.),
+    sampledRadius_(0.),
     idealFlowRate_(0.),
     rndGen_(0),
     cachedRndGen_(2,20000),
-    avgFlux_(),
-    dv50_(0.0),
+    phiTables_(),
+    thetaTables_(),
+    volFluxTables_(),
+    dv50Tables_(),
+    velMagTables_(),
+    volFlux_(),
+    volFlow_(),
+    volFlowHist_(),
+    diameterHist_(),
+    particleHist_(),
+    mappedIndices_(),
+    dv50_(),
     velMag_(),
     area_(),
     avgVelMag_(),
     ele_(),
     azi_(),
+    eleMin_(),
+    aziMin_(),
+    eleMax_(),
+    aziMax_(),
     parcelParticles_(),
-    sampleAvgFlux_(),
+    sampleVolFlow_(),
     sampleD_(),
     sampleArea_(),
     sampleAvgVelMag_(),
@@ -155,11 +173,15 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
 
     readTableData();
 
+    interpolatePressure();
+
+    computeAreas();
+
+    computeVolFlow();
+
     idealFlowRate_ = computeIdealFlowRate(); // L/s
 
     computeInjectionProperties();
-
-    setSampleSizes();
 
     // scalar injectionDeltaT = 0.001;
     // sampleInjectionTable(injectionDeltaT);
@@ -172,7 +194,11 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     // Dynamically set sampleSize_ based on time step
     // This will result in particles being injected at each timestep
     sampleSize_ = round(parcelsPerSecond_*injectionDeltaT_);
+    /*DEBUG(injectionDeltaT_);*/
+    /*DEBUG(parcelsPerSecond_);*/
+    /*DEBUG(sampleSize_);*/
     setSampleSizes();
+
     totalParcels_ = sampleSize_;
 
     // writeVolumeFluxSprinklerInjectionProfile();
@@ -184,7 +210,7 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     {
         FatalErrorIn
         (
-            "UniformSamplingSprinklerInjection()"
+            "DetailedSprinklerInjection()"
         )
             << "Sprinkler orientation " << direction_ << nl
             << "and arm orientation " << armDirection_ << nl
@@ -196,6 +222,7 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     // this->volumeTotal_ = flowRateProfile_.integrate(0.0, duration_); // m3
     scalar conversionLiterPerM3 = 1000.0;
     this->volumeTotal_ = idealFlowRate_*conversionLiterPerM3*duration_; // m3
+    /*DEBUG(this->volumeTotal_);*/
 
     cacheInjectorCells();
 
@@ -203,10 +230,11 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
         writeSprinklerHeader();
     }
 }
+
 template<class CloudType>
-Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInjection
+Foam::DetailedSprinklerInjection<CloudType>::DetailedSprinklerInjection
 (
-    const UniformSamplingSprinklerInjection<CloudType>& im
+    const DetailedSprinklerInjection<CloudType>& im
     )
     :
     InjectionModel<CloudType>(im),
@@ -245,23 +273,41 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
     activeSprinklerIndex_(im.activeSprinklerIndex_),
     injectionDeltaT_(im.injectionDeltaT_),
     sampleSize_(im.sampleSize_),
+    tableName_(im.tableName_),
+    sprinkler_(im.sprinkler_),
+    orientation_(im.orientation_),
     nEle_(im.nEle_),
     nAzi_(im.nAzi_),
-    pressure_(im.pressure_),
+    operatingPressure_(im.operatingPressure_),
+    tablePressures_(im.tablePressures_),
     kFactor_(im.kFactor_),
-    radius_(im.radius_),
+    sampledRadius_(im.sampledRadius_),
     idealFlowRate_(im.idealFlowRate_),
     rndGen_(im.rndGen_),
     cachedRndGen_(im.cachedRndGen_),
-    avgFlux_(im.avgFlux_),
+    phiTables_(im.phiTables_),
+    thetaTables_(im.thetaTables_),
+    volFluxTables_(im.volFluxTables_),
+    dv50Tables_(im.dv50Tables_),
+    velMagTables_(im.velMagTables_),
+    volFlux_(im.volFlux_),
+    volFlow_(im.volFlow_),
+    volFlowHist_(im.volFlowHist_),
+    diameterHist_(im.diameterHist_),
+    particleHist_(im.particleHist_),
+    mappedIndices_(im.mappedIndices_),
     dv50_(im.dv50_),
     velMag_(im.velMag_),
     area_(im.area_),
     avgVelMag_(im.avgVelMag_),
     ele_(im.ele_),
     azi_(im.azi_),
+    eleMin_(im.eleMin_),
+    aziMin_(im.aziMin_),
+    eleMax_(im.eleMax_),
+    aziMax_(im.aziMax_),
     parcelParticles_(im.parcelParticles_),
-    sampleAvgFlux_(im.sampleAvgFlux_),
+    sampleVolFlow_(im.sampleVolFlow_),
     sampleD_(im.sampleD_),
     sampleArea_(im.sampleArea_),
     sampleAvgVelMag_(im.sampleAvgVelMag_),
@@ -274,20 +320,20 @@ Foam::UniformSamplingSprinklerInjection<CloudType>::UniformSamplingSprinklerInje
 // * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::UniformSamplingSprinklerInjection<CloudType>::~UniformSamplingSprinklerInjection()
+Foam::DetailedSprinklerInjection<CloudType>::~DetailedSprinklerInjection()
 {}
 
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::timeEnd() const
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::timeEnd() const
 {
     return this->SOI_ + duration_;
 }
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::timeStart()
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::timeStart()
 {
     nActivatedSprinklers_=0;
     for(label i=0;i<nSprinklers_;i++)
@@ -339,7 +385,7 @@ Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::timeStart()
 
 
 template<class CloudType>
-Foam::label Foam::UniformSamplingSprinklerInjection<CloudType>::parcelsToInject
+Foam::label Foam::DetailedSprinklerInjection<CloudType>::parcelsToInject
 (
     const scalar time0,
     const scalar time1
@@ -354,23 +400,14 @@ Foam::label Foam::UniformSamplingSprinklerInjection<CloudType>::parcelsToInject
     // This will result in particles being injected at each timestep
     sampleSize_ = round(parcelsPerSecond_*injectionDeltaT_);
 
+    /*DEBUG(injectionDeltaT_);*/
+    /*DEBUG(sampleSize_);*/
     setSampleSizes();
     totalParcels_ = sampleSize_;
 
     if ((time0 >= 0.0) && (time0 < duration_))
     {
-        label numberparcels =
-            round((time1 - time0)*(parcelsPerSecond_*nActivatedSprinklers_));
-        // if(numberparcels == 0)
-        //    {return numberparcels;}
-        if(numberparcels < totalParcels_*nActivatedSprinklers_)
-        {
-            return 0;
-        }
-        else
-        {
-            return totalParcels_*nActivatedSprinklers_ ;  // this needs to be modified (kvm)
-        }
+        return totalParcels_*nActivatedSprinklers_ ;
     }
     else
     {
@@ -380,7 +417,7 @@ Foam::label Foam::UniformSamplingSprinklerInjection<CloudType>::parcelsToInject
 
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::volumeToInject
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::volumeToInject
 (
     const scalar time0,
     const scalar time1
@@ -402,13 +439,40 @@ Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::volumeToInject
 
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setParcelDirVec
+void Foam::DetailedSprinklerInjection<CloudType>::setParcelDirVec
 (
     scalar elevationAngle,
     scalar azimuthalAngle
     )
 {
+    /*DEBUG("setParcelDirVec");*/
     const scalar deg2Rad = pi/180.0;
+ 
+    // randomize quadrant
+    label quadrant = -1;
+    if(Pstream::master()){
+        quadrant = rndGen_.integer(0,3);
+    }
+    reduce(quadrant,maxOp<scalar>());
+    /*DEBUG(quadrant);*/
+    switch(quadrant)
+    {
+        case 0:
+            azimuthalAngle = azimuthalAngle;
+            break;
+        case 1:
+            azimuthalAngle = 180.0-azimuthalAngle;
+            break;
+        case 2:
+            azimuthalAngle = 180.0+azimuthalAngle;
+            break;
+        case 3:
+            azimuthalAngle = 360.0-azimuthalAngle;
+            break;
+        default:
+            DEBUG("something is wrong!");
+    }
+    /*DEBUG(azimuthalAngle);*/
     scalar alpha = cos(elevationAngle*deg2Rad);
     scalar dCorr = sin(elevationAngle*deg2Rad);
     vector normal = alpha*(tanVec1_*cos(azimuthalAngle*deg2Rad) + tanVec2_*sin(azimuthalAngle*deg2Rad));
@@ -423,7 +487,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setParcelDirVec
 
 /* Called from InjectionModel::inject() in base class */
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setPositionAndCell
+void Foam::DetailedSprinklerInjection<CloudType>::setPositionAndCell
 (
     const label parcelI_global,
     const label,
@@ -434,8 +498,6 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setPositionAndCell
     label& tetPtI
     )
 {
-
-    // DEBUG("enter setPositionAndCell");
 
     bool firstParcel=false;
     if(parcelI_global == 0){
@@ -468,21 +530,23 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setPositionAndCell
     parcelIndex_ = parcelI;
 
     // ideally, this should be a random value within the min/max of sample angle
-    scalar maxEleVar = nEle_/91.;
-    scalar maxAziVar = nAzi_/360.;
+    // scalar maxEleVar = nEle_/91.;
+    // scalar maxAziVar = nAzi_/360.;
     scalar variationEle = -1.0;
     scalar variationAzi = -1.0;
+    label index = mappedIndices_[parcelI];
     if(Pstream::master()){
-        variationEle = maxEleVar*(rndGen_.scalar01()-0.5);
-        variationAzi = maxAziVar*(rndGen_.scalar01()-0.5);
+        variationEle = (eleMax_[index]-eleMin_[index])*(rndGen_.scalar01()-0.0);
+        variationAzi = (aziMax_[index]-aziMin_[index])*(rndGen_.scalar01()-0.0);
     }
     reduce(variationEle,maxOp<scalar>());
     reduce(variationAzi,maxOp<scalar>());
     // variationEle = 0.0;
     // variationAzi = 0.0;
-    scalar elevationAngle = sampleEle_[parcelI]+variationEle;
-    scalar azimuthalAngle = sampleAzi_[parcelI]+variationAzi;
+    scalar elevationAngle = eleMin_[index]+variationEle; // sampleEle_[parcelI]+variationEle;
+    scalar azimuthalAngle = aziMin_[index]+variationAzi; // sampleAzi_[parcelI]+variationAzi;
     
+    /*Info << "DetailedInjection azi: " << aziMin_[index] << " " << azi_[index] << " " << aziMax_[index] << " " << variationAzi << " " << azimuthalAngle << endl;*/
     /*Allow central jet to cover a range of angles*/
     if (elevationAngle > centralCoreAngle_){
         elevationAngle = 90.0;
@@ -510,7 +574,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setPositionAndCell
 
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setParticleDiameter
+void Foam::DetailedSprinklerInjection<CloudType>::setParticleDiameter
 (
     typename CloudType::parcelType& parcel
 )
@@ -526,7 +590,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setParticleDiameter
 }
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setParticleVelocity
+void Foam::DetailedSprinklerInjection<CloudType>::setParticleVelocity
 (
     typename CloudType::parcelType& parcel
 )
@@ -562,7 +626,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setParticleVelocity
 
 /* Called from InjectionModel::inject() in base class */
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setProperties
+void Foam::DetailedSprinklerInjection<CloudType>::setProperties
 (
     const label parcelI,
     const label,
@@ -584,20 +648,20 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setProperties
 
 
 template<class CloudType>
-bool Foam::UniformSamplingSprinklerInjection<CloudType>::fullyDescribed() const
+bool Foam::DetailedSprinklerInjection<CloudType>::fullyDescribed() const
 {
     return false;
 }
 
 
 template<class CloudType>
-bool Foam::UniformSamplingSprinklerInjection<CloudType>::validInjection(const label)
+bool Foam::DetailedSprinklerInjection<CloudType>::validInjection(const label)
 {
     return true;
 }
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::setNumberOfParticles
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::setNumberOfParticles
 (
     const label parcels,
     const scalar volume,
@@ -612,7 +676,7 @@ Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::setNumberOfPart
 }
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::computeLinkTemperature
+void Foam::DetailedSprinklerInjection<CloudType>::computeLinkTemperature
 (
     const label sprinklerIndex
 )
@@ -668,7 +732,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeLinkTemperature
 
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::cacheInjectorCells()
+void Foam::DetailedSprinklerInjection<CloudType>::cacheInjectorCells()
 {
     // Set/cache the injector cell
     // this is the location used for the rti calculation
@@ -690,7 +754,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::cacheInjectorCells()
 
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::writeVolumeFluxSprinklerInjectionProfile()
+void Foam::DetailedSprinklerInjection<CloudType>::writeVolumeFluxSprinklerInjectionProfile()
 {
     // OFstream osP("sprinklerInjectionProfile");
 
@@ -718,7 +782,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::writeVolumeFluxSprinkle
 
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::treatSprinklerActivation()
+void Foam::DetailedSprinklerInjection<CloudType>::treatSprinklerActivation()
 {
     if(activeLinks_){
         //sprinkler to be activated via RTI calculation
@@ -770,7 +834,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::treatSprinklerActivatio
 }
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::writeSprinklerHeader()
+void Foam::DetailedSprinklerInjection<CloudType>::writeSprinklerHeader()
 {
 
     const fileName logDir = "sprinklerPostProcessing"/this->owner().time().timeName();
@@ -795,7 +859,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::writeSprinklerHeader()
 }
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::writeSprinklerData()
+void Foam::DetailedSprinklerInjection<CloudType>::writeSprinklerData()
 {
 
     // write to file sprinklerRti.dat
@@ -833,152 +897,240 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::writeSprinklerData()
 //- Lookup table functions
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::readTableData()
+void Foam::DetailedSprinklerInjection<CloudType>::readTableData()
 {
 
     Info << "Reading sprinkler injection lookup table data\n";
 
-    tableDirectory_ = this->coeffDict().subDict("lookupTableCoeffs").template lookupOrDefault< word >("tableDirectory","");
-    fileName dirName;
+    tableName_ = this->coeffDict().subDict("lookupTableCoeffs").template lookupOrDefault< word >("tableName","");
+    fileName constant;
     if(Pstream::parRun()){
-        dirName =
-            ".."/this->owner().db().time().constant()/tableDirectory_;
+        constant =
+            ".."/this->owner().db().time().constant();
     }
     else{
-        Info << "tableDirectory_: " << tableDirectory_ << endl;
-        dirName =
-            this->owner().db().time().constant()/tableDirectory_;
+        Info << "tableName_: " << tableName_ << endl;
+        constant =
+            this->owner().db().time().constant();
     }
+
+    operatingPressure_ = readScalar(this->coeffDict().subDict("lookupTableCoeffs").lookup("operatingPressure"));
 
     {
         IOdictionary dict
+        (
+            IOobject
             (
-                IOobject
-                (
-                    "lookup.foam.header",
-                    dirName,
-                    // this->owner().db().time().constant()+"/"+tableDirectory_,
-                    this->owner().db(),
-                    IOobject::MUST_READ_IF_MODIFIED,
-                    IOobject::NO_WRITE
-                    )
-                );
+                tableName_,
+                constant,
+                this->owner().db(),
+                IOobject::MUST_READ_IF_MODIFIED,
+                IOobject::NO_WRITE
+            )
+        );
+        sprinkler_ = dict.template lookupOrDefault< word >("sprinkler","not defined");
+        kFactor_ = readScalar(dict.lookup("kFactor")); // gpm/psi^0.5
         nEle_ = readLabel(dict.lookup("nEle"));
         nAzi_ = readLabel(dict.lookup("nAzi"));
-        pressure_ = readScalar(dict.lookup("pressure"));
-        kFactor_ = readScalar(dict.lookup("kFactor"));
-        radius_ = readScalar(dict.lookup("radius"));
-        Info << "radius " << radius_<< nl;
-    }
+        sampledRadius_ = readScalar(dict.lookup("radius"));
+        Info << "sampledRadius_ " << sampledRadius_<< nl;
+        orientation_ = dict.template lookupOrDefault< word >("orientation","not defined");
 
-    {
-        IOdictionary dict
-            (
-                IOobject
-                (
-                    "lookup.foam.avgFlux",
-                    dirName,
-                    // this->owner().db().time().constant()/tableDirectory_,
-                    // this->owner().db().time().constant(),
-                    this->owner().db(),
-                    IOobject::MUST_READ_IF_MODIFIED,
-                    IOobject::NO_WRITE
-                    )
-                );
-        dict.lookup("avgFlux") >> avgFlux_;
-    }
+        /*Info << dict.toc();*/
 
-    // {
-    //     IOdictionary dict
-    //         (
-    //             IOobject
-    //             (
-    //                 "lookup.foam.dv50",
-    //                 dirName,
-    //                 // this->owner().db().time().constant()/tableDirectory_,
-    //                 // this->owner().db().time().constant(),
-    //                 this->owner().db(),
-    //                 IOobject::MUST_READ_IF_MODIFIED,
-    //                 IOobject::NO_WRITE
-    //                 )
-    //             );
-    //     dict.lookup("dv50") >> dv50_;
-    // }
+        const dictionary& pressuresDict = dict.subDict("pressures");
+        /*Info << pressuresDict.toc();*/
+        const wordList pressureNames(pressuresDict.toc());
+        /*Info << pressureNames << endl;*/
+        forAll(pressureNames,i)
+        {
+            const dictionary& pressureSubDict = pressuresDict.subDict(pressureNames[i]);
+            tablePressures_.append(readScalar(pressureSubDict.lookup("pressure")));
+            /*Info << tablePressures_ << endl;*/
 
-    {
-        IOdictionary dict
-            (
-                IOobject
-                (
-                    "lookup.foam.area",
-                    dirName,
-                    // this->owner().db().time().constant()/tableDirectory_,
-                    // this->owner().db().time().constant(),
-                    this->owner().db(),
-                    IOobject::MUST_READ_IF_MODIFIED,
-                    IOobject::NO_WRITE
-                    )
-                );
-        dict.lookup("area") >> area_;
-    }
+            phiTables_.append(pressureSubDict.lookup("phi"));
+            thetaTables_.append(pressureSubDict.lookup("theta"));
+            volFluxTables_.append(pressureSubDict.lookup("volFlux"));
+            dv50Tables_.append(pressureSubDict.lookup("dv50"));
+            velMagTables_.append(pressureSubDict.lookup("velMag"));
 
-//    {
-//        IOdictionary dict
-//            (
-//                IOobject
-//                (
-//                    "lookup.foam.avgVelMag",
-//                    dirName,
-//                    // this->owner().db().time().constant()/tableDirectory_,
-//                    // this->owner().db().time().constant(),
-//                    this->owner().db(),
-//                    IOobject::MUST_READ_IF_MODIFIED,
-//                    IOobject::NO_WRITE
-//                    )
-//                );
-//        dict.lookup("avgVelMag") >> avgVelMag_;
-//    }
+        }
+        azi_.resize(phiTables_[0].size());
+        ele_.resize(thetaTables_[0].size());
+        azi_ = phiTables_[0]; // azi, phi
+        ele_ = thetaTables_[0]; // ele, theta
 
-    {
-        IOdictionary dict
-            (
-                IOobject
-                (
-                    "lookup.foam.ele",
-                    dirName,
-                    // this->owner().db().time().constant()/tableDirectory_,
-                    // this->owner().db().time().constant(),
-                    this->owner().db(),
-                    IOobject::MUST_READ_IF_MODIFIED,
-                    IOobject::NO_WRITE
-                    )
-                );
-        dict.lookup("ele") >> ele_;
-    }
-
-    {
-        IOdictionary dict
-            (
-                IOobject
-                (
-                    "lookup.foam.azi",
-                    dirName,
-                    // this->owner().db().time().constant()/tableDirectory_,
-                    // this->owner().db().time().constant(),
-                    this->owner().db(),
-                    IOobject::MUST_READ_IF_MODIFIED,
-                    IOobject::NO_WRITE
-                    )
-                );
-        dict.lookup("azi") >> azi_;
     }
 
     return;
 }
 
+template<class CloudType>
+void Foam::DetailedSprinklerInjection<CloudType>::interpolatePressure()
+{
+
+    Info << "Interpolate table data to operating pressure\n";
+
+    // identify interpolation indices and weighting
+    label begin = 0;
+    label end = tablePressures_.size()-1;
+
+    volFlux_.resize(volFluxTables_[begin].size());
+    dv50_.resize(dv50Tables_[begin].size());
+    velMag_.resize(velMagTables_[begin].size());
+
+    if(tablePressures_.size()==1)
+    {
+        volFlux_ = volFluxTables_[begin];
+        dv50_ = dv50Tables_[begin];
+        velMag_ = velMagTables_[begin];
+    }
+    else if(operatingPressure_ <= tablePressures_[begin])
+    {
+        volFlux_ = (volFluxTables_[begin+1]-volFluxTables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+volFluxTables_[begin];
+        dv50_ = (dv50Tables_[begin+1]-dv50Tables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+dv50Tables_[begin];
+        velMag_ = (velMagTables_[begin+1]-velMagTables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+velMagTables_[begin];
+    }
+    else if(operatingPressure_ >= tablePressures_[end])
+    {
+        volFlux_ = (volFluxTables_[end]-volFluxTables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+volFluxTables_[end];
+        dv50_ = (dv50Tables_[end]-dv50Tables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+dv50Tables_[end];
+        velMag_ = (velMagTables_[end]-velMagTables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+velMagTables_[end];
+    }
+    else
+    {
+        for(label i=0;i<tablePressures_.size()-1;i++)
+        {
+            label i1 = i;
+            label i2 = i+1;
+            if(operatingPressure_ > tablePressures_[i1] && operatingPressure_ <= tablePressures_[i2])
+            {
+                scalar weight = (operatingPressure_-tablePressures_[i1])/(tablePressures_[i2]-tablePressures_[i1]);
+                volFlux_ = (1.0-weight)*volFluxTables_[i1]+weight*volFluxTables_[i2];
+                dv50_ = (1.0-weight)*dv50Tables_[i1]+weight*dv50Tables_[i2];
+                velMag_ = (1.0-weight)*velMagTables_[i1]+weight*velMagTables_[i2];
+            }
+        }
+    }
+
+    /*Info << "volFlux: " << volFlux_ << endl;*/
+    /*Info << "dv50: " << dv50_ << endl;*/
+    /*Info << "velMag: " << velMag_ << endl;*/
+    dv50_ = dv50_*1e-3; // convert dv50_ to m from mm
+
+    /*DEBUG("leaving interpolatePressures()");*/
+    return;
+}
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionProperties()
+void Foam::DetailedSprinklerInjection<CloudType>::computeAreas()
+{
+    // compute areas based on input radius
+    
+    /*DEBUG("computeAreas()");*/
+    area_.resize(volFlux_.size());
+    eleMin_.resize(ele_.size());
+    eleMax_.resize(ele_.size());
+    aziMin_.resize(azi_.size());
+    aziMax_.resize(azi_.size());
+
+    scalar totalArea = 0.0;
+    
+    scalar ele1;
+    scalar ele2;
+    scalar azi1;
+    scalar azi2;
+    for(label jazi=0; jazi < nAzi_; jazi++) // phi
+    {
+        for(label iele=0; iele < nEle_; iele++) // theta
+        {
+            /*DEBUG(jazi);*/
+            /*DEBUG(iele);*/
+            label iCell = jazi*(nEle_)+iele;
+            /*DEBUG(iCell);*/
+            if(iele==0)
+            {
+                // ele1 = ele_[iCell]; 
+                ele1 = 0.0;
+                ele2 = 0.5*(ele_[iCell]+ele_[iCell+1]); 
+            }
+            else if(iele==nEle_-1)
+            {
+                ele2 = ele_[iCell]; 
+                ele1 = 0.5*(ele_[iCell]+ele_[iCell-1]); 
+            }
+            else
+            {
+                ele1 = 0.5*(ele_[iCell]+ele_[iCell-1]); 
+                ele2 = 0.5*(ele_[iCell]+ele_[iCell+1]); 
+            }
+            if(jazi==0)
+            {
+                azi1 = azi_[iCell]; 
+                azi2 = 0.5*(azi_[iCell]+azi_[iCell+1*nEle_]); 
+            }
+            else if(jazi==nAzi_-1)
+            {
+                azi2 = azi_[iCell]; 
+                azi1 = 0.5*(azi_[iCell]+azi_[iCell-1*nEle_]); 
+            }
+            else
+            {
+                azi1 = 0.5*(azi_[iCell]+azi_[iCell-1*nEle_]); 
+                azi2 = 0.5*(azi_[iCell]+azi_[iCell+1*nEle_]); 
+            }
+            /*DEBUG(ele_[iCell]);*/
+            /*DEBUG(azi_[iCell]);*/
+            /*DEBUG(ele1);*/
+            /*DEBUG(ele2);*/
+            /*DEBUG(azi1);*/
+            /*DEBUG(azi2);*/
+            eleMin_[iCell] = ele1;
+            eleMax_[iCell] = ele2;
+            aziMin_[iCell] = azi1;
+            aziMax_[iCell] = azi2;
+
+            const scalar deg2Rad = mathematical::pi/180.0;
+
+            area_[iCell] = sampledRadius_*sampledRadius_*
+                            (sin(deg2Rad*ele2)-sin(deg2Rad*ele1))*(deg2Rad*azi2-deg2Rad*azi1);
+
+            totalArea = totalArea+area_[iCell];
+        }
+    }
+
+    /*DEBUG(totalArea);*/
+    scalar idealArea = 4.*mathematical::pi*pow(sampledRadius_,2)/2./4.;
+    /*DEBUG(idealArea);*/
+
+    /*DEBUG("leaving computeAreas()");*/
+    return;
+}
+
+template<class CloudType>
+void Foam::DetailedSprinklerInjection<CloudType>::computeVolFlow()
+{
+
+    /*DEBUG("computeVolFlow()");*/
+    /*Info << volFlux_ << endl;*/
+    // volFlow_.resize(volFlux_.size());
+    volFlow_ = volFlux_*area_;
+    volFlowHist_.resize(volFlow_.size(),0.0);
+    diameterHist_.resize(volFlow_.size());
+    particleHist_.resize(volFlow_.size());
+    
+    /*Info << "volFlow_: " << volFlow_ << endl;*/
+    /*Info << "volFlow_.indices(): " << volFlow_.indices() << endl;*/
+    // sort volFlow_
+    volFlow_.sort();
+    /*Info << "volFlow_: " << volFlow_ << endl;*/
+    /*Info << "volFlow_.indices(): " << volFlow_.indices() << endl;*/
+    /*DEBUG("leaving computeVolFlow()");*/
+
+}
+
+template<class CloudType>
+void Foam::DetailedSprinklerInjection<CloudType>::computeInjectionProperties()
 {
 
     // compute sprinker orifice diameter
@@ -987,18 +1139,19 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     scalar Cd = 0.93; // tapered orifice, orifice coeficient
     scalar conversionKFactor = 14.464; //  gpm/psi^0.5 per lpm/bar^0.5
     scalar conversionMeterPerInch = 0.0254; //  meter per inch
+    scalar conversionPsiPerBar = 14.503774; // psi per bar
     scalar factor = 29.83/pow(conversionMeterPerInch,2)*conversionKFactor; // L/min per m2
     Info << "factor: " << factor << endl;
-    scalar orificeDiameter = sqrt(kFactor_/factor/Cd); // m
+    scalar orificeDiameter = sqrt(kFactor_*conversionKFactor/factor/Cd); // m
     Info << "orificeDiameter: " << orificeDiameter << endl;
 
     // compute velocity based on U = mdot/rho/A
     scalar rhow = 1000.0; // density of water, kg/m3
-    //old scalar uJet = kFactor_*sqrt(pressure_)/15.0/rhow/pi/pow(orificeDiameter,2.0); // m
-    scalar Q = kFactor_*sqrt(pressure_); // lpm
+    //old scalar uJet = kFactor_*sqrt(operatingPressure_)/15.0/rhow/pi/pow(orificeDiameter,2.0); // m
+    scalar Q = kFactor_*conversionKFactor*sqrt(operatingPressure_/conversionPsiPerBar); // lpm
     Info << "Q: " << Q << endl;
-    Info << "pressure_: " << pressure_ << endl;
-    Info << "kFactor_: " << kFactor_ << endl;
+    Info << "operatingPressure_ (psig): " << operatingPressure_ << endl;
+    Info << "kFactor_ (gpm/psi^0.5): " << kFactor_ << endl;
 
     scalar mdot = Q/60.;  // kg/s (assuming 1 l = 1 kg)
     scalar area = pi*pow(orificeDiameter,2.0)/4.0; // m2
@@ -1006,7 +1159,7 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     Info << "uJet: " << uJet << endl;
     Info << "diameterCoefficient: " << diameterCoefficient_ << endl;
     Info << "momentumEfficiency: " << momentumEfficiency_ << endl;
-    velMag_ = uJet*momentumEfficiency_; // account for momentum loss during atomization process
+    // velMag_ = uJet*momentumEfficiency_; // account for momentum loss during atomization process
 
     // compute dv50
     scalar C = 1.9; // sprinkler specific empirical factor for determining dv50
@@ -1014,19 +1167,20 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     scalar We = rhow*uJet*uJet*orificeDiameter/sigmaw;
     Info << "We: " << We << endl;
 
-    dv50_ = C*orificeDiameter/pow(We,0.33333); // m
-    dv50_ = diameterCoefficient_*dv50_;
-    Info << "dv50: " << dv50_ << endl;
+    // dv50_ = C*orificeDiameter/pow(We,0.33333); // m
+    // dv50_ = diameterCoefficient_*dv50_;
+    // Info << "dv50: " << dv50_ << endl;
 
     // compute particles per parcel
+    // I don't think the following is needed
     parcelParticles_.resize(azi_.size());
     forAll(parcelParticles_,nc){
-        scalar volumetricFlowRate = avgFlux_[nc]*area_[nc]; // L/s
+        scalar volumetricFlowRate = volFlux_[nc]*area_[nc]; // L/s
         scalar injectionDeltaT = 1.0; // s, representative only
         scalar conversionLiterPerM3 = 1000.0;
         scalar volumeToInject = volumetricFlowRate*injectionDeltaT/conversionLiterPerM3; // m3
         // scalar radius = 0.5*dv50_[nc]; // m
-        scalar radius = 0.5*dv50_; // m
+        scalar radius = 0.5*dv50_[0]; // m
         scalar singleVolume = 4./3.*pi*pow(radius,3); // m3
         parcelParticles_[nc] = volumeToInject/singleVolume; // None
     }
@@ -1034,75 +1188,96 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::computeInjectionPropert
     return;
 }
 
+template<class CloudType>
+Foam::label Foam::DetailedSprinklerInjection<CloudType>::weightedSampling
+()
+{
+    // weighted sampling
+    scalar flowSum = 0.0;
+    flowSum = sum(volFlow_);
+
+    scalar y(-1.);
+    if(Pstream::master()){
+        y = rndGen_.scalar01()*flowSum;
+    }
+    reduce(y,maxOp<scalar>());
+    // DEBUG(y);
+
+    forAll(volFlow_,i)
+    {
+        if(y < volFlow_[i])
+            return i;
+        y -= volFlow_[i];
+    }
+    // static_assert(false,"should never get here");
+
+}
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::sampleInjectionTable
+void Foam::DetailedSprinklerInjection<CloudType>::sampleInjectionTable
 (
     const scalar injectionDeltaT
 )
 {
 
-    scalar sumVolumetricFlowRate = 0.0;
+    /*DEBUG("here");*/
 
-    List<label> sampleAziIndicies(sampleSize_);
-    List<label> sampleEleIndicies(sampleSize_);
-    const scalar radPerDeg = pi/180.0;
-    if(Pstream::master()){
-        for(int i=0;i<sampleSize_;i++){
-            // theta == azimuthal angle
-            scalar theta;
-            do{
-                scalar u = rndGen_.scalar01();
-                theta = 2.0*pi*u/radPerDeg;
-                theta = round(theta);
-            }while(theta>=360.0);
-
-            // phi == elevation angle
-            scalar phi;
-            do{
-                scalar v = rndGen_.scalar01();
-                phi = acos(2.0*v-1.0)/radPerDeg;
-            }while(phi>90.0);
-
-            // invert phi to range from 0 to 90
-            phi = 90.0 - phi;
-            phi = round(phi);
-
-            scalar aziSkip = 360./scalar(nAzi_);
-            sampleAziIndicies[i] = label(theta)/aziSkip;
-            scalar eleSkip = 90./(scalar(nEle_)-1.);
-            sampleEleIndicies[i] = label(phi)/eleSkip; // this always skews away from 90
-        }
+    // sample (sampleSize_) number of indices
+    mappedIndices_.resize(sampleSize_);
+    labelList histogram(volFlow_.size(),0);
+    forAll(mappedIndices_,j)
+    {
+        label i = weightedSampling();
+        /*DEBUG(i);*/
+        histogram[i]++;
+        mappedIndices_[j] = volFlow_.indices()[i];
     }
-    else{
-        forAll(sampleAziIndicies,i){
-            sampleAziIndicies[i] = -1;
-            sampleEleIndicies[i] = -1;
-        }
-    }
+    /*Info << "histogram: " << histogram << endl;*/
+    /*Info << "mappedIndices: " << mappedIndices_ << endl;*/
 
-    forAll(sampleAziIndicies,i){
-        reduce(sampleAziIndicies[i],maxOp<label>());
-        reduce(sampleEleIndicies[i],maxOp<label>());
-    }
+   // knowing sampleSize_ and idealFlowRate_ then compute equal
+   // flow for each package and assign to corresponding mappedIndices
+
+    scalar parcelFlow = idealFlowRate_/sampleSize_; // L/s per parcel
+     
+    /*DEBUG(parcelFlow);*/
+    /*DEBUG(idealFlowRate_);*/
+    
+    labelList sampleIndices(mappedIndices_);
+
+
+    scalar sumVolumetricFlowRate(0.0);
+
+    // needed if procs out of sync with random number generation
+    // if(Pstream::master()){
+    // }
+    // else{
+    //     forAll(sampleIndices,i){
+    //         sampleIndices[i] = -1;
+    //     }
+    // }
+
+    // forAll(sampleIndices,i){
+    //     reduce(sampleIndices[i],maxOp<label>());
+    // }
 
     for(int nc=0;nc<sampleSize_;nc++){
-        label aziIndex = sampleAziIndicies[nc];
-        label eleIndex = sampleEleIndicies[nc];
-        label linearIndex = eleIndex+aziIndex*nEle_;
-        sampleAzi_[nc] = azi_[linearIndex];
-        sampleEle_[nc] = ele_[linearIndex];
-        sampleAvgFlux_[nc] = avgFlux_[linearIndex];
-        sampleArea_[nc] = area_[linearIndex];
+        label index = sampleIndices[nc];
+        sampleAzi_[nc] = azi_[index];
+        sampleEle_[nc] = ele_[index];
+        sampleVolFlow_[nc] = parcelFlow; // volFlux_[index];
+        scalar dt = this->owner().time().deltaT().value();
+        volFlowHist_[index] += parcelFlow*dt;
+        sampleArea_[nc] = area_[index];
         // sampleD_[nc] = dv50_[linearIndex]; // m
         // sampleD_[nc] = dv50_; // m
-        sampleD_[nc] = sampleRosinRammler(); // m
+        sampleD_[nc] = sampleRosinRammler(dv50_[index]); // m
+        diameterHist_[index].append(sampleD_[nc]);
         // sampleAvgVelMag_[nc] = avgVelMag_[linearIndex]; // m/s
-        sampleAvgVelMag_[nc] = velMag_; // m/s
+        sampleAvgVelMag_[nc] = momentumEfficiency_*velMag_[index]; // m/s
 
-        // scalar volumetricFlowRate = sampleAvgFlux_[nc]*sampleArea_[nc];
-        scalar volumetricFlowRate = sampleAvgFlux_[nc];
-        sumVolumetricFlowRate += volumetricFlowRate; // L/s
+        // scalar volumetricFlowRate = sampleVolFlow_[nc]*sampleArea_[nc];
+        sumVolumetricFlowRate += sampleVolFlow_[nc]; // L/s
     }
 
     scalar ratio = sumVolumetricFlowRate/idealFlowRate_;
@@ -1110,49 +1285,60 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::sampleInjectionTable
     // sumVolumetricFlowRate = 0.0;
     // scalar sumParcelParticles = 0.0;
 
+    // forAll(volFlowHist_,i)
+    // {
+    //     Info << "azi: " << azi_[i] << " ele: " << ele_[i] << " volFlowHist: " << volFlowHist_[i] << " volFlow: " << volFlux_[i]*area_[i] << endl;
+    // }
+
     scalar conversionLiterPerM3 = 1000.0;
-    forAll(sampleAziIndicies,nc){
-        // scalar volumetricFlowRate = sampleAvgFlux_[nc]*sampleArea_[nc]/ratio; // L/s
-        scalar volumetricFlowRate = sampleAvgFlux_[nc]/ratio; // L/s
+    forAll(sampleIndices,nc){
+        label index = sampleIndices[nc];
+        // scalar volumetricFlowRate = sampleVolFlow_[nc]*sampleArea_[nc]/ratio; // L/s
+        // new approach doesn't need to normalize
+        // scalar volumetricFlowRate = sampleVolFlow_[nc]/ratio; // L/s
         // sumVolumetricFlowRate += volumetricFlowRate; // L/s
 
-        scalar volumeToInject = volumetricFlowRate*injectionDeltaT/conversionLiterPerM3; // m3
+        scalar volumeToInject = sampleVolFlow_[nc]*injectionDeltaT/conversionLiterPerM3; // m3
         scalar radius = 0.5*sampleD_[nc]; // m
         scalar singleVolume = 4./3.*pi*pow(radius,3); // m3
         sampleParcelParticles_[nc] = volumeToInject/singleVolume; // None
+        particleHist_[index].append(sampleParcelParticles_[nc]);
         // sumParcelParticles += sampleParcelParticles_[nc];
     }
 
-    scalar nParticlesMax = -VGREAT;
-    scalar nParticlesMin =  VGREAT;
-    nParticlesMax = max(sampleParcelParticles_);
-    nParticlesMin = min(sampleParcelParticles_);
-    reduce(nParticlesMax,maxOp<scalar>());
-    reduce(nParticlesMin,minOp<scalar>());
-    Info << "UniformSprinklerInjection::nParticlesMin: " << tab << this->owner().db().time().timeName() << tab << nParticlesMin << endl;
-    Info << "UniformSprinklerInjection::nParticlesMax: " << tab << this->owner().db().time().timeName() << tab << nParticlesMax << endl;
+    // forAll(diameterHist_,i)
+    // {
+    //     Info << "azi: " << azi_[i] << " ele: " << ele_[i] << " volFlowHist: " << volFlowHist_[i] << " volFlow: " << volFlux_[i]*area_[i] << endl;
+    //     Info << "dv50: " << dv50_[i] << endl << "diameterHist: " << diameterHist_[i] << " particleHist: " << particleHist_[i] << endl;
+    //     Info << "sampled-dv50: " << computeDv50(diameterHist_[i],particleHist_[i]) << " " << dv50_[i] << endl;
+    // }
 
     return;
 }
 
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::computeIdealFlowRate()
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::computeIdealFlowRate()
 {
     scalar secondsPerMinute = 60.0;
 
-    scalar idealFlowRate = kFactor_*sqrt(pressure_); // L/min
+    scalar conversionKFactor = 14.464; //  gpm/psi^0.5 per lpm/bar^0.5
+    scalar conversionPsiPerBar = 14.503774; // psi per bar
+    scalar gpm_per_lps = 15.85; // gpm per l/s
+
+    scalar idealFlowRate = kFactor_*conversionKFactor*sqrt(operatingPressure_/conversionPsiPerBar); // L/min
     idealFlowRate /= secondsPerMinute; // L/s
     Info << "idealFlowRate " << (idealFlowRate) << " L/s " << nl;
+    Info << "idealFlowRate " << (idealFlowRate*gpm_per_lps) << " gpm " << nl;
 
     return idealFlowRate;
 }
 
 template<class CloudType>
-void Foam::UniformSamplingSprinklerInjection<CloudType>::setSampleSizes()
+void Foam::DetailedSprinklerInjection<CloudType>::setSampleSizes()
 {
 
-    sampleAvgFlux_.resize(sampleSize_);
+    sampleVolFlow_.resize(sampleSize_);
     sampleD_.resize(sampleSize_);
     sampleArea_.resize(sampleSize_);
     sampleAvgVelMag_.resize(sampleSize_);
@@ -1164,14 +1350,15 @@ void Foam::UniformSamplingSprinklerInjection<CloudType>::setSampleSizes()
 }
 
 template<class CloudType>
-Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::sampleRosinRammler()
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::sampleRosinRammler(const scalar dv50)
 {
-    scalar n_ = 2.0;
-    scalar d_ = dv50_/pow(0.693,1./n_); // d_ is D_{0.632}
+    scalar n_ = 2.6; // as recommeded by fds :)
+    scalar d_ = dv50/pow(0.693,1./n_); // d_ is D_{0.632}
     /*Info << "d_ " << d_ << endl;*/
-    scalar maxValue_ = d_*pow(6.9077,1./n_); // D_{0.999}
+    scalar maxValue_ = 1.0*d_*pow(6.9077,1./n_); // D_{0.999}
     /*Info << "maxValue_ " << maxValue_ << endl;*/
-    scalar minValue_ = 0.1*d_*pow(0.1054,1./n_); // 0.1*D_{0.1}
+    // minValue_ must be small enough (0.001*D_{0.1}) in order for sampling to return dv50
+    scalar minValue_ = 0.001*d_*pow(0.1054,1./n_); // 0.1*D_{0.1}
     /*Info << "minValue_ " << minValue_ << endl;*/
     scalar K = 1.0 - exp(-pow((maxValue_ - minValue_)/d_, n_));
     // why cached?
@@ -1180,4 +1367,45 @@ Foam::scalar Foam::UniformSamplingSprinklerInjection<CloudType>::sampleRosinRamm
     scalar x = minValue_ + d_*::pow(-log(1.0 - y*K), 1.0/n_);
     return x;
 }
+
+template<class CloudType>
+Foam::scalar Foam::DetailedSprinklerInjection<CloudType>::computeDv50(const scalarList& d,const scalarList& np)
+{
+    SortableList< scalar > dsort;
+    dsort = 1.0*d;
+    dsort.sort();
+    scalarList r = dsort/2.;
+    scalarList volume = 4./3.*pi*pow(r,3); // m3
+    scalarList cumVol(volume.size(),0.0);
+    labelList mapping = dsort.indices();
+    forAll(volume,i)
+    {
+        volume[i] *= np[mapping[i]];
+        Info << "volume[" << i << "]: " << volume[i] << endl;
+    }
+    forAll(cumVol,i)
+    {
+        if(i==0)
+        {
+            cumVol[i] = volume[i];
+        }
+        else
+        {
+            cumVol[i] += volume[i]+cumVol[i-1];
+        }
+    }
+    Info << cumVol << endl;
+    scalar v50 = 0.5*sum(volume);
+    scalar x(0.0);    
+    forAll(dsort,i)
+    {
+        if(cumVol[i]>v50)
+        {
+            x = dsort[i];
+            break;
+        }
+    }
+    return x;
+}
+
 // ************************************************************************* //

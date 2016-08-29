@@ -107,8 +107,8 @@ Foam::vector Foam::ThermoSurfaceFilm<CloudType>::splashDirection
     const vector& tanVec1,
     const vector& tanVec2,
     const vector& nf,
-    const vector& dropTan,
-    const scalar& beta
+    const vector& dropTan, // kvm
+    const scalar& beta // kvm
 ) const
 {
     // azimuthal angle [rad]
@@ -124,9 +124,9 @@ Foam::vector Foam::ThermoSurfaceFilm<CloudType>::splashDirection
     vector dirVec = dcorr*nf;
     dirVec += normal;
     /*account for tangential impingement*/
-    vector newDirVec = beta*dropTan+(1.-beta)*dirVec;
+    vector newDirVec = beta*dropTan+(1.-beta)*dirVec; // kvm
 
-    return newDirVec/(mag(newDirVec)+SMALL);
+    return newDirVec/(mag(newDirVec)+SMALL); // kvm
 }
 
 
@@ -233,6 +233,11 @@ void Foam::ThermoSurfaceFilm<CloudType>::drySplashInteraction
 
     // Retrieve parcel properties
     const scalar m = p.mass()*p.nParticle();
+    const scalar np = p.nParticle(); // kvm
+    if(p.nParticle() > 1e7)  // kvm
+    {
+        DEBUG(np); // kvm
+    }
     const scalar rho = p.rho();
     const scalar d = p.d();
     const scalar sigma = liq.sigma(pc, p.T());
@@ -370,10 +375,10 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
     const vector& posCf = mesh.Cf().boundaryField()[pp.index()][facei];
 
     // Determine direction vectors tangential to patch normal
-    const vector dropTan = Ut/(mag(Ut)+SMALL);
-    const scalar beta = mag(Ut)/(mag(Urel)+SMALL);
-    const vector tanVec1 = tangentVector(nf);
-    const vector tanVec2 = nf^tanVec1;
+    const vector dropTan = Ut/(mag(Ut)+SMALL); // kvm
+    const scalar beta = mag(Ut)/(mag(Urel)+SMALL); // kvm
+    const vector tanVec1 = tangentVector(nf); // kvm
+    const vector tanVec2 = nf^tanVec1; // kvm
 
     // total mass of (all) splashed parcels
     const scalar mSplash = m*mRatio;
@@ -398,7 +403,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
     forAll(dNew, i)
     {
         const scalar y = rndGen_.sample01<scalar>();
-        dNew[i] = max(dMin,-dBarSplash*log(exp(-dMin/dBarSplash) - y*K+SMALL));//have andy update to this
+        dNew[i] = max(dMin,-dBarSplash*log(exp(-dMin/dBarSplash) - y*K+SMALL));//have andy update to this, kvm
         npNew[i] = mRatio*np*pow3(d)/pow3(dNew[i])/parcelsPerSplash_;
         ESigmaSec += npNew[i]*sigma*p.areaS(dNew[i]);
     }
@@ -438,7 +443,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
     // Set splashed parcel properties
     forAll(dNew, i)
     {
-        const vector dirVec = splashDirection(tanVec1, tanVec2, -nf, dropTan, beta);
+        const vector dirVec = splashDirection(tanVec1, tanVec2, -nf, dropTan, beta); // kvm
 
         // Create a new parcel by copying source parcel
         parcelType* pPtr = new parcelType(p);

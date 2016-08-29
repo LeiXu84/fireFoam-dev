@@ -73,7 +73,7 @@ inclinedFilmNusseltHeightFvPatchScalarField
     a_(Function1<scalar>::New("a", dict)),
     omega_(Function1<scalar>::New("omega", dict))
 {
-    fvPatchScalarField::operator=(scalarField("value2", dict, p.size()));
+    fvPatchScalarField::operator=(scalarField("value2", dict, p.size())); // kvm
 }
 
 

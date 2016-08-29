@@ -104,9 +104,9 @@ void thermoSingleLayer::resetPrimaryRegionSourceTerms()
 void thermoSingleLayer::correctThermoFields()
 {
     // limit temperature to reasonable bounds
-    forAll(T_, celli)
+    forAll(T_, celli) // kvm
     {
-        T_[celli] = max(min(T_[celli],Tmax_),Tmin_);
+        T_[celli] = max(min(T_[celli],Tmax_),Tmin_); // kvm
     }
     
     rho_ == filmThermo_->rho();
@@ -115,17 +115,17 @@ void thermoSingleLayer::correctThermoFields()
     Cp_ == filmThermo_->Cp();
     kappa_ == filmThermo_->kappa();
 
-    forAll(rho_, celli)
+    forAll(rho_, celli) // kvm
     {
-        const scalar Ts = max(min(Ts_[celli],Tmax_),Tmin_);
-        const scalar p = pPrimary_[celli];
+        const scalar Ts = max(min(Ts_[celli],Tmax_),Tmin_); // kvm
+        const scalar p = pPrimary_[celli]; // kvm
     }
 
-    rho_.correctBoundaryConditions();
-    mu_.correctBoundaryConditions();
-    sigma_.correctBoundaryConditions();
-    Cp_.correctBoundaryConditions();
-    kappa_.correctBoundaryConditions();
+    rho_.correctBoundaryConditions(); // kvm
+    mu_.correctBoundaryConditions(); // kvm
+    sigma_.correctBoundaryConditions(); // kvm
+    Cp_.correctBoundaryConditions(); // kvm
+    kappa_.correctBoundaryConditions(); // kvm
 
 }
 
@@ -196,13 +196,13 @@ void thermoSingleLayer::updateSurfaceTemperatures()
             UIndirectList<scalar>(Tw_,pp.faceCells()) = 
                 Tpyr;
         }
-        else if(1){
-            // compute Tw based on 0D lumped capacitance model
-            forAll(Tw_,i){
-                Tw_[i]=qFilmToWall_[i]*time_.deltaTValue()/2702.0/949.0/0.0012 + Tw_[i];
-            }
-            Info << "max Tw " << tab << db().time().timeName() << tab << gMax(Tw_) << endl;
-        }
+        // else if(1){
+        //     // compute Tw based on 0D lumped capacitance model
+        //     forAll(Tw_,i){
+        //         Tw_[i]=qFilmToWall_[i]*time_.deltaTValue()/2702.0/949.0/0.0012 + Tw_[i];
+        //     }
+        //     Info << "max Tw " << tab << db().time().timeName() << tab << gMax(Tw_) << endl;
+        // }
         else{
             UIndirectList<scalar>(Tw_, pp.faceCells()) =
             		T_.boundaryField()[patchi];
@@ -693,7 +693,7 @@ thermoSingleLayer::thermoSingleLayer
         heatTransferModel::New(*this, coeffs().subDict("lowerSurfaceModels"))
     ),
     phaseChange_(phaseChangeModel::New(*this, coeffs())),
-    massAbsorption_(massAbsorptionModel::New(*this, coeffs())),
+    massAbsorption_(massAbsorptionModel::New(*this, coeffs())), // kvm
     radiation_(filmRadiationModel::New(*this, coeffs())),
     Tmin_(-VGREAT),
     Tmax_(VGREAT)
@@ -829,8 +829,8 @@ void thermoSingleLayer::preEvolveRegion()
     primaryMassPCTrans_ == dimensionedScalar("zero", dimMass, 0.0);
     primaryEnergyPCTrans_ == dimensionedScalar("zero", dimEnergy, 0.0);
     // Update mass absorption
-    massAbs_ == dimensionedScalar("zero", dimMass, 0.0);
-    energyAbs_ == dimensionedScalar("zero", dimEnergy, 0.0);
+    massAbs_ == dimensionedScalar("zero", dimMass, 0.0); // kvm
+    energyAbs_ == dimensionedScalar("zero", dimEnergy, 0.0); // kvm
 }
 
 
@@ -874,7 +874,7 @@ void thermoSingleLayer::evolveRegion()
     }
 
     // Update temperature using latest hs_
-    T_ == T(hs_);
+    T_ == T(hs_); // kvm
     //kvm-debug Info << "thermoSingleLayer::T_ " << T_ << endl;
 
 #include "diagnostics.H"
@@ -883,7 +883,7 @@ void thermoSingleLayer::evolveRegion()
     deltaRho_ == delta_*rho_;
 
     // Update film wall and surface velocities
-    updateSurfaceVelocities();
+    updateSurfaceVelocities(); // kvm
 
     // Update film wall and surface temperatures
     // updateSurfaceTemperatures();
@@ -929,9 +929,9 @@ const volScalarField& thermoSingleLayer::hs() const
 }
 
 
-tmp<volScalarField> thermoSingleLayer::massAbs() const
+tmp<volScalarField> thermoSingleLayer::massAbs() const // kvm
 {
-    return massAbs_;
+    return massAbs_; // kvm
 }
 
 
@@ -953,15 +953,15 @@ void thermoSingleLayer::info()
         << gMax(Tinternal) << nl;
 
     phaseChange_->info(Info);
-    massAbsorption_->info(Info);
+    massAbsorption_->info(Info); // kvm
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> thermoSingleLayer::Srho() const
+tmp<volScalarField::Internal> thermoSingleLayer::Srho() const
 {
-    tmp<DimensionedField<scalar, volMesh>> tSrho
+    tmp<volScalarField::Internal> tSrho
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (
@@ -1004,16 +1004,16 @@ tmp<DimensionedField<scalar, volMesh>> thermoSingleLayer::Srho() const
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> thermoSingleLayer::Srho
+tmp<volScalarField::Internal> thermoSingleLayer::Srho
 (
     const label i
 ) const
 {
     const label vapId = thermo_.carrierId(filmThermo_->name());
 
-    tmp<DimensionedField<scalar, volMesh>> tSrho
+    tmp<volScalarField::Internal> tSrho
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (
@@ -1059,11 +1059,11 @@ tmp<DimensionedField<scalar, volMesh>> thermoSingleLayer::Srho
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> thermoSingleLayer::Sh() const
+tmp<volScalarField::Internal> thermoSingleLayer::Sh() const
 {
-    tmp<DimensionedField<scalar, volMesh>> tSh
+    tmp<volScalarField::Internal> tSh
     (
-        new DimensionedField<scalar, volMesh>
+        new volScalarField::Internal
         (
             IOobject
             (

@@ -80,10 +80,10 @@ protected:
     // Protected data
 
         //- Flag to indicate pyrolysis region coupled to a film region
-        Switch pyrCoupled_;
+        Switch pyrCoupled_; // kvm
         //
         //- Flag to indicate diagnostics turned on
-        Switch diagnostics_;
+        Switch diagnostics_; // kvm
         
         //- Acceleration due to gravity [m/s2]
         const dimensionedVector& g_;
@@ -225,16 +225,16 @@ public:
             // Mapped into primary region
 
                 //- Return total mass source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Srho() const;
+                virtual tmp<volScalarField::Internal> Srho() const;
 
                 //- Return mass source for specie i - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Srho
+                virtual tmp<volScalarField::Internal> Srho
                 (
                     const label i
                 ) const;
 
                 //- Return enthalpy source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Sh() const;
+                virtual tmp<volScalarField::Internal> Sh() const;
 };
 
 

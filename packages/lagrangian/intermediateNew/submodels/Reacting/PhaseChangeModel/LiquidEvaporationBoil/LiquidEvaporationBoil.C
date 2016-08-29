@@ -168,10 +168,10 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
     }
 
     // droplet surface pressure assumed to surface vapour pressure
-    scalar ps = liquids_.pv(pc, Ts, X); // use TsLimited?
+    scalar ps = liquids_.pv(pc, Ts, X); // use TsLimited? // kvm
 
     // vapour density at droplet surface [kg/m3]
-    scalar rhos = ps*liquids_.W(X)/(RR*Ts); // use TsLimited?
+    scalar rhos = ps*liquids_.W(X)/(RR*Ts); // use TsLimited? // kvm
 
     // construct carrier phase species volume fractions for cell, celli
     const scalarField XcMix(calcXc(celli));
@@ -185,9 +185,9 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
     {
         scalar Yc = this->owner().thermo().carrier().Y()[i][celli];
         Hc += Yc*this->owner().thermo().carrier().Ha(i, pc, Tc);
-        Hsc += Yc*this->owner().thermo().carrier().Ha(i, ps, Ts); // use TsLimited ?
-        Cpc += Yc*this->owner().thermo().carrier().Cp(i, ps, Ts); // use TsLimited ?
-        kappac += Yc*this->owner().thermo().carrier().kappa(i, ps, Ts); // use TsLimited ?
+        Hsc += Yc*this->owner().thermo().carrier().Ha(i, ps, Ts); // use TsLimited ? // kvm
+        Cpc += Yc*this->owner().thermo().carrier().Cp(i, ps, Ts); // use TsLimited ? // kvm
+        kappac += Yc*this->owner().thermo().carrier().kappa(i, ps, Ts); // use TsLimited ? // kvm
     }
 
     // calculate mass transfer of each specie in liquid
@@ -216,7 +216,7 @@ void Foam::LiquidEvaporationBoil<CloudType>::calculate
         else
         {
             // vapour diffusivity [m2/s]
-            const scalar Dab = liquids_.properties()[lid].D(ps, Ts); // use TsLimited?
+            const scalar Dab = liquids_.properties()[lid].D(ps, Ts); // use TsLimited? // kvm
 
             // Schmidt number
             const scalar Sc = nu/(Dab + ROOTVSMALL);

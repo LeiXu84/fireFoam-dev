@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.com               |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -49,7 +49,7 @@ boundaryField
         value           uniform 298.15;
 */
         type                fixedIncidentRadiation;
-        kappa               solidThermo;
+        kappaMethod         solidThermo;
         kappaName           none;
         QrIncident          uniform 60000.0;   //W
         value               uniform 298.15;

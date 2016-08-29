@@ -28,7 +28,7 @@ License
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 template<class CloudType>
-Foam::scalar Foam::InjectionModel<CloudType>::timeStart()
+Foam::scalar Foam::InjectionModel<CloudType>::timeStart() // kvm
 {
     return SOI_;
 }

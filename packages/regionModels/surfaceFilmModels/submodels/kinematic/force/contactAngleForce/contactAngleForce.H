@@ -72,18 +72,18 @@ private:
         //- Parcel size PDF model
         const autoPtr<distributionModels::distributionModel> distribution_;
 
-        const autoPtr<distributionModels::distributionModel> timeIntervalDistribution_;
+        const autoPtr<distributionModels::distributionModel> timeIntervalDistribution_; // kvm
 
         //- Mask over which force is applied
         volScalarField mask_;
 
         //- Static contact angle
-        volScalarField contactAngle_;
-        volScalarField contactAngleOld_;
-        volScalarField contactAngleNew_;
-        volScalarField timeOld_;
-        volScalarField timeInterval_;
-        volScalarField nHits_;
+        volScalarField contactAngle_; // kvm
+        volScalarField contactAngleOld_; // kvm
+        volScalarField contactAngleNew_; // kvm
+        volScalarField timeOld_; // kvm
+        volScalarField timeInterval_; // kvm
+        volScalarField nHits_; // kvm
 
     // Private member functions
 

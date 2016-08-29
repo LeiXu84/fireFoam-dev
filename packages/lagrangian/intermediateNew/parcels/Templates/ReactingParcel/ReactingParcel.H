@@ -251,7 +251,7 @@ public:
             const vector& position,
             const label celli,
             const label tetFacei,
-            const label tetPtI
+            const label tetPti
         );
 
         //- Construct from components
@@ -261,7 +261,7 @@ public:
             const vector& position,
             const label celli,
             const label tetFacei,
-            const label tetPtI,
+            const label tetPti,
             const label typeId,
             const scalar nParticle0,
             const scalar d0,

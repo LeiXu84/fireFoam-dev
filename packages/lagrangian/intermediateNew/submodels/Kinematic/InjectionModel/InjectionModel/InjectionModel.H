@@ -154,7 +154,7 @@ protected:
             scalar timeStep0_;
 
             //- time step for injection [s]
-            scalar injectionDeltaT_;
+            scalar injectionDeltaT_; // kvm
 
             //- Volume that should have been injected, but would lead to
             //  less than 1 particle per parcel
@@ -182,7 +182,7 @@ protected:
         (
             label& celli,
             label& tetFacei,
-            label& tetPtI,
+            label& tetPti,
             vector& position,
             bool errorOnNotFound = true
         );
@@ -279,7 +279,7 @@ public:
         // Global information
 
             //- Return the start-of-injection time
-            virtual scalar timeStart();
+            virtual scalar timeStart(); // kvm
 
             //- Return the total volume to be injected across the event
             inline scalar volumeTotal() const;
@@ -342,7 +342,7 @@ public:
                 vector& position,
                 label& cellOwner,
                 label& tetFacei,
-                label& tetPtI
+                label& tetPti
             ) = 0;
 
             //- Set the parcel properties

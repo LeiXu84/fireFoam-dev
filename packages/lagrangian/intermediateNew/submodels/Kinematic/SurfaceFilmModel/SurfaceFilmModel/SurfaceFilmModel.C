@@ -152,7 +152,7 @@ void Foam::SurfaceFilmModel<CloudType>::inject(TrackData& td)
                 // point as the tetPt.  The tracking will pick the cell
                 // consistent with the motion in the first tracking step.
                 const label tetFacei = this->owner().mesh().cells()[celli][0];
-                const label tetPtI = 1;
+                const label tetPti = 1;
 
 //                const point& pos = this->owner().mesh().C()[celli];
 
@@ -172,7 +172,7 @@ void Foam::SurfaceFilmModel<CloudType>::inject(TrackData& td)
                         pos,
                         celli,
                         tetFacei,
-                        tetPtI
+                        tetPti
                     );
 
                 // Check/set new parcel thermo properties
@@ -236,13 +236,13 @@ void Foam::SurfaceFilmModel<CloudType>::setParcelProperties
     const label filmFacei
 ) const
 {
-    // Dripping...
+    // Dripping... // kvm
     // Set parcel properties
     scalar vol = mathematical::pi/6.0*pow3(diameterParcelPatch_[filmFacei]);
     p.d() = diameterParcelPatch_[filmFacei];
     p.U() = UFilmPatch_[filmFacei];
     //kvm, fix odd behavior with injected particle velocity
-    p.U() = Zero;
+    p.U() = Zero; // kvm
     p.rho() = rhoFilmPatch_[filmFacei];
 
     p.nParticle() = massParcelPatch_[filmFacei]/p.rho()/vol;

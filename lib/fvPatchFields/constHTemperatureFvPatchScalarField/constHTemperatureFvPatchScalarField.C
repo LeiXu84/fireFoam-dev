@@ -32,6 +32,11 @@ License
 #include "IOobjectList.H"
 #include "solidThermo.H"
 
+#define DEBUG(x) std::cout << "["<< __FILE__ << ":" << __LINE__ << "] "<< #x " = " << x << std::endl;
+#define TRACE(s) std::cout << "["<< __FILE__ << ":" << __LINE__ << "] "<< #s << std::endl; s;
+#define DEBUGP(x) std::cout << "[p"<<Pstream::myProcNo()<<":"<< __FILE__ << ":" << __LINE__ << "] "<< #x " = " << x << std::endl;
+#define TRACEP(s) std::cout << "[p"<<Pstream::myProcNo()<<":"<< __FILE__ << ":" << __LINE__ << "] "<< #s << std::endl; s;
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
@@ -180,6 +185,8 @@ setTInf(const scalarField& TInf)
 {
 
 
+    /*DEBUGP(TInf.size());*/
+    /*DEBUGP(Tinf_.size());*/
     if (TInf.size() != Tinf_.size())
     {
         FatalErrorIn

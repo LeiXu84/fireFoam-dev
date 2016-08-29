@@ -46,8 +46,8 @@ bool surfaceFilmModel::read()
 {
     if (singleLayerRegion::read())
     {
-        diagnostics_ = coeffs_.lookupOrDefault<Switch>("diagnostics",false);
-        pyrCoupled_ = coeffs_.lookupOrDefault<Switch>("pyrolysisCoupled",false);
+        diagnostics_ = coeffs_.lookupOrDefault<Switch>("diagnostics",false); // kvm
+        pyrCoupled_ = coeffs_.lookupOrDefault<Switch>("pyrolysisCoupled",false); // kvm
         return true;
     }
     else
@@ -68,8 +68,8 @@ surfaceFilmModel::surfaceFilmModel
 )
 :
     singleLayerRegion(mesh, regionType, modelType),
-    pyrCoupled_(false),
-    diagnostics_(false),
+    pyrCoupled_(false), // kvm
+    diagnostics_(false), // kvm
     g_(g)
 {
     if (active_)
@@ -93,28 +93,28 @@ Foam::scalar surfaceFilmModel::CourantNumber() const
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> surfaceFilmModel::Srho() const
+tmp<volScalarField::Internal> surfaceFilmModel::Srho() const
 {
     NotImplemented;
 
-    return tmp<DimensionedField<scalar, volMesh>>(NULL);
+    return tmp<volScalarField::Internal>(nullptr);
 }
 
 
-tmp<DimensionedField<scalar, volMesh>>
+tmp<volScalarField::Internal>
 surfaceFilmModel::Srho(const label) const
 {
     NotImplemented;
 
-    return tmp<DimensionedField<scalar, volMesh>>(NULL);
+    return tmp<volScalarField::Internal>(nullptr);
 }
 
 
-tmp<DimensionedField<scalar, volMesh>> surfaceFilmModel::Sh() const
+tmp<volScalarField::Internal> surfaceFilmModel::Sh() const
 {
     NotImplemented;
 
-    return tmp<DimensionedField<scalar, volMesh>>(NULL);
+    return tmp<volScalarField::Internal>(nullptr);
 }
 
 

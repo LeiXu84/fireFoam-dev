@@ -79,33 +79,33 @@ class eddyDissipationBertExtModel
         //- Flame Extinction Temperature (K)
         volScalarField Textinction_;
 
-        //- Additional Energy Required (J/m3/s, required - provided)
-        volScalarField hsAdditional_;
+        //- Adabatic Flame temperature
+        volScalarField Tad_;
 
-        //- Entrainment rate (1/s)
-        volScalarField entrainRate_;
+        //- Adabatic Flame temperature with heat loss
+        volScalarField TadLoss_;
 
-        //- Evaporation rate (1/s)
-        volScalarField evaporationRate_;
+        //- Near wall cells
+        volScalarField nearWallCells_;
 
-	//- Flame surface
-	volScalarField flameQ_;
-
-		//- Reaction rates (kg/m3/s)
+        //- Reaction rates (kg/m3/s)
         volScalarField WCO2_;
         volScalarField WO2_;
         volScalarField WH2O_;
         volScalarField WF_;
-	volScalarField WFstar_;
+        volScalarField WFstar_;
         volScalarField WFNet_;
-	volScalarField WFstarNet_;
-	scalar tExt_;
-	scalar TFuelStarExt_;
-	scalar TFuelExt_;
-	scalar Cstrain_;
-	scalar Cevap_;
-	scalar ignitionLocation_;
-	scalar dQMin_;
+        volScalarField WFstarNet_;
+
+        scalar tExt_;
+        scalar TFuelStarExt_;
+        scalar TFuelExt_;
+        scalar Cstrain_;
+        scalar Cevap_;
+        scalar XrExtinction_;
+        bool nearWallExtinction_;
+        bool radiativeHeatLoss_;
+
 
     // Private Member Functions
 
@@ -132,11 +132,11 @@ public:
 
         //- Construct from components
         eddyDissipationBertExtModel
-	(
-	    const word& modelType, 
-	    const fvMesh& mesh,
-	    const word& phaseName
-	);
+        (
+            const word& modelType, 
+            const fvMesh& mesh,
+            const word& phaseName
+        );
 
 
     //- Destructor
@@ -150,11 +150,13 @@ public:
             //- Correct combustion rate
             virtual void correct();
 
-	    //- Fuel consumption rate matrix                                     
+            //- Fuel consumption rate matrix                                     
             virtual tmp<fvScalarMatrix> R(volScalarField& Y) const;                       
 
             //- Sensible enthalpy source term                                        
             virtual tmp<volScalarField> Sh() const;
+
+            void calculateFlameTemperature();
 
 
         // I-O

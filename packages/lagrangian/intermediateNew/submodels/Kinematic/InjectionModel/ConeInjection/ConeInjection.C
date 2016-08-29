@@ -241,7 +241,7 @@ void Foam::ConeInjection<CloudType>::setPositionAndCell
     vector& position,
     label& cellOwner,
     label& tetFacei,
-    label& tetPtI
+    label& tetPti
 )
 {
     const label i = parcelI % positionAxis_.size();
@@ -249,7 +249,7 @@ void Foam::ConeInjection<CloudType>::setPositionAndCell
     position = positionAxis_[i].first();
     cellOwner = injectorCells_[i];
     tetFacei = injectorTetFaces_[i];
-    tetPtI = injectorTetPts_[i];
+    tetPti = injectorTetPts_[i];
 }
 
 
@@ -271,12 +271,12 @@ void Foam::ConeInjection<CloudType>::setProperties
     scalar ti = thetaInner_.value(t);
     scalar to = thetaOuter_.value(t);
     scalar coneAngle = degToRad(rnd.position<scalar>(ti, to));
-    scalar beta = twoPi*rnd.sample01<scalar>();
+    scalar beta = twoPi*rnd.sample01<scalar>(); // kvm
 
-    // Info << "coneAngle1 " << radToDeg(coneAngle) << nl;
+    // Info << "coneAngle1 " << radToDeg(coneAngle) << nl;         
     // Info << "beta1 " << radToDeg(beta) << nl;
 
-    // uniform spherical sampling
+    // uniform spherical sampling, kvm
     Switch uniform = true;
     if(uniform)
     {

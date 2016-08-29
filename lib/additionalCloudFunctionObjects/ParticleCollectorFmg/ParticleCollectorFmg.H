@@ -195,6 +195,9 @@ private:
         //- Mass flow rate storage
         List<scalar> massFlowRate_;
 
+        //- Momentum rate (force) storage
+        List<scalar> momRate_;
+
         //- particle sampling
         List <List<scalarList> > diameters_;
         List <List<scalarList> > velocityMagnitudes_;

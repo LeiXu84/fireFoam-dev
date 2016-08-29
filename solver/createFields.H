@@ -19,8 +19,15 @@ basicMultiComponentMixture& composition = thermo.composition();
 PtrList<volScalarField>& Y = composition.Y();
 
 const word inertSpecie(thermo.lookup("inertSpecie"));
+if (!composition.species().found(inertSpecie))
+{
+    FatalIOErrorIn(args.executable().c_str(), thermo)
+        << "Inert specie " << inertSpecie << " not found in available species "
+        << composition.species()
+        << exit(FatalIOError);
+}
 
-#include "readAdditionalThermo.H"
+#include "readAdditionalThermo.H" // kvm
 
 Info<< "Creating field rho\n" << endl;
 volScalarField rho
@@ -91,8 +98,8 @@ volScalarField p_rgh
     mesh
 );
 
-thermo.correct();
-rho = thermo.rho();
+thermo.correct(); // kvm
+rho = thermo.rho(); // kvm
 
 mesh.setFluxRequired(p_rgh.name());
 
@@ -140,7 +147,7 @@ volScalarField dQ
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("dQ", dimEnergy/dimTime/dimVolume, 0.0)
+    dimensionedScalar("dQ", dimEnergy/dimTime/dimVolume, 0.0) // kvm
 );
 
 
@@ -157,12 +164,11 @@ volScalarField dpdt
     dimensionedScalar("dpdt", p.dimensions()/dimTime, 0)
 );
 
-
 Info<< "Creating field kinetic energy K\n" << endl;
 volScalarField K("K", 0.5*magSqr(U));
 
 
-volScalarField kappa
+volScalarField kappa // kvm
 (
     IOobject
     (
@@ -175,7 +181,7 @@ volScalarField kappa
     thermo.Cp()*thermo.alpha()
 );
 
-volScalarField cp
+volScalarField cp // kvm
 (
     IOobject
     (
@@ -188,54 +194,55 @@ volScalarField cp
     thermo.Cp()
 );
 
-singleStepReactingMixture<gasHThermoPhysics>& singleMixture
+singleStepReactingMixture<gasHThermoPhysics>& singleMixture // kvm
 (
     dynamic_cast<singleStepReactingMixture<gasHThermoPhysics>&>
     (thermo)
 );
 
 // stoichiometric O2 to fuel ratio
-scalar s(singleMixture.s().value());
+scalar s(singleMixture.s().value()); // kvm
 
 // stoichiometric air to fuel ratio
-scalar stoicRatio(singleMixture.stoicRatio().value());  
+scalar stoicRatio(singleMixture.stoicRatio().value());   // kvm
 
 // heat of combustion [J/kg]
-scalar qFuel(singleMixture.qFuel().value());  
+scalar qFuel(singleMixture.qFuel().value());   // kvm
 
-label fuelIndex(singleMixture.fuelIndex());
-label inertIndex(singleMixture.inertIndex());
+label fuelIndex(singleMixture.fuelIndex()); // kvm
+const label inertIndex(composition.species()[inertSpecie]);
+// label inertIndex(singleMixture.inertIndex()); // kvm
 
 const volScalarField* O2Ptr = &Y[inertIndex]; //dummy ptr when O2 is not available 
-if (thermo.composition().contains("O2")) 
+if (thermo.composition().contains("O2"))  // kvm
 {
-    O2Ptr = &thermo.composition().Y("O2");
+    O2Ptr = &thermo.composition().Y("O2"); // kvm
 }
-const volScalarField& O2 = *O2Ptr;
+const volScalarField& O2 = *O2Ptr; // kvm
 
 const volScalarField* CO2Ptr = &Y[inertIndex]; //dummy ptr when O2 is not available 
-if (thermo.composition().contains("CO2")) 
+if (thermo.composition().contains("CO2"))  // kvm
 {
-    CO2Ptr = &thermo.composition().Y("CO2");
+    CO2Ptr = &thermo.composition().Y("CO2"); // kvm
 }
-const volScalarField& CO2 = *CO2Ptr;
+const volScalarField& CO2 = *CO2Ptr; // kvm
 
-const volScalarField& fu = Y[fuelIndex]; 
+const volScalarField& fu = Y[fuelIndex];  // kvm
 
 scalar YO2Inf = 0.23301; //hardcode for now
 
 // Fuel molecular weight
-scalar Wu_ = singleMixture.speciesData()[fuelIndex].W();
+scalar Wu_ = singleMixture.speciesData()[fuelIndex].W(); // kvm
 // Fuel enthalpy of formation
-scalar Hu_ = singleMixture.speciesData()[fuelIndex].hc();
+scalar Hu_ = singleMixture.speciesData()[fuelIndex].hc(); // kvm
 
 // compute stoichiometric mixture fraction
-scalar ftSt = 1.0 / ( 1.0 + stoicRatio );
-Info << "stoichiometric mixture fraction is = " << ftSt << nl;
+scalar ftSt = 1.0 / ( 1.0 + stoicRatio ); // kvm
+Info << "stoichiometric mixture fraction is = " << ftSt << nl; // kvm
 
 
 // create fileds for mixture fraction
-volScalarField ft
+volScalarField ft // kvm
 (
     IOobject
     (

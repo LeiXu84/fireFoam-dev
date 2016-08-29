@@ -74,7 +74,7 @@ namespace surfaceFilmModels
 class filmViscosityModel;
 class heatTransferModel;
 class phaseChangeModel;
-class massAbsorptionModel;
+class massAbsorptionModel; // kvm
 class filmRadiationModel;
 
 /*---------------------------------------------------------------------------*\
@@ -130,16 +130,16 @@ protected:
                 volScalarField hs_;
 
                 //- convective heat flux to film from gas / [W/m2]
-                volScalarField qGasToFilm_;
+                volScalarField qGasToFilm_; // kvm
 
                 //- convective heat flux to wall from film/ [W/m2]
-                volScalarField qFilmToWall_;
+                volScalarField qFilmToWall_; // kvm
 
                 //- mass absorption [kg/s]
-                volScalarField massAbs_;
+                volScalarField massAbs_; // kvm
 
                 //- mass absorption energy [kJ/s]
-                volScalarField energyAbs_;
+                volScalarField energyAbs_; // kvm
                 
             // Transfer fields - to the primary region
 
@@ -168,7 +168,7 @@ protected:
             scalar hydrophilicWetScale_;
 
             // Conduction heat transfer model
-            Switch conduction_;
+            Switch conduction_; // kvm
 
         // Source term fields
 
@@ -213,7 +213,7 @@ protected:
             autoPtr<phaseChangeModel> phaseChange_;
 
             //- Phase change
-            autoPtr<massAbsorptionModel> massAbsorption_;
+            autoPtr<massAbsorptionModel> massAbsorption_; // kvm
 
             //- Radiation
             autoPtr<filmRadiationModel> radiation_;
@@ -323,7 +323,7 @@ public:
             // Transfer fields - to the primary region
 
                 //- Return absorption mass source
-                virtual tmp<volScalarField> massAbs() const;
+                virtual tmp<volScalarField> massAbs() const; // kvm
 
                 //- Return mass transfer source - Eulerian phase only
                 virtual tmp<volScalarField> primaryMassTrans() const;
@@ -402,7 +402,7 @@ public:
             inline const phaseChangeModel& phaseChange() const;
 
             //- Return const access to the mass absorption model
-            inline const massAbsorptionModel& massAbsorption() const;
+            inline const massAbsorptionModel& massAbsorption() const; // kvm
 
             //- Return const access to the radiation model
             inline const filmRadiationModel& radiation() const;
@@ -431,16 +431,16 @@ public:
             // Mapped into primary region
 
                 //- Return total mass source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Srho() const;
+                virtual tmp<volScalarField::Internal> Srho() const;
 
                 //- Return mass source for specie i - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Srho
+                virtual tmp<volScalarField::Internal> Srho
                 (
                     const label i
                 ) const;
 
                 //- Return enthalpy source - Eulerian phase only
-                virtual tmp<DimensionedField<scalar, volMesh>> Sh() const;
+                virtual tmp<volScalarField::Internal> Sh() const;
 
 
        // I-O
