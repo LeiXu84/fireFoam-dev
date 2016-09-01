@@ -161,6 +161,8 @@ namespace Foam
         label nAzi_;
         scalar operatingPressure_;
         scalarList tablePressures_;
+        scalarList velocityCorrections_;
+        scalar  velocityCorrection_;
         //K-factor of operating pressure lpm/bar^0.5
         scalar kFactor_;
         scalar sampledRadius_;

@@ -1,3 +1,7 @@
+2016-09-01: Version 16.09.01
+    added velocityCorrection to detailedSprinklerInjection model
+    compiled against OpenFOAM commit 12ee01790182eddc3e63ba369ef1e88d2d7739fa
+
 2016-08-29: Version 16.08.29
 	Upgraded to latest OpenFOAM-dev 
         commit 12ee01790182eddc3e63ba369ef1e88d2d7739fa

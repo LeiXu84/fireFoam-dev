@@ -133,6 +133,8 @@ Foam::DetailedSprinklerInjection<CloudType>::DetailedSprinklerInjection
     nAzi_(0),
     operatingPressure_(0.),
     tablePressures_(),
+    velocityCorrections_(),
+    velocityCorrection_(1.),
     kFactor_(0.),
     sampledRadius_(0.),
     idealFlowRate_(0.),
@@ -280,6 +282,8 @@ Foam::DetailedSprinklerInjection<CloudType>::DetailedSprinklerInjection
     nAzi_(im.nAzi_),
     operatingPressure_(im.operatingPressure_),
     tablePressures_(im.tablePressures_),
+    velocityCorrections_(im.velocityCorrections_),
+    velocityCorrection_(im.velocityCorrection_),
     kFactor_(im.kFactor_),
     sampledRadius_(im.sampledRadius_),
     idealFlowRate_(im.idealFlowRate_),
@@ -946,6 +950,7 @@ void Foam::DetailedSprinklerInjection<CloudType>::readTableData()
         {
             const dictionary& pressureSubDict = pressuresDict.subDict(pressureNames[i]);
             tablePressures_.append(readScalar(pressureSubDict.lookup("pressure")));
+            velocityCorrections_.append(pressureSubDict.template lookupOrDefault< scalar >("velocityCorrection",1.0));
             /*Info << tablePressures_ << endl;*/
 
             phiTables_.append(pressureSubDict.lookup("phi"));
@@ -984,18 +989,21 @@ void Foam::DetailedSprinklerInjection<CloudType>::interpolatePressure()
         volFlux_ = volFluxTables_[begin];
         dv50_ = dv50Tables_[begin];
         velMag_ = velMagTables_[begin];
+        velocityCorrection_ = velocityCorrections_[begin];
     }
     else if(operatingPressure_ <= tablePressures_[begin])
     {
         volFlux_ = (volFluxTables_[begin+1]-volFluxTables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+volFluxTables_[begin];
         dv50_ = (dv50Tables_[begin+1]-dv50Tables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+dv50Tables_[begin];
         velMag_ = (velMagTables_[begin+1]-velMagTables_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+velMagTables_[begin];
+        velocityCorrection_ = (velocityCorrections_[begin+1]-velocityCorrections_[begin])/(tablePressures_[begin+1]-tablePressures_[begin])*(operatingPressure_ - tablePressures_[begin])+velocityCorrections_[begin];
     }
     else if(operatingPressure_ >= tablePressures_[end])
     {
         volFlux_ = (volFluxTables_[end]-volFluxTables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+volFluxTables_[end];
         dv50_ = (dv50Tables_[end]-dv50Tables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+dv50Tables_[end];
         velMag_ = (velMagTables_[end]-velMagTables_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+velMagTables_[end];
+        velocityCorrection_ = (velocityCorrections_[end]-velocityCorrections_[end-1])/(tablePressures_[end]-tablePressures_[end-1])*(operatingPressure_ - tablePressures_[end])+velocityCorrections_[end];
     }
     else
     {
@@ -1009,6 +1017,7 @@ void Foam::DetailedSprinklerInjection<CloudType>::interpolatePressure()
                 volFlux_ = (1.0-weight)*volFluxTables_[i1]+weight*volFluxTables_[i2];
                 dv50_ = (1.0-weight)*dv50Tables_[i1]+weight*dv50Tables_[i2];
                 velMag_ = (1.0-weight)*velMagTables_[i1]+weight*velMagTables_[i2];
+                velocityCorrection_ = (1.0-weight)*velocityCorrections_[i1]+weight*velocityCorrections_[i2];
             }
         }
     }
@@ -1158,6 +1167,7 @@ void Foam::DetailedSprinklerInjection<CloudType>::computeInjectionProperties()
     scalar uJet = mdot/(rhow*area); // m/s
     Info << "uJet: " << uJet << endl;
     Info << "diameterCoefficient: " << diameterCoefficient_ << endl;
+    Info << "velocityCorrection: " << velocityCorrection_ << endl;
     Info << "momentumEfficiency: " << momentumEfficiency_ << endl;
     // velMag_ = uJet*momentumEfficiency_; // account for momentum loss during atomization process
 
@@ -1274,7 +1284,7 @@ void Foam::DetailedSprinklerInjection<CloudType>::sampleInjectionTable
         sampleD_[nc] = sampleRosinRammler(dv50_[index]); // m
         diameterHist_[index].append(sampleD_[nc]);
         // sampleAvgVelMag_[nc] = avgVelMag_[linearIndex]; // m/s
-        sampleAvgVelMag_[nc] = momentumEfficiency_*velMag_[index]; // m/s
+        sampleAvgVelMag_[nc] = momentumEfficiency_*velocityCorrection_*velMag_[index]; // m/s
 
         // scalar volumetricFlowRate = sampleVolFlow_[nc]*sampleArea_[nc];
         sumVolumetricFlowRate += sampleVolFlow_[nc]; // L/s
