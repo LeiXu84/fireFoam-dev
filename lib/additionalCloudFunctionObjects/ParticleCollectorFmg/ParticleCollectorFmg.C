@@ -458,6 +458,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         massTotal_[faceI] += mass_[faceI];
         // kvm, massFlowRate_ calculation is wrong when resetOnWrite set to false
         massFlowRate_[faceI] = alpha*massFlowRate_[faceI] + beta*mass_[faceI]/(timeElapsed+VSMALL);
+        massFlux_[faceI] = massFlowRate_[faceI]/area_[faceI];
         momTotal_[faceI] += mom_[faceI];
         momRate_[faceI] = alpha*momRate_[faceI] + beta*mom_[faceI]/(timeElapsed+VSMALL);
     }
@@ -474,6 +475,9 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
 
     Field<scalar> faceMassFlowRate(massFlowRate_.size(), 0.0);
     this->getModelProperty("massFlowRate", faceMassFlowRate);
+
+    Field<scalar> faceMassFlux(massFlux_.size(), 0.0);
+    this->getModelProperty("massFlux", faceMassFlux);
 
     Field<scalar> faceMomRate(momRate_.size(), 0.0);
     this->getModelProperty("momRate", faceMomRate);
@@ -499,6 +503,11 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         allProcMassFlowRate[procI] = massFlowRate_[faceI];
         Pstream::gatherList(allProcMassFlowRate);
         faceMassFlowRate[faceI] += sum(allProcMassFlowRate);
+
+        scalarList allProcMassFlux(Pstream::nProcs());
+        allProcMassFlux[procI] = massFlux_[faceI];
+        Pstream::gatherList(allProcMassFlux);
+        faceMassFlux[faceI] += sum(allProcMassFlux);
 
         scalarList allProcMomRate(Pstream::nProcs());
         allProcMomRate[procI] = momRate_[faceI];
@@ -640,6 +649,17 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                 "collector",
                 points_,
                 faces_,
+                "massFlux",
+                faceMassFlux,
+                false
+            );
+
+            writer->write
+            (
+                this->writeTimeDir(),
+                "collector",
+                points_,
+                faces_,
                 "momTotal",
                 faceMomTotal,
                 false
@@ -666,6 +686,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         this->setModelProperty("massTotal", dummy);
         this->setModelProperty("momTotal", dummy2);
         this->setModelProperty("massFlowRate", dummy);
+        this->setModelProperty("massFlux", dummy);
         this->setModelProperty("momRate", dummy);
 
         timeOld_ = timeNew;
@@ -676,6 +697,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         this->setModelProperty("massTotal", faceMassTotal);
         this->setModelProperty("momTotal", faceMomTotal);
         this->setModelProperty("massFlowRate", faceMassFlowRate);
+        this->setModelProperty("massFlux", faceMassFlux);
         this->setModelProperty("momRate", faceMomRate);
     }
 
@@ -686,6 +708,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         massTotal_[faceI] = 0.0;
         momTotal_[faceI] = 0.0;
         massFlowRate_[faceI] = 0.0;
+        massFlux_[faceI] = 0.0;
         momRate_[faceI] = 0.0;
     }
 }
@@ -724,6 +747,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     massTotal_(),
     momTotal_(),
     massFlowRate_(),
+    massFlux_(),
     momRate_(),
     diameters_(),
     velocityMagnitudes_(),
@@ -795,6 +819,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     massTotal_.setSize(faces_.size(), 0.0);
     momTotal_.setSize(faces_.size(), 0.0);
     massFlowRate_.setSize(faces_.size(), 0.0);
+    massFlux_.setSize(faces_.size(), 0.0);
     momRate_.setSize(faces_.size(), 0.0);
 
     makeLogFile(faces_, points_, area_);
@@ -842,6 +867,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     massTotal_(pc.massTotal_),
     momTotal_(pc.momTotal_),
     massFlowRate_(pc.massFlowRate_),
+    massFlux_(pc.massFlux_),
     momRate_(pc.momRate_),
     diameters_(pc.diameters_),
     velocityMagnitudes_(pc.velocityMagnitudes_),

@@ -195,6 +195,9 @@ private:
         //- Mass flow rate storage
         List<scalar> massFlowRate_;
 
+        //- Mass flux
+        List<scalar> massFlux_;
+
         //- Momentum rate (force) storage
         List<scalar> momRate_;
 

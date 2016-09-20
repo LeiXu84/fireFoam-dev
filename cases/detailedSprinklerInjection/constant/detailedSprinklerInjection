@@ -1,0 +1,52 @@
+/*--------------------------------*- C++ -*----------------------------------*/
+
+    detailedSprinklerInjection
+    {
+        type detailedSprinklerInjection;
+
+        lookupTableCoeffs
+        {
+            tableName       sampleSprinkler;
+            operatingPressure  5.0; // psig
+        }
+
+        SOI             0.0;
+        duration        180; //0.005;
+        parcelsPerSecond 1000;  // per one sprinkler
+
+        positionList
+        ( 
+            (  0  6  0 ) // 
+            ( -3  6  0 ) // 
+        );
+
+        direction       ( 0 -1  0);
+        armDirection    ( 1  0  0);
+
+
+        radiusToSprinkler 0.3; // m
+
+        rtiCoeffs
+        {
+            active                false;
+            RTI                   22; // (m s)^0.5  // average of 45-55 (ft s)^0.5
+			C                     0.222; // (m/s)^0.5  // average of 0.7-1.81 (ft / s)^0.5
+            initialTemperature    298.15;
+            activationTemperature 347.039; // K  // average of 155-165 deg F
+
+            rtiOutputInterval     200; // output rti data do sprinklerPostProcessing folder every n time steps
+
+			// to convert RTI from (ft s )^0.5 to (m s)^0.5 square the value, multiply by 0.3048, and take the sqrt
+			// to convert C from (ft / s)^0.5 to (m/s)^0.5 square the value, multiply by 0.3048, and take the sqrt
+        }
+
+
+
+        // begin section not used anywhere
+            massTotal       -1; 
+            parcelBasisType mass;
+            massFlowRate 0;
+        // end section not used anywhere
+
+    
+    }
