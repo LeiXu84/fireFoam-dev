@@ -156,7 +156,7 @@ void Foam::ParticleCollectorFmg<CloudType>::makeLogFile
 template<class CloudType>
 void Foam::ParticleCollectorFmg<CloudType>::initPolygons
 (
-    const List<Field<point> >& polygons
+    const List<Field<point>>& polygons
 )
 {
     mode_ = mtPolygon;
@@ -167,11 +167,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initPolygons
         label np = polygons[polyI].size();
         if (np < 3)
         {
-            FatalIOErrorIn
-            (
-                "Foam::ParticleCollectorFmg<CloudType>::initPolygons()",
-                this->coeffDict()
-            )
+            FatalIOErrorInFunction(this->coeffDict())
                 << "polygons must consist of at least 3 points"
                 << exit(FatalIOError);
         }
@@ -184,18 +180,18 @@ void Foam::ParticleCollectorFmg<CloudType>::initPolygons
     faces_.setSize(polygons.size());
     faceTris_.setSize(polygons.size());
     area_.setSize(polygons.size());
-    forAll(faces_, faceI)
+    forAll(faces_, facei)
     {
-        const Field<point>& polyPoints = polygons[faceI];
+        const Field<point>& polyPoints = polygons[facei];
         face f(identity(polyPoints.size()) + pointOffset);
         UIndirectList<point>(points_, f) = polyPoints;
-        area_[faceI] = f.mag(points_);
+        area_[facei] = f.mag(points_);
 
         DynamicList<face> tris;
         f.triangles(points_, tris);
-        faceTris_[faceI].transfer(tris);
+        faceTris_[facei].transfer(tris);
 
-        faces_[faceI].transfer(f);
+        faces_[facei].transfer(f);
 
         pointOffset += polyPoints.size();
     }
@@ -226,7 +222,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
         // set 4 quadrants for single sector cases
         nS = 4;
 
-        vector tangent = vector::zero;
+        vector tangent = Zero;
         scalar magTangent = 0.0;
 
         Random rnd(1234);
@@ -298,10 +294,10 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
                     facePts.append(id);
                 }
 
-                label faceI = secI + radI*nS;
+                label facei = secI + radI*nS;
 
-                faces_[faceI] = face(facePts);
-                area_[faceI] = faces_[faceI].mag(points_);
+                faces_[facei] = face(facePts);
+                area_[facei] = faces_[facei].mag(points_);
             }
         }
         else
@@ -325,10 +321,10 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
                     facePts.append(id);
                 }
 
-                label faceI = secI + radI*nS;
+                label facei = secI + radI*nS;
 
-                faces_[faceI] = face(facePts);
-                area_[faceI] = faces_[faceI].mag(points_);
+                faces_[facei] = face(facePts);
+                area_[facei] = faces_[facei].mag(points_);
             }
         }
     }
@@ -345,14 +341,14 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelPolygon
     label dummyNearType = -1;
     label dummyNearLabel = -1;
 
-    forAll(faces_, faceI)
+    forAll(faces_, facei)
     {
-        const label facePoint0 = faces_[faceI][0];
+        const label facePoint0 = faces_[facei][0];
 
         const point& pf = points_[facePoint0];
 
-        const scalar d1 = normal_[faceI] & (p1 - pf);
-        const scalar d2 = normal_[faceI] & (p2 - pf);
+        const scalar d1 = normal_[facei] & (p1 - pf);
+        const scalar d2 = normal_[facei] & (p2 - pf);
 
         if (sign(d1) == sign(d2))
         {
@@ -363,7 +359,7 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelPolygon
         // intersection point
         const point pIntersect = p1 + (d1/(d1 - d2))*(p2 - p1);
 
-        const List<face>& tris = faceTris_[faceI];
+        const List<face>& tris = faceTris_[facei];
 
         // identify if point is within poly bounds
         forAll(tris, triI)
@@ -378,7 +374,7 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelPolygon
 
             if (t.classify(pIntersect, dummyNearType, dummyNearLabel))
             {
-                hitFaceIDs_.append(faceI);
+                hitFaceIDs_.append(facei);
             }
         }
     }
@@ -440,6 +436,8 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelConcentricCircles
 }
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
 template<class CloudType>
 void Foam::ParticleCollectorFmg<CloudType>::write()
 {
@@ -453,17 +451,17 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     const scalar alpha = (totalTime_ - timeElapsed)/totalTime_;
     const scalar beta = timeElapsed/(totalTime_+VSMALL);
 
-    forAll(faces_, faceI)
+    forAll(faces_, facei)
     {
-        massTotal_[faceI] += mass_[faceI];
+        massTotal_[facei] += mass_[facei];
         // kvm, massFlowRate_ calculation is wrong when resetOnWrite set to false
-        massFlowRate_[faceI] = alpha*massFlowRate_[faceI] + beta*mass_[faceI]/(timeElapsed+VSMALL);
-        massFlux_[faceI] = massFlowRate_[faceI]/area_[faceI];
-        momTotal_[faceI] += mom_[faceI];
-        momRate_[faceI] = alpha*momRate_[faceI] + beta*mom_[faceI]/(timeElapsed+VSMALL);
+        massFlowRate_[facei] = alpha*massFlowRate_[facei] + beta*mass_[facei]/(timeElapsed+VSMALL);
+        massFlux_[facei] = massFlowRate_[facei]/area_[facei];
+        momTotal_[facei] += mom_[facei];
+        momRate_[facei] = alpha*momRate_[facei] + beta*mom_[facei]/(timeElapsed+VSMALL);
     }
 
-    const label procI = Pstream::myProcNo();
+    const label proci = Pstream::myProcNo();
 
     Info<< type() << " output:" << nl;
 
@@ -487,47 +485,47 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     scalar sumTotalMom = 0.0;
     scalar sumAverageMFR = 0.0;
     scalar sumAverageMomRate = 0.0;
-    forAll(faces_, faceI)
+    forAll(faces_, facei)
     {
         scalarList allProcMass(Pstream::nProcs());
-        allProcMass[procI] = massTotal_[faceI];
+        allProcMass[proci] = massTotal_[facei];
         Pstream::gatherList(allProcMass);
-        faceMassTotal[faceI] += sum(allProcMass);
+        faceMassTotal[facei] += sum(allProcMass);
 
         scalarList allProcMom(Pstream::nProcs());
-        allProcMom[procI] = momTotal_[faceI];
+        allProcMom[proci] = momTotal_[facei];
         Pstream::gatherList(allProcMom);
-        faceMomTotal[faceI] += sum(allProcMom);
+        faceMomTotal[facei] += sum(allProcMom);
 
         scalarList allProcMassFlowRate(Pstream::nProcs());
-        allProcMassFlowRate[procI] = massFlowRate_[faceI];
+        allProcMassFlowRate[proci] = massFlowRate_[facei];
         Pstream::gatherList(allProcMassFlowRate);
-        faceMassFlowRate[faceI] += sum(allProcMassFlowRate);
+        faceMassFlowRate[facei] += sum(allProcMassFlowRate);
 
         scalarList allProcMassFlux(Pstream::nProcs());
-        allProcMassFlux[procI] = massFlux_[faceI];
+        allProcMassFlux[proci] = massFlux_[facei];
         Pstream::gatherList(allProcMassFlux);
-        faceMassFlux[faceI] += sum(allProcMassFlux);
+        faceMassFlux[facei] += sum(allProcMassFlux);
 
         scalarList allProcMomRate(Pstream::nProcs());
-        allProcMomRate[procI] = momRate_[faceI];
+        allProcMomRate[proci] = momRate_[facei];
         Pstream::gatherList(allProcMomRate);
-        faceMomRate[faceI] += sum(allProcMomRate);
+        faceMomRate[facei] += sum(allProcMomRate);
 
-        sumTotalMass += faceMassTotal[faceI];
-        sumTotalMom += faceMomTotal[faceI];
-        sumAverageMFR += faceMassFlowRate[faceI];
-        sumAverageMomRate += faceMomRate[faceI];
+        sumTotalMass += faceMassTotal[facei];
+        sumTotalMom += faceMomTotal[facei];
+        sumAverageMFR += faceMassFlowRate[facei];
+        sumAverageMomRate += faceMomRate[facei];
 
         if (outputFilePtr_.valid())
         {
             outputFilePtr_()
                 << time.timeName()
-                << tab << faceI
-                << tab << faceMassTotal[faceI]
-                << tab << faceMassFlowRate[faceI]
-                << tab << faceMomTotal[faceI]
-                << tab << faceMomRate[faceI]
+                << tab << facei
+                << tab << faceMassTotal[facei]
+                << tab << faceMassFlowRate[facei]
+                << tab << faceMomTotal[facei]
+                << tab << faceMomRate[facei]
                 << endl;
         }
 
@@ -535,10 +533,10 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         {
             // gather particle statistics onto master
 
-            Pstream::gatherList(diameters_[faceI]);
-            Pstream::gatherList(velocityMagnitudes_[faceI]);
-            Pstream::gatherList(numberParticles_[faceI]);
-            Pstream::gatherList(positions_[faceI]);
+            Pstream::gatherList(diameters_[facei]);
+            Pstream::gatherList(velocityMagnitudes_[facei]);
+            Pstream::gatherList(numberParticles_[facei]);
+            Pstream::gatherList(positions_[facei]);
 
             if (Pstream::master())
             {
@@ -549,17 +547,17 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                 vectorList localPositions;
                 for(label proc=0;proc<Pstream::nProcs();proc++)
                 {
-                    localDiameters.append(diameters_[faceI][proc]); 
-                    localVelocityMagnitudes.append(velocityMagnitudes_[faceI][proc]); 
-                    localNumberParticles.append(numberParticles_[faceI][proc]); 
-                    localPositions.append(positions_[faceI][proc]); 
+                    localDiameters.append(diameters_[facei][proc]); 
+                    localVelocityMagnitudes.append(velocityMagnitudes_[facei][proc]); 
+                    localNumberParticles.append(numberParticles_[facei][proc]); 
+                    localPositions.append(positions_[facei][proc]); 
                 }
 
 
                 fileName  basedir(this->outputDir()/time.timeName());
                 fileName  filename(
                              basedir/"parcels_"
-                            +Foam::name(faceI)+
+                            +Foam::name(facei)+
                             ".dat"
                           );
 
@@ -602,10 +600,10 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
 
             }
             // reset particle statistics
-            diameters_[faceI][Pstream::myProcNo()].clear();
-            velocityMagnitudes_[faceI][Pstream::myProcNo()].clear();
-            numberParticles_[faceI][Pstream::myProcNo()].clear();
-            positions_[faceI][Pstream::myProcNo()].clear();
+            diameters_[facei][Pstream::myProcNo()].clear();
+            velocityMagnitudes_[facei][Pstream::myProcNo()].clear();
+            numberParticles_[facei][Pstream::myProcNo()].clear();
+            positions_[facei][Pstream::myProcNo()].clear();
         }
     }
 
@@ -701,15 +699,15 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         this->setModelProperty("momRate", faceMomRate);
     }
 
-    forAll(faces_, faceI)
+    forAll(faces_, facei)
     {
-        mass_[faceI] = 0.0;
-        mom_[faceI] = 0.0;
-        massTotal_[faceI] = 0.0;
-        momTotal_[faceI] = 0.0;
-        massFlowRate_[faceI] = 0.0;
-        massFlux_[faceI] = 0.0;
-        momRate_[faceI] = 0.0;
+        mass_[facei] = 0.0;
+        mom_[facei] = 0.0;
+        massTotal_[facei] = 0.0;
+        momTotal_[facei] = 0.0;
+        massFlowRate_[facei] = 0.0;
+        massFlux_[facei] = 0.0;
+        momRate_[facei] = 0.0;
     }
 }
 
@@ -830,12 +828,12 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     numberParticles_.setSize(faces_.size());
     positions_.setSize(faces_.size());
 
-    forAll(faces_,faceI)
+    forAll(faces_,facei)
     {
-        diameters_[faceI].setSize(Pstream::nProcs());
-        velocityMagnitudes_[faceI].setSize(Pstream::nProcs());
-        numberParticles_[faceI].setSize(Pstream::nProcs());
-        positions_[faceI].setSize(Pstream::nProcs());
+        diameters_[facei].setSize(Pstream::nProcs());
+        velocityMagnitudes_[facei].setSize(Pstream::nProcs());
+        numberParticles_[facei].setSize(Pstream::nProcs());
+        positions_[facei].setSize(Pstream::nProcs());
     }
 
 }
@@ -894,7 +892,7 @@ template<class CloudType>
 void Foam::ParticleCollectorFmg<CloudType>::postMove
 (
     parcelType& p,
-    const label cellI,
+    const label celli,
     const scalar dt,
     const point& position0,
     bool& keepParticle
@@ -930,7 +928,7 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
 
     forAll(hitFaceIDs_, i)
     {
-        label faceI = hitFaceIDs_[i];
+        label facei = hitFaceIDs_[i];
         scalar m = p.nParticle()*p.mass();
         scalar d = p.d();
         scalar u = mag(p.U());
@@ -941,37 +939,38 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
 
         /*cout << "diameter " << d << " velocity " << u << " nParticle " << np << "\n";*/
 
-        diameters_[faceI][Pstream::myProcNo()].append(d);
-        velocityMagnitudes_[faceI][Pstream::myProcNo()].append(u);
-        numberParticles_[faceI][Pstream::myProcNo()].append(np);
-        positions_[faceI][Pstream::myProcNo()].append(position);
+        if(sampleParticles_)
+        {
+            diameters_[facei][Pstream::myProcNo()].append(d);
+            velocityMagnitudes_[facei][Pstream::myProcNo()].append(u);
+            numberParticles_[facei][Pstream::myProcNo()].append(np);
+            positions_[facei][Pstream::myProcNo()].append(position);
+        }
 
         if (negateParcelsOppositeNormal_)
         {
             vector Uhat = p.U();
             Uhat /= mag(Uhat) + ROOTVSMALL;
-            if ((Uhat & normal_[faceI]) < 0)
+            if ((Uhat & normal_[facei]) < 0)
             {
                 m *= -1.0;
             }
         }
 
         // add mass contribution
-        mass_[faceI] += m; // should be *0.25 if nSector_ == 1
+        mass_[facei] += m; // should be *0.25 if nSector_ == 1
         vector Uhat = p.U();
-        scalar Unormal = Uhat & normal_[faceI];
-        mom_[faceI] += m*Unormal; // should be *0.25 if nSector_ == 1
-        /*Info << "Unormal: " << Unormal << endl;*/
-        /*Info << "Uy: " << Uy << endl;*/
+        scalar Unormal = Uhat & normal_[facei];
+        mom_[facei] += m*Unormal; // should be *0.25 if nSector_ == 1
 
         if (nSector_ == 1)
         {
-            mass_[faceI + 1] += m; // should be *0.25
-            mass_[faceI + 2] += m; // should be *0.25
-            mass_[faceI + 3] += m; // should be *0.25
-            mom_[faceI + 1] += m*Unormal; // should be *0.25
-            mom_[faceI + 2] += m*Unormal; // should be *0.25
-            mom_[faceI + 3] += m*Unormal; // should be *0.25
+            mass_[facei + 1] += m; // should be *0.25
+            mass_[facei + 2] += m; // should be *0.25
+            mass_[facei + 3] += m; // should be *0.25
+            mom_[facei + 1] += m*Unormal; // should be *0.25
+            mom_[facei + 2] += m*Unormal; // should be *0.25
+            mom_[facei + 3] += m*Unormal; // should be *0.25
         }
 
         if (removeCollected_)

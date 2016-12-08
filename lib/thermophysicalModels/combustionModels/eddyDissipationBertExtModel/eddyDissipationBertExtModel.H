@@ -135,6 +135,7 @@ public:
         (
             const word& modelType, 
             const fvMesh& mesh,
+            const word& combustionProperties,
             const word& phaseName
         );
 

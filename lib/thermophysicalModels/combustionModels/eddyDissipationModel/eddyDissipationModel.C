@@ -40,6 +40,7 @@ eddyDissipationModel<CombThermoType, ThermoType>::eddyDissipationModel
 (
     const word& modelType,
     const fvMesh& mesh,
+    const word& combustionProperties,
     const word& phaseName
 )
 :
@@ -47,6 +48,7 @@ eddyDissipationModel<CombThermoType, ThermoType>::eddyDissipationModel
     (
         modelType,
         mesh,
+        combustionProperties,
         phaseName
     ),
     C_(readScalar(this->coeffs().lookup("C_EDC"))),

@@ -259,3 +259,4 @@ volScalarField ft // kvm
 #include "createSurfaceFilmModel.H"
 #include "createPyrolysisModel.H"
 #include "createRadiationModel.H"
+#include "createRTI.H"

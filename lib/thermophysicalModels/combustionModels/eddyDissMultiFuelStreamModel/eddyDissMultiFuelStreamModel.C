@@ -71,6 +71,7 @@ eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::eddyDissMultiFuelStrea
 (
     const word& modelType,
     const fvMesh& mesh,
+    const word& combustionProperties,
     const word& phaseName
 )
 :
@@ -78,6 +79,7 @@ eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::eddyDissMultiFuelStrea
     (
         modelType,
         mesh,
+        combustionProperties,
         phaseName
     ),
     C_(readScalar(this->coeffs().lookup("C_EDC"))),

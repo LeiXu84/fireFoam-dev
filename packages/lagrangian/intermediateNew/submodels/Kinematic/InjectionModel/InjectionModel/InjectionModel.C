@@ -202,6 +202,15 @@ Foam::scalar Foam::InjectionModel<CloudType>::setNumberOfParticles
             scalar volumeTot = massTotal_/rho;
 
             nP = (volumeFraction*volumeTot + delayedVolume_)/(parcels*volumep);
+            if(nP<0.)
+            {
+                DEBUG(nP);
+                DEBUG(volumeFraction);
+                DEBUG(volumeTot);
+                DEBUG(delayedVolume_);
+                DEBUG(parcels);
+                DEBUG(volumep);
+            }
             break;
         }
         case pbNumber:
@@ -417,6 +426,15 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
         return;
     }
 
+    scalar npMax = -VGREAT; // kvm
+    scalar npMin =  VGREAT; // kvm
+
+    scalar dMax = -VGREAT; // kvm
+    scalar dMin =  VGREAT; // kvm
+
+    scalar UMax = -VGREAT; // kvm
+    scalar UMin =  VGREAT; // kvm
+
     const scalar time = this->owner().db().time().value();
 
     // Prepare for next time step
@@ -441,6 +459,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
         const scalar padTime = max(0.0, SOI_ - time0_);
 
         // Introduce new parcels linearly across carrier phase timestep
+        label added = -1;
         for (label parcelI = 0; parcelI < newParcels; parcelI++)
         {
             if (validInjection(parcelI))
@@ -506,6 +525,15 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                             pPtr->rho()
                         );
 
+                    npMax = max(npMax,pPtr->nParticle());
+                    npMin = min(npMin,pPtr->nParticle());
+
+                    dMax = max(dMax,pPtr->d());
+                    dMin = min(dMin,pPtr->d());
+
+                    UMax = max(UMax,mag(pPtr->U()));
+                    UMin = min(UMin,mag(pPtr->U()));
+
                     // This value does not need to be 1.0, kvm
                     if (pPtr->nParticle() >= 0.001) // kvm
                     {
@@ -515,6 +543,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                         if (pPtr->move(td, dt))
                         {
                             td.cloud().addParticle(pPtr);
+                            added = 1;
                         }
                         else
                         {
@@ -523,6 +552,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                     }
                     else
                     {
+                        Info << "parcel not added, nParticle(): " << pPtr->nParticle() << nl;
                         delayedVolume += pPtr->nParticle()*pPtr->volume();
                         delete pPtr;
                     }
@@ -531,6 +561,27 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
         }
 
         delayedVolume_ = delayedVolume;
+        
+        // output diagnostic info for parcels
+        reduce(added,maxOp<scalar>());
+        if(added>0)
+        {
+            reduce(npMax,maxOp<scalar>());
+            reduce(npMin,minOp<scalar>());
+            Info << "InjectionModel::npMax:" << tab << this->owner().db().time().timeName() << tab << npMax << endl;
+            Info << "InjectionModel::npMin:" << tab << this->owner().db().time().timeName() << tab << npMin << endl;
+
+            reduce(dMax,maxOp<scalar>());
+            reduce(dMin,minOp<scalar>());
+            Info << "InjectionModel::dMax:" << tab << this->owner().db().time().timeName() << tab << dMax << endl;
+            Info << "InjectionModel::dMin:" << tab << this->owner().db().time().timeName() << tab << dMin << endl;
+
+            reduce(UMax,maxOp<scalar>());
+            reduce(UMin,minOp<scalar>());
+            Info << "InjectionModel::UMax:" << tab << this->owner().db().time().timeName() << tab << UMax << endl;
+            Info << "InjectionModel::UMin:" << tab << this->owner().db().time().timeName() << tab << UMin << endl;
+        }
+
     }
 
     postInjectCheck(parcelsAdded, massAdded);

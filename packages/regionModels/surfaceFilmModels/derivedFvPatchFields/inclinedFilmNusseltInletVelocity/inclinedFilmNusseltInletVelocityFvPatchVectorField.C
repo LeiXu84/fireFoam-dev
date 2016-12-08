@@ -164,7 +164,7 @@ void Foam::inclinedFilmNusseltInletVelocityFvPatchVectorField::updateCoeffs()
     const scalar a = a_->value(t);
     const scalar omega = omega_->value(t);
 
-    const scalarField G(GMean + a*GMean*sin(omega*constant::mathematical::twoPi*d));
+    const scalarField G(GMean + a*GMean*sin(omega*constant::mathematical::twoPi*d)); // kvm
 
     const volScalarField& mu = film.mu();
     const scalarField mup(mu.boundaryField()[patchi].patchInternalField());
@@ -174,7 +174,7 @@ void Foam::inclinedFilmNusseltInletVelocityFvPatchVectorField::updateCoeffs()
 
     const scalarField Re(max(G, scalar(0.0))/mup);
 
-    operator==(n*pow(gTan*mup/(3.0*rhop), 0.33333333)*pow(Re, 0.6666666));
+    operator==(n*pow(gTan*mup/(3.0*rhop), 0.33333333)*pow(Re, 0.6666666)); // kvm
 
     fixedValueFvPatchVectorField::updateCoeffs();
 }

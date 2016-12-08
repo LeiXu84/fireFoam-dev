@@ -150,3 +150,6 @@ forAll(QcWallFunction.boundaryField(), patchi)
      //- Flame Extinction (Bert)
      volFracSpray = parcels.theta();
      rhoSpray = rhoWater*volFracSpray;
+
+#include "rti.H"
+

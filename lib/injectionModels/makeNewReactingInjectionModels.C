@@ -5,6 +5,7 @@
 #include "LookupTableVolumeFluxSprinklerInjection.H"
 #include "UniformSamplingSprinklerInjection.H"
 #include "DetailedSprinklerInjection.H"
+#include "DetailedSprinklerInjection2.H"
 
 #include "basicReactingCloud.H"
 
@@ -16,4 +17,5 @@ namespace Foam
     makeInjectionModelType(LookupTableVolumeFluxSprinklerInjection, basicReactingCloud);
     makeInjectionModelType(UniformSamplingSprinklerInjection, basicReactingCloud);
     makeInjectionModelType(DetailedSprinklerInjection, basicReactingCloud);
+    makeInjectionModelType(DetailedSprinklerInjection2, basicReactingCloud);
 }

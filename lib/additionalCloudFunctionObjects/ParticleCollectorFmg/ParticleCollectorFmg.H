@@ -148,7 +148,7 @@ private:
         // Polygon collector
 
             //- Triangulation of faces
-            List<List<face> > faceTris_;
+            List<List<face>> faceTris_;
 
         // Concentric circles collector
 
@@ -233,7 +233,7 @@ private:
         );
 
         //- Initialise polygon collectors
-        void initPolygons(const List<Field<point> >& polygons);
+        void initPolygons(const List<Field<point>>& polygons);
 
         //- Initialise concentric circle collectors
         void initConcentricCircles();
@@ -281,9 +281,9 @@ public:
         ParticleCollectorFmg(const ParticleCollectorFmg<CloudType>& pc);
 
         //- Construct and return a clone
-        virtual autoPtr<CloudFunctionObject<CloudType> > clone() const
+        virtual autoPtr<CloudFunctionObject<CloudType>> clone() const
         {
-            return autoPtr<CloudFunctionObject<CloudType> >
+            return autoPtr<CloudFunctionObject<CloudType>>
             (
                 new ParticleCollectorFmg<CloudType>(*this)
             );
@@ -308,7 +308,7 @@ public:
             virtual void postMove
             (
                 parcelType& p,
-                const label cellI,
+                const label celli,
                 const scalar dt,
                 const point& position0,
                 bool& keepParticle

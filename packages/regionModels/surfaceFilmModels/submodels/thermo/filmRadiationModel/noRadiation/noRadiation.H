@@ -96,7 +96,7 @@ public:
             //- Return the radiation sensible enthalpy source
             virtual tmp<volScalarField> Shs();
             //- Return const access to the radiation sensible enthalpy source
-            virtual tmp<volScalarField> ShsConst() const;
+            virtual tmp<volScalarField> ShsConst() const; // kvm
 };
 
 

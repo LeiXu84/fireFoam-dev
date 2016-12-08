@@ -38,15 +38,17 @@ namespace combustionModels
 template<class CombThermoType, class ThermoType>
 eddyDissipationBertExtModel<CombThermoType, ThermoType>::eddyDissipationBertExtModel
 (
-    const word& modelType, 
+    const word& modelType,
     const fvMesh& mesh,
+    const word& combustionProperties,
     const word& phaseName
 )
 :
     singleStepCombustion<CombThermoType, ThermoType>
     (
-        modelType, 
+        modelType,
         mesh,
+        combustionProperties,
         phaseName
     ),
     C_(readScalar(this->coeffs().lookup("C_EDC"))),

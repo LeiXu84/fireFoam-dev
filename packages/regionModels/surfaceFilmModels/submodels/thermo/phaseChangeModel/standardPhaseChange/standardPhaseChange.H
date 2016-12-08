@@ -79,9 +79,9 @@ protected:
         //  Used to set max limit on temperature to Tb*TbFactor
         const scalar TbFactor_;
 
-        const scalar scaling_;
+        const scalar scaling_; // kvm
 
-        scalar dMassMax_;
+        scalar dMassMax_; // kvm
         // scalarField dMassMax_;
 
     // Protected member functions

@@ -36,9 +36,9 @@ License
 #include "mapDistribute.H"
 #include "filmThermoModel.H"
 
-#include "cachedRandom.H"
-#include "normal.H"
-#include "mathematicalConstants.H"
+#include "cachedRandom.H" // kvm
+#include "normal.H" // kvm
+#include "mathematicalConstants.H" // kvm
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -294,9 +294,9 @@ void kinematicSingleLayer::updateSurfaceVelocities()
     Uw_ -= nHat()*(Uw_ & nHat());
     Uw_.correctBoundaryConditions();
 
-    // apply quadratic profile to surface velocity
+    // apply quadratic profile to surface velocity // kvm
     Us_ = 2.0*U_;
-    // Limit velocity to reasonable values
+    // Limit velocity to reasonable values // kvm
     const scalar Umax=10.0;
     label limitCount=0;
     forAll(Us_,cellI){

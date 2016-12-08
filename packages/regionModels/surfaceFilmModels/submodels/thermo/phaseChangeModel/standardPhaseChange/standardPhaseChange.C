@@ -26,9 +26,9 @@ License
 #include "standardPhaseChange.H"
 #include "addToRunTimeSelectionTable.H"
 #include "thermoSingleLayer.H"
-#include "specie.H"
-#include "heatTransferModel.H"
-#include "filmRadiationModel.H"
+#include "specie.H" // kvm
+#include "heatTransferModel.H" // kvm
+#include "filmRadiationModel.H" // kvm
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -82,10 +82,10 @@ protected:
 
         //- Limits [K]
 
-        //- Minimum temperature limit (optional)
+        //- Minimum temperature limit (optional) // kvm
         scalar Tmin_;
 
-        //- Maximum temperature limit (optional)
+        //- Maximum temperature limit (optional) // kvm
         scalar Tmax_;
 
 

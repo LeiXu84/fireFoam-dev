@@ -4,6 +4,8 @@ set -x
 
 ./installVersion.sh
 
+touch fireFoam.C
+
 wmake
 
 # ----------------------------------------------------------------- end-of-file

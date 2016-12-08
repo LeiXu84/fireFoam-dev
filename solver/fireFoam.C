@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     #include "postProcess.H"
 
     #include "setRootCase.H"
-    /*#include "printVersion.H"*/
+    #include "printVersion.H"
     #include "createTime.H"
     #include "createMesh.H"
     #include "createControl.H"

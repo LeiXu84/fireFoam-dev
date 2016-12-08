@@ -93,7 +93,7 @@ tmp<volScalarField> noRadiation::Shs()
     );
 }
 
-tmp<volScalarField> noRadiation::ShsConst() const
+tmp<volScalarField> noRadiation::ShsConst() const // kvm
 {
     return tmp<volScalarField>
     (

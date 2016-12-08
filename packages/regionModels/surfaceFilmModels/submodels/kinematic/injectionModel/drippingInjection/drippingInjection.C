@@ -107,7 +107,7 @@ void drippingInjection::correct
 
     forAll(gNorm, i)
     {
-        if (gNorm[i] > 5.0) // SMALL)
+        if (gNorm[i] > 5.0) // SMALL) // kvm
         {
             const scalar ddelta = max(0.0, delta[i] - deltaStable_);
             massDrip[i] +=

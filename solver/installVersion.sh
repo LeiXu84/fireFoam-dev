@@ -4,14 +4,16 @@
 destination=$WM_DIR/rules/General/
 file=version2
 
-if [ -e  $destination/$file ]
+if cmp $destination/$file $file >/dev/null 2>&1
     then
-    echo "file $file exists in $destination"
+    cmp $WM_DIR/rules/General/version2 version2
+    echo "./$file and $destination/$file are identical"
 else
+    cmp $WM_DIR/rules/General/version2 version2 
     if [ -e $file -a -d $destination ]
 	then
 	echo "installing $file in $destination"
-	cp -rip $file $destination
+	cp -rp $file $destination
     fi
 fi
 

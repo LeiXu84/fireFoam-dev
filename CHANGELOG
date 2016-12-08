@@ -1,3 +1,8 @@
+2016-12-08: Version 16.12.08
+    added detailedSprinklerInjection2 model
+    added rtiVolSF diagnostics
+    compiled against OpenFOAM-dev commit 8dafde6048ab9c7302712447a0d3bb49f800f8f6 (2016-12-07)
+
 2016-09-20: Version 16.09.20
     added detailedSprinklerInjection case
     compiled against OpenFOAM commit 12ee01790182eddc3e63ba369ef1e88d2d7739fa

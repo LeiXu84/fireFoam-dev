@@ -29,7 +29,7 @@ License
 #include "unitConversion.H"
 #include "fvPatchField.H"
 #include "meshWavePatchDistMethod.H"
-#include "kinematicSingleLayer.H"
+#include "kinematicSingleLayer.H" // kvm
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -109,7 +109,7 @@ contactAngleForce::contactAngleForce
             rndGen_
         )
     ),
-    timeIntervalDistribution_
+    timeIntervalDistribution_ // kvm
     (
         distributionModels::distributionModel::New
         (
@@ -132,7 +132,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("mask", dimless, 1.0)
         // zeroGradientFvPatchScalarField::typeName
      ),
-    contactAngle_
+    contactAngle_ // kvm
     (
         IOobject
         (
@@ -146,7 +146,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("zero", dimless, 0.0),
         zeroGradientFvPatchScalarField::typeName
      ),
-    contactAngleOld_
+    contactAngleOld_ // kvm
     (
         IOobject
         (
@@ -160,7 +160,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("zero", dimless, 0.0),
         zeroGradientFvPatchScalarField::typeName
      ),
-    contactAngleNew_
+    contactAngleNew_ // kvm
     (
         IOobject
         (
@@ -174,7 +174,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("zero", dimless, 0.0),
         zeroGradientFvPatchScalarField::typeName
      ),
-    timeOld_
+    timeOld_ // kvm
     (
         IOobject
         (
@@ -188,7 +188,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("zero", dimTime, 0.0),
         zeroGradientFvPatchScalarField::typeName
      ),
-    timeInterval_
+    timeInterval_ // kvm
     (
         IOobject
         (
@@ -202,7 +202,7 @@ contactAngleForce::contactAngleForce
         dimensionedScalar("zero", dimTime, 0.0),
         zeroGradientFvPatchScalarField::typeName
      ),
-    nHits_
+    nHits_ // kvm
     (
         IOobject
         (
@@ -220,15 +220,15 @@ contactAngleForce::contactAngleForce
     initialise();
     // mask for zero-ing out contact angle
     // mask_ = pos(mask_-0.5);
-    forAll(contactAngleOld_,celli){
+    forAll(contactAngleOld_,celli){ // kvm
         contactAngleOld_[celli] = distribution_->sample();
         timeOld_[celli] = owner.time().value();
     }
-    forAll(contactAngleNew_,celli){
+    forAll(contactAngleNew_,celli){ // kvm
         contactAngleNew_[celli] = distribution_->sample();
         timeInterval_[celli] = timeIntervalDistribution_->sample();
     }
-    const kinematicSingleLayer& film =
+    const kinematicSingleLayer& film = // kvm
         dynamic_cast<const kinematicSingleLayer&>(owner_);
     Info << "dx " << sqrt(film.magSf()[0]) << nl;
 }
@@ -245,7 +245,7 @@ contactAngleForce::~contactAngleForce()
 tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
 {
     const kinematicSingleLayer& film =
-        dynamic_cast<const kinematicSingleLayer&>(owner_);
+        dynamic_cast<const kinematicSingleLayer&>(owner_); // kvm
 
     tmp<volVectorField> tForce
     (

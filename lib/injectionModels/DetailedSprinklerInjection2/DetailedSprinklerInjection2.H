@@ -22,7 +22,7 @@
   along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
   Class
-  Foam::DetailedSprinklerInjection
+  Foam::DetailedSprinklerInjection2
 
   Description
   Detailed-Sprinkler injection
@@ -35,12 +35,12 @@
   - parcel velocity
 
   SourceFiles
-  DetailedSprinklerInjection.C
+  DetailedSprinklerInjection2.C
 
   \*---------------------------------------------------------------------------*/
 
-#ifndef DetailedSprinklerInjection_H
-#define DetailedSprinklerInjection_H
+#ifndef DetailedSprinklerInjection2_H
+#define DetailedSprinklerInjection2_H
 
 #include "InjectionModel.H"
 #include "distributionModel.H"
@@ -62,11 +62,11 @@ namespace Foam
     class distributionModel;
 
 /*---------------------------------------------------------------------------*\
-  Class DetailedSprinklerInjection Declaration
+  Class DetailedSprinklerInjection2 Declaration
   \*---------------------------------------------------------------------------*/
 
     template<class CloudType>
-    class DetailedSprinklerInjection
+    class DetailedSprinklerInjection2
         :
         public InjectionModel<CloudType>
     {
@@ -143,6 +143,7 @@ namespace Foam
         const volVectorField& Ugas_;
         Switch activeLinks_;
         scalar RTI_;
+        scalar RTI_deflector_;
         scalar C_;
         List< scalar > initialTemperatureList_;
         scalar activationTemperature_;
@@ -166,6 +167,8 @@ namespace Foam
         word tableName_;
         word sprinkler_;
         word orientation_;
+        List< scalar > phiMinMax_;
+        List< scalar > thetaMinMax_;
         label nEle_;
         label nAzi_;
         scalar operatingPressure_;
@@ -175,14 +178,14 @@ namespace Foam
         scalar  velocityCorrection_;
         //K-factor of operating pressure lpm/bar^0.5
         scalar kFactor_;
+        scalar ratio_;
+        scalar totalTime_;
         scalar sampledRadius_;
         scalar idealFlowRate_;
         Random rndGen_;
         cachedRandom cachedRndGen_;
 
         // Table values
-        List< List< scalar > > phiTables_;
-        List< List< scalar > > thetaTables_;
         List< List< scalar > > volFluxTables_;
         List< List< scalar > > dv50Tables_;
         List< List< scalar > > velMagTables_;
@@ -237,13 +240,13 @@ namespace Foam
     public:
 
         //- Runtime type information
-        TypeName("detailedSprinklerInjection");
+        TypeName("detailedSprinklerInjection2");
 
 
         // Constructors
 
         //- Construct from dictionary
-        DetailedSprinklerInjection
+        DetailedSprinklerInjection2
         (
             const dictionary& dict, 
             CloudType& owner,
@@ -251,20 +254,20 @@ namespace Foam
         );
 
         //- Construct copy
-        DetailedSprinklerInjection(const DetailedSprinklerInjection<CloudType>& im);
+        DetailedSprinklerInjection2(const DetailedSprinklerInjection2<CloudType>& im);
 
         //- Construct and return a clone
         virtual autoPtr<InjectionModel<CloudType> > clone() const
         {
             return autoPtr<InjectionModel<CloudType> >
                 (
-                    new DetailedSprinklerInjection<CloudType>(*this)
+                    new DetailedSprinklerInjection2<CloudType>(*this)
                 );
         }
 
 
         //- Destructor
-        virtual ~DetailedSprinklerInjection();
+        virtual ~DetailedSprinklerInjection2();
 
 
         // Member Functions
@@ -373,7 +376,7 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #ifdef NoRepository
-#   include "DetailedSprinklerInjection.C"
+#   include "DetailedSprinklerInjection2.C"
 #endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
