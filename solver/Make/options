@@ -9,7 +9,7 @@ EXE_INC = \
     -I$(DEV_PATH)/lagrangian/intermediateNew/lnInclude \
     \
     -I$(LIB_SRC)/regionModels/regionModel/lnInclude \
-    -I$(LIB_SRC)/regionModels/pyrolysisModels/lnInclude \
+    -I$(DEV_PATH)/regionModels/pyrolysisModels/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I${LIB_SRC}/meshTools/lnInclude \
@@ -32,7 +32,7 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/thermophysicalFunctions/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/SLGThermo/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/radiation/lnInclude \
+    -I$(DEV_PATH)/thermophysicalModels/radiation/lnInclude \
     -I$(LIB_SRC)/combustionModels/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/ODE/lnInclude
@@ -61,11 +61,12 @@ EXE_LIBS = \
     -lchemistryModel \
     -lsolidChemistryModel \
     -lcombustionModels \
-    -lradiationModels \
+    -L$(FOAM_USER_LIBBIN) \
     -llagrangian \
     -lODE \
     -lregionModels \
-    -lpyrolysisModels \
+    -L$(FOAM_USER_LIBBIN) \
+    -lpyrolysisModelsFF \
     -lfieldFunctionObjects \
     -lliquidProperties \
     /* -lIOFunctionObjects */ \
@@ -76,4 +77,5 @@ EXE_LIBS = \
         -lregionCouplingFF \
         -llagrangianIntermediateFF \
         -lnewInjectionModels \
-        -lRadiationBCs_FMG
+        -lRadiationBCs_FMG \
+        -lradiationModelsFF

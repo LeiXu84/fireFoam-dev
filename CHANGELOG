@@ -1,3 +1,7 @@
+2017-06-01: Version 17.06.01
+    added treatment for radiation attenuation due to spray
+    compiled against OpenFOAM-dev commit 8dafde6048ab9c7302712447a0d3bb49f800f8f6 (2016-12-07)
+
 2016-12-08: Version 16.12.08
     added detailedSprinklerInjection2 model
     added rtiVolSF diagnostics

@@ -1351,8 +1351,16 @@ void reactingOneDimRollPaper::updateRollPaper()
                     Tsurface_[cell0] = TcriticalDelamination_;
                     //blockFactor_[cell0] = blockOfBurningPaper_;
                     scalar paperLeft = max(0.0, massBurningPaper_[cell0]/cellMassCombustible);
-                    blockFactor_[cell0] = min(1.0, paperLeft);
-                    massReleaseRate_[cell0] = max(0.0, Qnet_[cell0]*mag(sf)/Hpyrolysis_);
+
+                    //- Old Model (double count heat flux)
+                    //blockFactor_[cell0] = min(1.0, paperLeft);
+                    //massReleaseRate_[cell0] = max(0.0, Qnet_[cell0]*mag(sf)/Hpyrolysis_);
+
+                    //- New Model (need to adjust Hpy)
+                    blockFactor_[cell0] = max(0.5, min(1.0, paperLeft));
+                    massReleaseRate_[cell0] =
+                        max(0.0, blockFactor_[cell0]*Qnet_[cell0]*mag(sf)/Hpyrolysis_);
+
                     scalar dMass = massReleaseRate_[cell0]*time().deltaTValue();
                     if((massBurningPaper_[cell0]-dMass) > 0)
                     {

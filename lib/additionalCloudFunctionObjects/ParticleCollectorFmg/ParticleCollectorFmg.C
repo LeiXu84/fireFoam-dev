@@ -947,11 +947,29 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
             positions_[facei][Pstream::myProcNo()].append(position);
         }
 
+        scalar Unormal(0);
+        vector Uhat = p.U();
+        switch (mode_)
+        {
+            case mtPolygon:
+            {
+                Unormal = Uhat & normal_[facei];
+                break;
+            }
+            case mtConcentricCircle:
+            {
+                Unormal = Uhat & normal_[0];
+                break;
+            }
+            default:
+            {
+            }
+        }
+
         if (negateParcelsOppositeNormal_)
         {
-            vector Uhat = p.U();
             Uhat /= mag(Uhat) + ROOTVSMALL;
-            if ((Uhat & normal_[facei]) < 0)
+            if (Unormal < 0)
             {
                 m *= -1.0;
             }
@@ -959,8 +977,6 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
 
         // add mass contribution
         mass_[facei] += m; // should be *0.25 if nSector_ == 1
-        vector Uhat = p.U();
-        scalar Unormal = Uhat & normal_[facei];
         mom_[facei] += m*Unormal; // should be *0.25 if nSector_ == 1
 
         if (nSector_ == 1)

@@ -1,7 +1,7 @@
 DEV_PATH=./../../packages
 
 EXE_INC = \
-    /*-DFULLDEBUG -g -O0 \*/ \
+    /* -DFULLDEBUG -g -O0 \*/ \
         -I$(DEV_PATH)/lagrangian/intermediateNew/lnInclude \
         -I$(DEV_PATH)/regionModels/surfaceFilmModels/lnInclude \
     \
@@ -23,7 +23,8 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/reactionThermo/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/SLGThermo/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/chemistryModel/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/radiationModels/lnInclude \
+    -I$(DEV_PATH)/thermophysicalModels/radiationModels/lnInclude \
+    -I$(DEV_PATH)/thermophysicalModels/radiation/lnInclude \
     -I$(LIB_SRC)/lagrangian/basic/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
 
@@ -46,5 +47,5 @@ EXE_LIBS = \
     -lreactionThermophysicalModels \
     -lSLGThermo \
     -lchemistryModel \
-    -lradiationModels \
+    -lradiationModelsFF \
 

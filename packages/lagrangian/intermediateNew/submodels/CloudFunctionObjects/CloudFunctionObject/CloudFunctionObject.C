@@ -61,7 +61,8 @@ template<class CloudType>
 Foam::CloudFunctionObject<CloudType>::CloudFunctionObject(CloudType& owner)
 :
     CloudSubModelBase<CloudType>(owner),
-    outputDir_()
+    outputDir_(),
+    callWriteEveryTime_()
 {}
 
 
@@ -75,7 +76,8 @@ Foam::CloudFunctionObject<CloudType>::CloudFunctionObject
 )
 :
     CloudSubModelBase<CloudType>(modelName, owner, dict, typeName, objectType),
-    outputDir_(owner.mesh().time().path())
+    outputDir_(owner.mesh().time().path()),
+    callWriteEveryTime_(this->coeffDict().lookupOrDefault("callWriteEveryTime",false))
 {
     const fileName relPath =
         "postProcessing"/cloud::prefix/owner.name()/this->modelName();
@@ -101,7 +103,8 @@ Foam::CloudFunctionObject<CloudType>::CloudFunctionObject
 )
 :
     CloudSubModelBase<CloudType>(ppm),
-    outputDir_(ppm.outputDir_)
+    outputDir_(ppm.outputDir_),
+    callWriteEveryTime_(ppm.callWriteEveryTime_)
 {}
 
 
@@ -124,7 +127,11 @@ void Foam::CloudFunctionObject<CloudType>::preEvolve()
 template<class CloudType>
 void Foam::CloudFunctionObject<CloudType>::postEvolve()
 {
-    if (this->owner().time().writeTime())
+    if (callWriteEveryTime_)
+    {
+        this->write();
+    }
+    else if (this->owner().time().writeTime())
     {
         this->write();
     }

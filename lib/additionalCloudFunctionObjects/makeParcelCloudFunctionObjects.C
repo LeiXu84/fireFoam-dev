@@ -25,6 +25,7 @@ License
 
 #include "CloudFunctionObject.H"
 #include "ParticleCollectorFmg.H"
+#include "ParticleCollectorFmgMassThres.H"
 #include "basicReactingCloud.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -32,6 +33,7 @@ License
 namespace Foam
 {
     makeCloudFunctionObjectType(ParticleCollectorFmg, basicReactingCloud);
+    makeCloudFunctionObjectType(ParticleCollectorFmgMassThres, basicReactingCloud);
 }
 
 

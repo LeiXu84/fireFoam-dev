@@ -86,7 +86,10 @@ public:
         // Access
 
             //- Return scatter coefficient
-            tmp<volScalarField> sigmaEff() const;
+            virtual tmp<volScalarField> sigmaEff(const label bandI) const;
+
+            //- Return phase-function for computing in-scattering 
+            virtual tmp<volScalarField> pFunc(const label bandI, const label sour, const label dest) const;
 };
 
 

@@ -294,6 +294,9 @@ public:
 
             //- Evolve the cloud
             void evolve();
+  
+            //- Update properties of the cloud
+            void updateProp();
 
 
         // Mapping

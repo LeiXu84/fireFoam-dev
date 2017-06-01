@@ -68,7 +68,7 @@ Foam::radiation::cloudScatter::~cloudScatter()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::cloudScatter::sigmaEff() const
+Foam::radiation::cloudScatter::sigmaEff(const label bandI) const
 {
     tmp<volScalarField> tsigma
     (
@@ -88,6 +88,7 @@ Foam::radiation::cloudScatter::sigmaEff() const
         )
     );
 
+    //scalar bandI=0;
     forAll(cloudNames_, i)
     {
         const thermoCloud& tc
@@ -95,11 +96,47 @@ Foam::radiation::cloudScatter::sigmaEff() const
             mesh_.objectRegistry::lookupObject<thermoCloud>(cloudNames_[i])
         );
 
-        tsigma.ref() += tc.sigmap();
+        tsigma.ref() += tc.sigmap(bandI);
     }
 
-    return 3.0*tsigma;
+    //return 3.0*tsigma;
+    return tsigma;     // removing 3.0 here, to make it generic for P1 and fvDOM
 }
 
+Foam::tmp<Foam::volScalarField>
+Foam::radiation::cloudScatter::pFunc(const label bandI, const label sour, const label dest) const
+{
+    tmp<volScalarField> tPhaseFunc
+    (
+        new volScalarField
+        (
+            IOobject
+            (
+                "phaseFunc",
+                mesh_.time().timeName(),
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::NO_WRITE,
+                false
+            ),
+            mesh_,
+            dimensionedScalar("zero", dimless/dimLength, 0.0)
+        )
+    );
+
+    forAll(cloudNames_, i)
+    {
+    	const thermoCloud& tc
+    	(
+      	mesh_.objectRegistry::lookupObject<thermoCloud>(cloudNames_[i])
+    	);
+
+        tPhaseFunc.ref() += tc.sigmap(bandI)*tc.phaseFunc(bandI,sour,dest);   // sigma_cloud * phaseFunc_cloud [sigma not to be included 
+									      // while solving for RTE since it is already included here]
+     }
+
+    return tPhaseFunc; 
+
+}
 
 // ************************************************************************* //

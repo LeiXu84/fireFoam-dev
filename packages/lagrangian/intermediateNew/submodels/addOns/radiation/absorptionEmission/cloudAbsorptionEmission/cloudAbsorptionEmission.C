@@ -68,7 +68,7 @@ Foam::radiation::cloudAbsorptionEmission::~cloudAbsorptionEmission()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::cloudAbsorptionEmission::aDisp(const label) const
+Foam::radiation::cloudAbsorptionEmission::aDisp(const label bandI) const
 {
     tmp<volScalarField> ta
     (
@@ -95,7 +95,7 @@ Foam::radiation::cloudAbsorptionEmission::aDisp(const label) const
             mesh_.objectRegistry::lookupObject<thermoCloud>(cloudNames_[i])
         );
 
-        ta.ref() += tc.ap();
+        ta.ref() += tc.ap(bandI);
     }
 
     return ta;
@@ -155,7 +155,7 @@ Foam::radiation::cloudAbsorptionEmission::EDisp(const label bandI) const
             mesh_.objectRegistry::lookupObject<thermoCloud>(cloudNames_[i])
         );
 
-        tE.ref() += tc.Ep();
+        tE.ref() += tc.Ep(bandI);
     }
 
     // Total emission is 4 times the projected emission

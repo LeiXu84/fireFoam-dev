@@ -586,15 +586,15 @@ void Foam::ReactingParcel<ParcelType>::calc
         td.cloud().hsTrans()[celli] += np0*dhsTrans;
         td.cloud().hsCoeff()[celli] += np0*Sph;
 
-        // Update radiation fields
-        if (td.cloud().radiation())
-        {
-            const scalar ap = this->areaP();
-            const scalar T4 = pow4(T0);
-            td.cloud().radAreaP()[celli] += dt*np0*ap;
-            td.cloud().radT4()[celli] += dt*np0*T4;
-            td.cloud().radAreaPT4()[celli] += dt*np0*ap*T4;
-        }
+//        // Update radiation fields
+//        if (td.cloud().radiation())
+//        {
+//            const scalar ap = this->areaP();
+//            const scalar T4 = pow4(T0);
+//            td.cloud().radAreaP()[celli] += dt*np0*ap;
+//            td.cloud().radT4()[celli] += dt*np0*T4;
+//            td.cloud().radAreaPT4()[celli] += dt*np0*ap*T4;
+//        }
     }
 }
 

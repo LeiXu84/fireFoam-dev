@@ -174,7 +174,7 @@ void Foam::fixedEnthalpyFluxTemperatureFvPatchScalarField::updateCoeffs()
     const fvsPatchField<scalar>& phip =
         patch().lookupPatchField<surfaceScalarField, scalar>(phiName_);
 
-    Info << "turbModel.alphaEff()() called" << endl;
+    // Info << "turbModel.alphaEff()() called" << endl;
     const scalarField alphap =
         turbModel.alphaEff()().boundaryField()[patchI];
 
@@ -185,8 +185,8 @@ void Foam::fixedEnthalpyFluxTemperatureFvPatchScalarField::updateCoeffs()
 //        1.0/(1.0 - alphap*patch().deltaCoeffs()*patch().magSf()/max(mag(phip), SMALL));
         1.0/(1.0 + alphap*patch().deltaCoeffs()*patch().magSf()/max(mag(phip), SMALL));
 
-    Info << "alphap " << alphap << " " << patch().deltaCoeffs() << endl;
-    Info << "valueFraction " << valueFraction() << " " << refValue() << endl;
+    // Info << "alphap " << alphap << " " << patch().deltaCoeffs() << endl;
+    // Info << "valueFraction " << valueFraction() << " " << refValue() << endl;
 
     mixedFvPatchField<scalar>::updateCoeffs();
 }
