@@ -42,7 +42,7 @@ SourceFiles
 #include "KinematicCloud.H"
 #include "thermoCloud.H"
 #include "SLGThermo.H"
-#include "radiationModel.H"
+#include "radiationModel.H" // ankur
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -134,58 +134,58 @@ protected:
             Switch radiation_;
 
             //- Include coupled radiation
-            Switch coupledRadiation_;
+            Switch coupledRadiation_; // ankur
 
             //- Reference to radiation model
             //const radiation::radiationModel& radModel_;
 
             //- Number of wavelengths/bands
-	    label nBands_;
+            label nBands_; // ankur
 
             //- Radiation property type
-            word radProp_;
+            word radProp_; // ankur
 
             //- Constant radiation properties
-            scalar constAbsEff_;
-            scalar constSctEff_;
+            scalar constAbsEff_; // ankur
+            scalar constSctEff_; // ankur
 
             //- Diameter dependent, banded radiation properties
-            label numPropBands_;
-            scalar beamLen_;
-            List<scalar> energyFrac_;
-            List<scalar> diaVal_;
-            List<List<scalar>> absEff_;
-            List<List<scalar>> sctEff_;
-            List<List<scalar>> asyFac_;
+            label numPropBands_; // ankur
+            scalar beamLen_; // ankur
+            List<scalar> energyFrac_; // ankur
+            List<scalar> diaVal_; // ankur
+            List<List<scalar>> absEff_; // ankur
+            List<List<scalar>> sctEff_; // ankur
+            List<List<scalar>> asyFac_; // ankur
  
             //- Radiation sum of parcel projected areas
-            PtrList<volScalarField::Internal> radAreaP_;
+            PtrList<volScalarField::Internal> radAreaP_; // ankur
 
             //- Radiation sum of parcel projected areas for scattering
-            PtrList<volScalarField::Internal> radAreaPSc_;
+            PtrList<volScalarField::Internal> radAreaPSc_; // ankur
 
             //- Radiation sum of parcel temperature^4
-            PtrList<volScalarField::Internal> radT4_;
+            PtrList<volScalarField::Internal> radT4_; // ankur
 
             //- Radiation sum of parcel projected areas * temperature^4
-            PtrList<volScalarField::Internal> radAreaPT4_;
+            PtrList<volScalarField::Internal> radAreaPT4_; // ankur
 
             //- Radiation sum of scattering coefficient * asymmetry factor
-            PtrList<volScalarField::Internal> radAreaPScAsy_;
+            PtrList<volScalarField::Internal> radAreaPScAsy_; // ankur
 
             //- Normalization factor for in-scattering terms  (as a function of bands and space)
             //- Assuming that this factor is same for different directions (different rays) for now..
-            PtrList<volScalarField::Internal> CScat_;
+            PtrList<volScalarField::Internal> CScat_; // ankur
    
             //- Angular-discretization dependent constants appearing in the expression for computation of CScat
             //- Computed only once at the start of the run
-            List<scalar> CScatCoeffs_;
+            List<scalar> CScatCoeffs_; // ankur
 
             //- Bool for setting CScat
-            bool setCScat_; 
+            bool setCScat_;  // ankur
 
             //- Bool for setting CScatCoeffs
-            bool setCScatCoeffs_; 
+            bool setCScatCoeffs_;  // ankur
 
         // Sources
 
@@ -204,10 +204,10 @@ protected:
             void setModels();
 
             //-Set CScatCoeffs
-            void setCScatCoeffs();
+            void setCScatCoeffs(); // ankur
 
             //-Set CScat
-            void setCScat();
+            void setCScat(); // ankur
 
         // Cloud evolution functions
 
@@ -307,54 +307,52 @@ public:
                 inline bool radiation() const;
 
                  //- coupled radiation flag
-                inline bool coupledRadiation() const;
+                inline bool coupledRadiation() const; // ankur
 
                 //- Return the number of bands
-                inline label nBands() const;
+                inline label nBands() const; // ankur
 
                 //- Radiation sum of parcel projected areas [m2]
-                inline volScalarField::Internal& radAreaP(const label bandI);
+                inline volScalarField::Internal& radAreaP(const label bandI); // ankur
 
                 //- Radiation sum of parcel projected areas [m2]
                 inline const volScalarField::Internal&
-                    radAreaP(const label bandI) const;
+                    radAreaP(const label bandI) const; // ankur
 
                 //- Radiation sum of parcel projected areas for scattering [m2]
-                inline volScalarField::Internal& radAreaPSc(const label bandI);
+                inline volScalarField::Internal& radAreaPSc(const label bandI); // ankur
 
                 //- Radiation sum of parcel projected areas for scattering [m2]
                 inline const volScalarField::Internal&
-                    radAreaPSc(const label bandI) const;
+                    radAreaPSc(const label bandI) const; // ankur
 
                 //- Radiation sum of parcel temperature^4 [K4]
-                inline volScalarField::Internal& radT4(const label bandI);
+                inline volScalarField::Internal& radT4(const label bandI); // ankur
 
                 //- Radiation sum of parcel temperature^4 [K4]
-                inline const volScalarField::Internal& radT4(const label bandI) const;
+                inline const volScalarField::Internal& radT4(const label bandI) const; // ankur
 
                 //- Radiation sum of parcel projected area*temperature^4 [m2K4]
-                inline volScalarField::Internal& radAreaPT4(const label bandI);
+                inline volScalarField::Internal& radAreaPT4(const label bandI); // ankur
 
                 //- Radiation sum of parcel temperature^4 [m2K4]
                 inline const volScalarField::Internal&
-                    radAreaPT4(const label bandI) const;
+                    radAreaPT4(const label bandI) const; // ankur
 
                 //- Radiation sum of scattering * asyymetry factor
-                inline volScalarField::Internal& radAreaPScAsy(const label bandI);
+                inline volScalarField::Internal& radAreaPScAsy(const label bandI); // ankur
 
                 //- Radiation sum of scattering * asyymetry factor
-                inline const volScalarField::Internal&
-                    radAreaPScAsy(const label bandI) const;
+                inline const volScalarField::Internal& radAreaPScAsy(const label bandI) const; // ankur
 
                 //- Radiation sum of normalization coefficients for in-scattering term
-                inline volScalarField::Internal& CScat(const label bandI);
+                inline volScalarField::Internal& CScat(const label bandI); // ankur
 
                 //- Radiation sum of normalization coefficients for in-scattering term
-                inline const volScalarField::Internal&
-                    CScat(const label bandI) const;
+                inline const volScalarField::Internal& CScat(const label bandI) const; // ankur
 
                 //- Radiation dia-Banded model diameters
-                inline const List<scalar>& diaVal() const;
+                inline const List<scalar>& diaVal() const; // ankur
 
             // Sources
 
@@ -381,37 +379,37 @@ public:
                 // Radiation - overrides thermoCloud virtual abstract members
 
                     //- Return tmp equivalent particulate emission
-                    inline tmp<volScalarField> Ep(const label bandI) const;
+                    inline tmp<volScalarField> Ep(const label bandI) const; // ankur
 
                     //- Return tmp equivalent particulate absorption
-                    inline tmp<volScalarField> ap(const label bandI) const;
+                    inline tmp<volScalarField> ap(const label bandI) const; // ankur
 
                     //- Return tmp equivalent particulate scattering factor
-                    inline tmp<volScalarField> sigmap(const label bandI) const;
+                    inline tmp<volScalarField> sigmap(const label bandI) const; // ankur
 
                     //- Return tmp phase-function 
-                    inline tmp<volScalarField> phaseFunc(const label bandI, const label sour, const label dest) const;
+                    inline tmp<volScalarField> phaseFunc(const label bandI, const label sour, const label dest) const; // ankur
 
                  // Radiation - Access functions for radiation calculations for parcels
 
-    	             // - Update cloud level radiation properties in cells
-    	             inline void updateRadProperties(const label celli, const scalar ap, const label np, const scalar T4, const scalar dt);
+                     // - Update cloud level radiation properties in cells
+                     inline void updateRadProperties(const label celli, const scalar ap, const label np, const scalar T4, const scalar dt); // ankur
 
-    	             // - Update cloud level radiation properties in cells, and compute quantities to calculate radiation source terms for parcels
-    	             inline List<scalar> radCalc(const label celli, const scalar ap, const scalar np, const scalar T4, const scalar dt);
+                     // - Update cloud level radiation properties in cells, and compute quantities to calculate radiation source terms for parcels
+                     inline List<scalar> radCalc(const label celli, const scalar ap, const scalar np, const scalar T4, const scalar dt); // ankur
 
-    		     // - Compute k*G for a parcel particle
-    		     inline scalar getkG(const scalar pDia) const; 
+                 // - Compute k*G for a parcel particle
+                 inline scalar getkG(const scalar pDia) const;  // ankur
 
-		     // - Compute QEmm and emFrac of a parcle particle for all bands
-		     //inline scalar getEmm(const scalar pDia) const;
-                     inline void getQEmmFrac(const scalar pDia, const scalar pT, List<scalar>& QEmm, List<scalar>& emFrac) const;
+             // - Compute QEmm and emFrac of a parcle particle for all bands
+             //inline scalar getEmm(const scalar pDia) const;
+             inline void getQEmmFrac(const scalar pDia, const scalar pT, List<scalar>& QEmm, List<scalar>& emFrac) const; // ankur
 
-		     // - Compute Qabs of a parcle particle
-		     inline scalar getQAbs(const scalar pDia, const label bandI) const;
+             // - Compute Qabs of a parcle particle
+             inline scalar getQAbs(const scalar pDia, const label bandI) const; // ankur
 
-		     // - Compute Qabs and Qsct of a parcle for all bands
-		     inline void getQAbsQSct(const scalar, const scalar nParticle, List<scalar>& QAbs, List<scalar>& QSct, List<scalar>& asyFac) const;
+             // - Compute Qabs and Qsct of a parcle for all bands
+             inline void getQAbsQSct(const scalar, const scalar nParticle, List<scalar>& QAbs, List<scalar>& QSct, List<scalar>& asyFac) const; // ankur
 
         // Check
 
@@ -461,7 +459,7 @@ public:
             void evolve();
 
             //- update properties of the cloud
-            void updateProp();
+            void updateProp(); // ankur
 
 
         // Mapping

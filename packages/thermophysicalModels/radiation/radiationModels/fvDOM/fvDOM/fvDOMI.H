@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -79,6 +79,7 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::aLambda
     return aLambda_[lambdaI];
 }
 
+// ankur
 inline const Foam::volScalarField& Foam::radiation::fvDOM::GLambda
 (
     const label lambdaI
@@ -87,6 +88,7 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::GLambda
     return GLambda_[lambdaI];
 }
 
+// ankur
 inline const Foam::volScalarField& Foam::radiation::fvDOM::enFracLambda
 (
     const label lambdaI
@@ -95,6 +97,7 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::enFracLambda
     return enFracLambda_[lambdaI];
 }
 
+// ankur
 inline const Foam::volScalarField& Foam::radiation::fvDOM::T() const
 {
     return this->T_;
@@ -106,9 +109,9 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::G() const
 }
 
 
-inline const Foam::volScalarField& Foam::radiation::fvDOM::Qr() const
+inline const Foam::volScalarField& Foam::radiation::fvDOM::qr() const
 {
-    return Qr_;
+    return qr_;
 }
 
 inline const Foam::volScalarField& Foam::radiation::fvDOM::Qin() const

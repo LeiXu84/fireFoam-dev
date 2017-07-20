@@ -192,7 +192,7 @@ updateCoeffs()
 
     const scalarField nAve(n & ray.dAve());
 
-    ray.Qr().boundaryFieldRef()[patchi] += Iw*nAve;
+    ray.qr().boundaryFieldRef()[patchi] += Iw*nAve;
 
     const scalarField pT
     (

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -53,7 +53,7 @@ Foam::radiation::constantScatter::constantScatter
 )
 :
     scatterModel(dict, mesh),
-    coeffsDict_(dict.subDict(typeName + "Coeffs")),
+    coeffsDict_(dict.optionalSubDict(typeName + "Coeffs")),
     sigma_(coeffsDict_.lookup("sigma")),
     C_(coeffsDict_.lookup("C"))
 {}
@@ -68,7 +68,7 @@ Foam::radiation::constantScatter::~constantScatter()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::constantScatter::sigmaEff(const label bandI) const
+Foam::radiation::constantScatter::sigmaEff(const label bandI) const // ankur
 {
     return tmp<volScalarField>
     (
@@ -89,6 +89,7 @@ Foam::radiation::constantScatter::sigmaEff(const label bandI) const
     );
 }
 
+// ankur
 Foam::tmp<Foam::volScalarField>
 Foam::radiation::constantScatter::pFunc(const label bandI, const label sour, const label dest) const
 {

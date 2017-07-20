@@ -88,9 +88,9 @@ public:
     // Member Functions
 
         //- Return scatter coefficient
-        virtual tmp<volScalarField> sigmaEff(const label bandI) const;
+        virtual tmp<volScalarField> sigmaEff(const label bandI) const; // ankur
 
-        //- Return phase-function for computing in-scattering 
+        //- Return phase-function for computing in-scattering  // ankur
         virtual tmp<volScalarField> pFunc(const label bandI, const label sour, const label dest) const;
 };
 

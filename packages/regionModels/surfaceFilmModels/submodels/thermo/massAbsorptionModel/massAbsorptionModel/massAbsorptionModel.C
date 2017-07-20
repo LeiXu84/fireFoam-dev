@@ -43,10 +43,10 @@ defineRunTimeSelectionTable(massAbsorptionModel, dictionary);
 
 massAbsorptionModel::massAbsorptionModel
 (
-    surfaceFilmModel& owner
+    surfaceFilmModel& film
 )
 :
-    filmSubModelBase(owner),
+    filmSubModelBase(film),
     latestMassAbs_(0.0),
     totalMassAbs_(0.0)
 {}
@@ -55,11 +55,11 @@ massAbsorptionModel::massAbsorptionModel
 massAbsorptionModel::massAbsorptionModel
 (
     const word& modelType,
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    filmSubModelBase(owner, dict, typeName, modelType),
+    filmSubModelBase(film, dict, typeName, modelType),
     latestMassAbs_(0.0),
     totalMassAbs_(0.0)
 {}
@@ -106,7 +106,7 @@ void massAbsorptionModel::info(Ostream& os) const
 {
     const scalar massAbsRate =
         returnReduce(latestMassAbs_, sumOp<scalar>())
-       /owner_.time().deltaTValue();
+       /filmModel_.time().deltaTValue();
 
     os  << indent << "mass absorption    = " 
         << returnReduce(totalMassAbs_, sumOp<scalar>()) << nl

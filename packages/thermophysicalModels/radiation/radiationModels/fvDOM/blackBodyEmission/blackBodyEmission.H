@@ -76,7 +76,7 @@ private:
         const dimensionedScalar C2_;
 
         // Ptr List for black body emission energy field for each wavelength
-        PtrList<volScalarField> bLambda_;
+        PtrList<volScalarField> bLambda_; // kvm, should be deleted, per ankur
 
         // Reference to the temperature field
         const volScalarField& T_;
@@ -130,14 +130,14 @@ public:
                 const Vector2D<scalar>& band
             ) const;
 
-            //- fraction of energy at T from lambda1 to lambda2
+            //- fraction of energy at T from lambda1 to lambda2, ankur
             tmp<Foam::volScalarField> fracDeltaLambdaT
             (
                 const volScalarField& T,
                 const Vector2D<scalar>& band
             ) const;
 
-            //- Fraction of emitted energy at T from lambda1 to lambda2
+            //- Fraction of emitted energy at T from lambda1 to lambda2, ankur
             scalar fDeltaLambdaT
             (
                 const scalar T,
@@ -150,7 +150,7 @@ public:
         // Update black body emission
         void correct(const label lambdaI, const Vector2D<scalar>& band);
 
-        // Update black body emission fraction
+        // Update black body emission fraction, ankur
         void correctEnFrac(volScalarField& enFracLambda, const Vector2D<scalar>& band);
 
 };

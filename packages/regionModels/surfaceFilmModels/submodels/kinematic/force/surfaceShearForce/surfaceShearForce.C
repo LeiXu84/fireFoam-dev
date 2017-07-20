@@ -47,11 +47,11 @@ addToRunTimeSelectionTable(force, surfaceShearForce, dictionary);
 
 surfaceShearForce::surfaceShearForce
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& filmModel_,
     const dictionary& dict
 )
 :
-    force(owner),
+    force(filmModel_),
     Cf_(readScalar(coeffDict_.lookup("Cf")))
 {}
 
@@ -68,7 +68,7 @@ tmp<fvVectorMatrix> surfaceShearForce::correct(volVectorField& U)
 {
     // local reference to film model
     const kinematicSingleLayer& film =
-        static_cast<const kinematicSingleLayer&>(owner_);
+        static_cast<const kinematicSingleLayer&>(filmModel_);
 
     // local references to film fields
     const volScalarField& mu = film.mu();

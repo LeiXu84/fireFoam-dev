@@ -97,12 +97,14 @@ inline bool Foam::ThermoCloud<CloudType>::radiation() const
     return radiation_;
 }
 
+//ankur
 template<class CloudType>
 inline bool Foam::ThermoCloud<CloudType>::coupledRadiation() const
 {
     return coupledRadiation_;
 }
 
+//ankur
 template<class CloudType>
 inline Foam::label Foam::ThermoCloud<CloudType>::nBands() const
 {
@@ -112,7 +114,7 @@ inline Foam::label Foam::ThermoCloud<CloudType>::nBands() const
 
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radAreaP(const label bandI)
+Foam::ThermoCloud<CloudType>::radAreaP(const label bandI) // ankur
 {
     if (!radiation_)
     {
@@ -121,13 +123,13 @@ Foam::ThermoCloud<CloudType>::radAreaP(const label bandI)
             << abort(FatalError);
     }
 
-    return radAreaP_[bandI];
+    return radAreaP_[bandI]; // ankur
 }
 
 
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radAreaP(const label bandI) const
+Foam::ThermoCloud<CloudType>::radAreaP(const label bandI) const // ankur
 {
     if (!radiation_)
     {
@@ -136,9 +138,10 @@ Foam::ThermoCloud<CloudType>::radAreaP(const label bandI) const
             << abort(FatalError);
     }
 
-    return radAreaP_[bandI];
+    return radAreaP_[bandI]; // ankur
 }
 
+// ankur
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::radAreaPSc(const label bandI)
@@ -154,6 +157,7 @@ Foam::ThermoCloud<CloudType>::radAreaPSc(const label bandI)
 }
 
 
+// ankur
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::radAreaPSc(const label bandI) const
@@ -170,7 +174,7 @@ Foam::ThermoCloud<CloudType>::radAreaPSc(const label bandI) const
 
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radT4(const label bandI)
+Foam::ThermoCloud<CloudType>::radT4(const label bandI) // ankur
 {
     if (!radiation_)
     {
@@ -179,13 +183,13 @@ Foam::ThermoCloud<CloudType>::radT4(const label bandI)
             << abort(FatalError);
     }
 
-    return radT4_[bandI];
+    return radT4_[bandI]; // ankur
 }
 
 
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radT4(const label bandI) const
+Foam::ThermoCloud<CloudType>::radT4(const label bandI) const // ankur
 {
     if (!radiation_)
     {
@@ -194,13 +198,13 @@ Foam::ThermoCloud<CloudType>::radT4(const label bandI) const
             << abort(FatalError);
     }
 
-    return radT4_[bandI];
+    return radT4_[bandI]; // ankur
 }
 
 
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI)
+Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI) // ankur
 {
     if (!radiation_)
     {
@@ -209,13 +213,13 @@ Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI)
             << abort(FatalError);
     }
 
-    return radAreaPT4_[bandI];
+    return radAreaPT4_[bandI]; // ankur
 }
 
 
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
-Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI) const
+Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI) const // ankur
 {
     if (!radiation_)
     {
@@ -224,9 +228,10 @@ Foam::ThermoCloud<CloudType>::radAreaPT4(const label bandI) const
             << abort(FatalError);
     }
 
-    return radAreaPT4_[bandI];
+    return radAreaPT4_[bandI]; // ankur
 }
 
+// ankur
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::radAreaPScAsy(const label bandI)
@@ -242,6 +247,7 @@ Foam::ThermoCloud<CloudType>::radAreaPScAsy(const label bandI)
 }
 
 
+// ankur
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::radAreaPScAsy(const label bandI) const
@@ -256,6 +262,7 @@ Foam::ThermoCloud<CloudType>::radAreaPScAsy(const label bandI) const
     return radAreaPScAsy_[bandI];
 }
 
+// ankur
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::CScat(const label bandI)
@@ -271,6 +278,7 @@ Foam::ThermoCloud<CloudType>::CScat(const label bandI)
 }
 
 
+// ankur
 template<class CloudType>
 inline const Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::CScat(const label bandI) const
@@ -285,12 +293,14 @@ Foam::ThermoCloud<CloudType>::CScat(const label bandI) const
     return CScat_[bandI];
 }
 
+// ankur
 template<class CloudType>
 inline const Foam::List<Foam::scalar>& Foam::ThermoCloud<CloudType>::diaVal() const
 {
   return diaVal_;
 }
 
+// ankur
 template<class CloudType>
 inline Foam::DimensionedField<Foam::scalar, Foam::volMesh>&
 Foam::ThermoCloud<CloudType>::hsTrans()
@@ -364,7 +374,7 @@ Foam::ThermoCloud<CloudType>::Sh(volScalarField& hs) const
 
 
 template<class CloudType>
-inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::Ep(const label bandI) const
+inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::Ep(const label bandI) const // ankur
 {
     tmp<volScalarField> tEp
     (
@@ -390,10 +400,11 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::Ep(const la
         const scalar dt = this->db().time().deltaTValue();
         const scalarField& V = this->mesh().V();
         const scalar epsilon = constProps_.epsilon0();
-        const scalarField& sumAreaPT4 = radAreaPT4_[bandI].field();
+        const scalarField& sumAreaPT4 = radAreaPT4_[bandI].field(); // ankur
 
         //Ep = sumAreaPT4*epsilon*physicoChemical::sigma.value()/V/dt;
-        Ep = sumAreaPT4*physicoChemical::sigma.value()/dt;    // In this implementation, epsilon (i.e., emission efficiency) and division by V is included in radAreaP_ term
+        // ankur, in this implementation, epsilon (i.e., emission efficiency) and division by V is included in radAreaP_ term
+        Ep = sumAreaPT4*physicoChemical::sigma.value()/dt;    
     }
     //Pout << "Sum of Ep: " << Foam::sum(Ep) << endl;
     return tEp;
@@ -401,7 +412,7 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::Ep(const la
 
 
 template<class CloudType>
-inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::ap(const label bandI) const
+inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::ap(const label bandI) const // ankur
 {
     tmp<volScalarField> tap
     (
@@ -427,10 +438,11 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::ap(const la
         const scalar dt = this->db().time().deltaTValue();
         const scalarField& V = this->mesh().V();
         //const scalar epsilon = constProps_.epsilon0();
-        const scalarField& sumAreaP = radAreaP_[bandI].field();
+        const scalarField& sumAreaP = radAreaP_[bandI].field(); // ankur
 
         //ap = sumAreaP*epsilon/V/dt;
-        ap = sumAreaP/dt;     // In this implementation, epsilon (i.e., absorption efficiency) and division by V is included in radAreaP_ term
+        // ankur, in this implementation, epsilon (i.e., absorption efficiency) and division by V is included in radAreaP_ term
+        ap = sumAreaP/dt;
     }
 
     return tap;
@@ -439,7 +451,7 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::ap(const la
 
 template<class CloudType>
 inline Foam::tmp<Foam::volScalarField>
-Foam::ThermoCloud<CloudType>::sigmap(const label bandI) const
+Foam::ThermoCloud<CloudType>::sigmap(const label bandI) const // ankur
 {
     tmp<volScalarField> tsigmap
     (
@@ -466,15 +478,17 @@ Foam::ThermoCloud<CloudType>::sigmap(const label bandI) const
         const scalarField& V = this->mesh().V();
         const scalar epsilon = constProps_.epsilon0();
         const scalar f = constProps_.f0();
-        const scalarField& sumAreaP = radAreaPSc_[bandI].field();
+        const scalarField& sumAreaP = radAreaPSc_[bandI].field(); // ankur
 
         //sigmap *= sumAreaP*(1.0 - f)*(1.0 - epsilon)/V/dt;
-        sigmap = sumAreaP/dt;     // In this implementation, scattering efficiency and division by V is included in radAreaP_ term
+        // ankur, in this implementation, scattering efficiency and division by V is included in radAreaP_ term
+        sigmap = sumAreaP/dt;
     }
 
     return tsigmap;
 }
 
+// ankur
 template<class CloudType>
 inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::phaseFunc(const label bandI, const label sour, const label dest) const
 {
@@ -518,19 +532,21 @@ inline Foam::tmp<Foam::volScalarField> Foam::ThermoCloud<CloudType>::phaseFunc(c
     return tPhaseFunc;
 }
 
+// kvm, can be deleted per Ankur
 template<class CloudType>
 inline void Foam::ThermoCloud<CloudType>::updateRadProperties(const label celli, const scalar ap, const label np, const scalar T4, const scalar dt)
 {
         scalar pDia = pow((4.*ap/3.1415),0.5);
         forAll(radAreaP_, bandI)
         {       
-		radAreaP_[bandI].field()[celli] += dt*np*ap*getQAbs(pDia,bandI);
-		radT4_[bandI].field()[celli] += dt*np*T4;
-		radAreaPT4_[bandI].field()[celli] += dt*np*ap*T4;
+        radAreaP_[bandI].field()[celli] += dt*np*ap*getQAbs(pDia,bandI);
+        radT4_[bandI].field()[celli] += dt*np*T4;
+        radAreaPT4_[bandI].field()[celli] += dt*np*ap*T4;
         }
 }
 
 
+// ankur
 template<class CloudType>
 inline Foam::List<Foam::scalar> Foam::ThermoCloud<CloudType>::radCalc(const label celli, const scalar ap, const scalar np, const scalar T4, const scalar dt)
 {
@@ -570,19 +586,19 @@ inline Foam::List<Foam::scalar> Foam::ThermoCloud<CloudType>::radCalc(const labe
         scalar multFac = dt*npDen*ap;
         forAll(radAreaP_, bandI)
         {      
-                scalar QAbs = QAbsorp[bandI]; 
-                scalar QSct = QScat[bandI]; 
-                scalar asy  = asyFactor[bandI]; 
-                scalar effEmm = QEmm[bandI]*emFrac[bandI];
-		radAreaP_[bandI].field()[celli] += multFac*QAbs;
-		radAreaPSc_[bandI].field()[celli] += multFac*QSct;
-                //Info << " Abs contribution: " << dt*npDen*ap*QAbs  << endl;
-		radT4_[bandI].field()[celli] += dt*npDen*T4;
-		radAreaPT4_[bandI].field()[celli] += multFac*effEmm*T4;
-		radAreaPScAsy_[bandI].field()[celli] += multFac*QSct*asy;
+            scalar QAbs = QAbsorp[bandI]; 
+            scalar QSct = QScat[bandI]; 
+            scalar asy  = asyFactor[bandI]; 
+            scalar effEmm = QEmm[bandI]*emFrac[bandI];
+            radAreaP_[bandI].field()[celli] += multFac*QAbs;
+            radAreaPSc_[bandI].field()[celli] += multFac*QSct;
+            //Info << " Abs contribution: " << dt*npDen*ap*QAbs  << endl;
+            radT4_[bandI].field()[celli] += dt*npDen*T4;
+            radAreaPT4_[bandI].field()[celli] += multFac*effEmm*T4;
+            radAreaPScAsy_[bandI].field()[celli] += multFac*QSct*asy;
 
-                kgAndEmm[0] += QAbs*fvdomModel_.GLambda(bandI)[celli];
-                kgAndEmm[1] += effEmm;
+            kgAndEmm[0] += QAbs*fvdomModel_.GLambda(bandI)[celli];
+            kgAndEmm[1] += effEmm;
  
         }
      
@@ -595,34 +611,38 @@ inline Foam::List<Foam::scalar> Foam::ThermoCloud<CloudType>::radCalc(const labe
         return kgAndEmm;     
 }
 
+// ankur
 template<class CloudType>
 inline Foam::scalar Foam::ThermoCloud<CloudType>::getkG(const scalar pDia) const
 {
-scalar test1;
+    scalar test1;
 
-test1 = 0;
+    test1 = 0;
 
-return test1;
+    return test1;
 } 
 
+// ankur
 template<class CloudType>
 inline void Foam::ThermoCloud<CloudType>::getQEmmFrac(const scalar pDia, const scalar pT, List<scalar>& QEmm, List<scalar>& emFrac) const
 {
-// NEED TO DEFINE THIS FUNCTION........
-return;
+    // NEED TO DEFINE THIS FUNCTION........
+    return;
 }
 
+// ankur
 template<class CloudType>
 inline Foam::scalar Foam::ThermoCloud<CloudType>::getQAbs(const scalar pDia, const label bandI) const
 {
 
-scalar test1;
+    scalar test1;
 
-test1 = 0;
+    test1 = 0;
 
-return test1;
+    return test1;
 }
 
+// ankur
 template<class CloudType>
 inline void Foam::ThermoCloud<CloudType>::getQAbsQSct(const scalar pDia, const scalar np, List<scalar>& QAbs, List<scalar>& QSct, List<scalar>& asyFac) const
 {
@@ -674,45 +694,45 @@ inline void Foam::ThermoCloud<CloudType>::getQAbsQSct(const scalar pDia, const s
 
     if (nBands_ !=1)
     {
-     QAbs = qabs;
-     QSct = qsct; 
-     asyFac = asyF;
-    //Info << "qabs: " << qabs << endl;
-    //Info << "qsct: " << qsct << endl;
+        QAbs = qabs;
+        QSct = qsct; 
+        asyFac = asyF;
+        //Info << "qabs: " << qabs << endl;
+        //Info << "qsct: " << qsct << endl;
     }
     else
     {
-     List<scalar> tau(numPropBands_,0.);
-     scalar tauGray = 0.;
-     scalar rSum = 0.;
+        List<scalar> tau(numPropBands_,0.);
+        scalar tauGray = 0.;
+        scalar rSum = 0.;
 
-     scalar asyNum = 0.;
-     scalar asyDen = 0.;
-     
-     forAll(tau,pBandI)
-     { 
-        tau[pBandI] = 1 - exp(-0.25*3.1415*pDia*pDia*np*(qabs[pBandI]+qsct[pBandI])*beamLen_);
-        tauGray += energyFrac_[pBandI]*tau[pBandI];
-        rSum += energyFrac_[pBandI]*tau[pBandI]*qabs[pBandI]/(qabs[pBandI]+qsct[pBandI]+VSMALL);
-        //Info << " tau tauGray   rSum pBandI: "  << tau[pBandI]  << " " << tauGray << " " << rSum << endl;
-        asyNum += energyFrac_[pBandI]*qsct[pBandI]*asyF[pBandI];
-        asyDen += energyFrac_[pBandI]*qsct[pBandI];
-     }
-     
-     scalar kextGray = -log(1. - tauGray)/(beamLen_+VSMALL);
-     //Info << "kextgray: " << kextGray << endl;
-     QAbs[0] = kextGray*rSum/(tauGray+VSMALL);
-     QSct[0] = kextGray - QAbs[0]; 
-     scalar kOverQ = 0.25*3.1415*pDia*pDia*np;
-     QAbs[0] = QAbs[0]/(kOverQ + VSMALL);
-     QSct[0] = QSct[0]/(kOverQ + VSMALL);
+        scalar asyNum = 0.;
+        scalar asyDen = 0.;
 
-     asyFac[0] = asyNum/(asyDen + VSMALL);
+        forAll(tau,pBandI)
+        { 
+            tau[pBandI] = 1 - exp(-0.25*3.1415*pDia*pDia*np*(qabs[pBandI]+qsct[pBandI])*beamLen_);
+            tauGray += energyFrac_[pBandI]*tau[pBandI];
+            rSum += energyFrac_[pBandI]*tau[pBandI]*qabs[pBandI]/(qabs[pBandI]+qsct[pBandI]+VSMALL);
+            //Info << " tau tauGray   rSum pBandI: "  << tau[pBandI]  << " " << tauGray << " " << rSum << endl;
+            asyNum += energyFrac_[pBandI]*qsct[pBandI]*asyF[pBandI];
+            asyDen += energyFrac_[pBandI]*qsct[pBandI];
+        }
+
+        scalar kextGray = -log(1. - tauGray)/(beamLen_+VSMALL);
+        //Info << "kextgray: " << kextGray << endl;
+        QAbs[0] = kextGray*rSum/(tauGray+VSMALL);
+        QSct[0] = kextGray - QAbs[0]; 
+        scalar kOverQ = 0.25*3.1415*pDia*pDia*np;
+        QAbs[0] = QAbs[0]/(kOverQ + VSMALL);
+        QSct[0] = QSct[0]/(kOverQ + VSMALL);
+
+        asyFac[0] = asyNum/(asyDen + VSMALL);
     }   
-    //Info << "QAbs: "  << QAbs << endl;
-    //Info << "np: "   << np << endl;
-    //Info << "pDia: " << pDia << endl;
-    //Info << "beamLength: " << beamLen_ << endl;
+    // Info << "QAbs: "  << QAbs << endl;
+    // Info << "np: "   << np << endl;
+    // Info << "pDia: " << pDia << endl;
+    // Info << "beamLength: " << beamLen_ << endl;
     return;
 }
 
@@ -767,6 +787,7 @@ inline Foam::scalar Foam::ThermoCloud<CloudType>::Tmin() const
     }
 }
 
+// ankur
 template<class CloudType>
 void Foam::ThermoCloud<CloudType>::setCScatCoeffs()
 {
@@ -781,13 +802,13 @@ void Foam::ThermoCloud<CloudType>::setCScatCoeffs()
 
      for (int i=1; i < nRays; i++)
      {
-       scalar s0Dotsi = dRay0 & fvdomModel_.IRay(i).d();
-       scalar omegaI  = fvdomModel_.IRay(i).omega();
-      
-       CScatCoeffs_[0] += omegaI*s0Dotsi;
-       CScatCoeffs_[1] += omegaI*s0Dotsi*s0Dotsi;
-       CScatCoeffs_[2] += omegaI*s0Dotsi*s0Dotsi*s0Dotsi;
-       CScatCoeffs_[3] += omegaI*s0Dotsi*s0Dotsi*s0Dotsi*s0Dotsi;
+         scalar s0Dotsi = dRay0 & fvdomModel_.IRay(i).d();
+         scalar omegaI  = fvdomModel_.IRay(i).omega();
+
+         CScatCoeffs_[0] += omegaI*s0Dotsi;
+         CScatCoeffs_[1] += omegaI*s0Dotsi*s0Dotsi;
+         CScatCoeffs_[2] += omegaI*s0Dotsi*s0Dotsi*s0Dotsi;
+         CScatCoeffs_[3] += omegaI*s0Dotsi*s0Dotsi*s0Dotsi*s0Dotsi;
      } 
 
      CScatCoeffs_[0] *= 1./(4.*constant::mathematical::pi - omega0);
@@ -796,18 +817,20 @@ void Foam::ThermoCloud<CloudType>::setCScatCoeffs()
      CScatCoeffs_[3] *= 1./(4.*constant::mathematical::pi - omega0);
 }
 
+// ankur
 template<class CloudType>
 void Foam::ThermoCloud<CloudType>::setCScat()
 {
-     const scalar dt = this->db().time().deltaTValue();
-     //Info << "Here setting cscat" << endl;
-     forAll(CScat_, bandI)
-     {
-            scalarField& cscat = CScat_[bandI].field();
-            scalarField asyFacVal = radAreaPScAsy_[bandI].field()/(radAreaPSc_[bandI].field() + VSMALL);    
-            scalarField A_asy = 2.*asyFacVal/(1. + asyFacVal*asyFacVal);
-            scalarField B_asy = (1. - asyFacVal*asyFacVal)/(1. + asyFacVal*asyFacVal);
-            cscat =  1./( B_asy*(1. + A_asy*CScatCoeffs_[0] + A_asy*A_asy*CScatCoeffs_[1] + Foam::pow(A_asy,3.)*CScatCoeffs_[2] + Foam::pow(A_asy,4.)*CScatCoeffs_[3]) + VSMALL);
-     }
+    const scalar dt = this->db().time().deltaTValue();
+    //Info << "Here setting cscat" << endl;
+    forAll(CScat_, bandI)
+    {
+        scalarField& cscat = CScat_[bandI].field();
+        scalarField asyFacVal = radAreaPScAsy_[bandI].field()/(radAreaPSc_[bandI].field() + VSMALL);    
+        scalarField A_asy = 2.*asyFacVal/(1. + asyFacVal*asyFacVal);
+        scalarField B_asy = (1. - asyFacVal*asyFacVal)/(1. + asyFacVal*asyFacVal);
+        cscat =  1./( B_asy*(1. + A_asy*CScatCoeffs_[0] + A_asy*A_asy*CScatCoeffs_[1] + Foam::pow(A_asy,3.)*CScatCoeffs_[2] + Foam::pow(A_asy,4.)*CScatCoeffs_[3]) + VSMALL);
+    }
 }
+
 // ************************************************************************* //

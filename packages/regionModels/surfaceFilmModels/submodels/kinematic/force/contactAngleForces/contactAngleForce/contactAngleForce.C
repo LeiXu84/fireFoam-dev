@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,17 +43,19 @@ namespace surfaceFilmModels
 // * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
 
 defineTypeNameAndDebug(contactAngleForce, 0);
-addToRunTimeSelectionTable(force, contactAngleForce, dictionary);
 
 // * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * * //
 
 void contactAngleForce::initialise()
 {
-    const wordReList zeroForcePatches(coeffDict_.lookup("zeroForcePatches"));
+    const wordReList zeroForcePatches
+    (
+        coeffDict_.lookupOrDefault<wordReList>("zeroForcePatches", wordReList())
+    );
 
     if (zeroForcePatches.size())
     {
-        const polyBoundaryMesh& pbm = owner_.regionMesh().boundaryMesh();
+        const polyBoundaryMesh& pbm = filmModel_.regionMesh().boundaryMesh();
         scalar dLim = readScalar(coeffDict_.lookup("zeroForceDistance"));
 
         Info<< "        Assigning zero contact force within " << dLim
@@ -68,19 +70,19 @@ void contactAngleForce::initialise()
         }
 
         // Temporary implementation until run-time selection covers this case
-        patchDistMethods::meshWave dist(owner_.regionMesh(), patchIDs);
+        patchDistMethods::meshWave dist(filmModel_.regionMesh(), patchIDs);
         volScalarField y
         (
             IOobject
             (
                 "y",
-                owner_.regionMesh().time().timeName(),
-                owner_.regionMesh(),
+                filmModel_.regionMesh().time().timeName(),
+                filmModel_.regionMesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE,
                 false
             ),
-            owner_.regionMesh(),
+            filmModel_.regionMesh(),
             dimensionedScalar("y", dimLength, GREAT)
         );
         dist.correct(y);
@@ -94,143 +96,45 @@ void contactAngleForce::initialise()
 
 contactAngleForce::contactAngleForce
 (
-    surfaceFilmModel& owner,
+    const word& typeName,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    force(typeName, owner, dict),
+    force(typeName, film, dict),
     Ccf_(readScalar(coeffDict_.lookup("Ccf"))),
     rndGen_(label(0), -1),
-    distribution_
-    (
-        distributionModels::distributionModel::New
-        (
-            coeffDict_.subDict("contactAngleDistribution"),
-            rndGen_
-        )
-    ),
-    timeIntervalDistribution_ // kvm
-    (
-        distributionModels::distributionModel::New
-        (
-            coeffDict_.subDict("timeIntervalDistribution"),
-            rndGen_
-        )
-    ),
     mask_
     (
         IOobject
         (
             typeName + ":contactForceMask",
-            owner_.time().timeName(),
-            owner_.regionMesh(),
+            filmModel_.time().timeName(),
+            filmModel_.regionMesh(),
             // IOobject::MUST_READ,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        owner_.regionMesh(),
+        filmModel_.regionMesh(),
         dimensionedScalar("mask", dimless, 1.0)
         // zeroGradientFvPatchScalarField::typeName
-     ),
-    contactAngle_ // kvm
-    (
-        IOobject
-        (
-            typeName + ":contactAngle",
-            owner.time().timeName(),
-            owner.regionMesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        owner.regionMesh(),
-        dimensionedScalar("zero", dimless, 0.0),
-        zeroGradientFvPatchScalarField::typeName
-     ),
-    contactAngleOld_ // kvm
-    (
-        IOobject
-        (
-            typeName + ":contactAngleOld",
-            owner.time().timeName(),
-            owner.regionMesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        owner.regionMesh(),
-        dimensionedScalar("zero", dimless, 0.0),
-        zeroGradientFvPatchScalarField::typeName
-     ),
-    contactAngleNew_ // kvm
-    (
-        IOobject
-        (
-            typeName + ":contactAngleNew",
-            owner.time().timeName(),
-            owner.regionMesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        owner.regionMesh(),
-        dimensionedScalar("zero", dimless, 0.0),
-        zeroGradientFvPatchScalarField::typeName
-     ),
-    timeOld_ // kvm
-    (
-        IOobject
-        (
-            typeName + ":timeOld",
-            owner.time().timeName(),
-            owner.regionMesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        owner.regionMesh(),
-        dimensionedScalar("zero", dimTime, 0.0),
-        zeroGradientFvPatchScalarField::typeName
-     ),
-    timeInterval_ // kvm
-    (
-        IOobject
-        (
-            typeName + ":timeInterval",
-            owner.time().timeName(),
-            owner.regionMesh(),
-            IOobject::NO_READ,
-            IOobject::AUTO_WRITE
-        ),
-        owner.regionMesh(),
-        dimensionedScalar("zero", dimTime, 0.0),
-        zeroGradientFvPatchScalarField::typeName
      ),
     nHits_ // kvm
     (
         IOobject
         (
             typeName + ":nHits",
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
-        owner.regionMesh(),
+        film.regionMesh(),
         dimensionedScalar("zero", dimless, 0.0),
         zeroGradientFvPatchScalarField::typeName
      )
 {
     initialise();
-    // mask for zero-ing out contact angle
-    // mask_ = pos(mask_-0.5);
-    forAll(contactAngleOld_,celli){ // kvm
-        contactAngleOld_[celli] = distribution_->sample();
-        timeOld_[celli] = owner.time().value();
-    }
-    forAll(contactAngleNew_,celli){ // kvm
-        contactAngleNew_[celli] = distribution_->sample();
-        timeInterval_[celli] = timeIntervalDistribution_->sample();
-    }
-    const kinematicSingleLayer& film = // kvm
-        dynamic_cast<const kinematicSingleLayer&>(owner_);
-    Info << "dx " << sqrt(film.magSf()[0]) << nl;
 }
 
 
@@ -245,7 +149,7 @@ contactAngleForce::~contactAngleForce()
 tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
 {
     const kinematicSingleLayer& film =
-        dynamic_cast<const kinematicSingleLayer&>(owner_); // kvm
+        dynamic_cast<const kinematicSingleLayer&>(filmModel_); // kvm
 
     tmp<volVectorField> tForce
     (
@@ -254,47 +158,31 @@ tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
             IOobject
             (
                 typeName + ":contactForce",
-                owner_.time().timeName(),
-                owner_.regionMesh(),
+                filmModel_.time().timeName(),
+                filmModel_.regionMesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            owner_.regionMesh(),
+            filmModel_.regionMesh(),
             dimensionedVector("zero", dimForce/dimArea, Zero)
         )
     );
 
-    scalar time=film.time().value();
-
-    forAll(contactAngle_,celli){
-        if(time > timeOld_[celli]+timeInterval_[celli]){
-            contactAngleOld_[celli]=contactAngleNew_[celli];
-            timeOld_[celli]=timeOld_[celli]+timeInterval_[celli];
-            contactAngleNew_[celli]=distribution_->sample();
-            timeInterval_[celli]=timeIntervalDistribution_->sample();
-        }
-        scalar f = (time - timeOld_[celli])/(timeInterval_[celli]);
-        contactAngle_[celli] = (1.0-f)*contactAngleOld_[celli]+f*contactAngleNew_[celli];
-    }
-
-
-    contactAngleNew_.correctBoundaryConditions();
-    contactAngleOld_.correctBoundaryConditions();
-    contactAngle_.correctBoundaryConditions();
-    timeInterval_.correctBoundaryConditions();
-
     vectorField& force = tForce.ref();
 
-    const labelUList& own = owner_.regionMesh().owner();
-    const labelUList& nbr = owner_.regionMesh().neighbour();
+    const labelUList& own = filmModel_.regionMesh().owner();
+    const labelUList& nbr = filmModel_.regionMesh().neighbour();
 
-    const scalarField& magSf = owner_.magSf();
+    const scalarField& magSf = filmModel_.magSf();
 
-    const volScalarField& alpha = owner_.alpha();
-    const volScalarField& sigma = owner_.sigma();
+    const volScalarField& alpha = filmModel_.alpha();
+    const volScalarField& sigma = filmModel_.sigma();
     const volScalarField& deltaf = film.delta();
 
     volVectorField gradAlpha(fvc::grad(alpha));
+
+    const tmp<volScalarField> ttheta = theta();
+    const volScalarField& theta = ttheta();
 
     scalarField nHits(film.regionMesh().nCells(), 0.0);
 
@@ -332,15 +220,15 @@ tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
             // won't the contact angle be changing each timestep?
             // scalar theta = cos(degToRad(distribution_->sample()));
             scalar ratio = min(deltaf[celli]/deltaf0,1.0);
-            scalar theta = cos(contactAngle_[celli]);
-            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - theta)/dxInverse;
-            force[celli] += mask_[celli]*n*sigma[celli]*(1.0 - theta)/Ccf_*ratio; // using Ccf_ as characteristic length
+            scalar cosTheta = cos(theta[celli]);
+            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - cosTheta)/dxInverse;
+            force[celli] += mask_[celli]*n*sigma[celli]*(1.0 - cosTheta)/Ccf_*ratio; // using Ccf_ as characteristic length
             // TODO: seems like we want to have the contact angel force on both sides of
             // the contact line interface.  This way, the residual liquid will be forced out.
             // (not sure about this one)
-            // force[cellOther] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - theta)/dxInverse;
-            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - theta)*dxInverse; //bug fix
-            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - theta)*area; //bug fix
+            // force[cellOther] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - cosTheta)/dxInverse;
+            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - cosTheta)*dxInverse; //bug fix
+            // force[celli] += mask_[celli]*Ccf_*n*sigma[celli]*(1.0 - cosTheta)*area; //bug fix
             nHits[celli]++;
         }
     }
@@ -362,16 +250,16 @@ tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
                 // won't the contact angle be changing each timestep?
                 const vector n =
                     gradAlpha[cellO]/(mag(gradAlpha[cellO]) + ROOTVSMALL);
-                // scalar theta = cos(degToRad(distribution_->sample()));
+                // scalar cosTheta = cos(degToRad(distribution_->sample()));
                 // ratio is important for code stability
                 // when alpha=1 and deltaf is very small, the contact angle force
                 // can be so large as to cause instabilities in the velocity.
                 scalar ratio = min(deltaf[cellO]/deltaf0,1.0);
-                scalar theta = cos(contactAngle_[cellO]);
+                scalar cosTheta = cos(theta[cellO]);
                 // is this the right dxInverse to be using?
-                // force[cellO] += mask_[cellO]*Ccf_*n*sigma[cellO]*(1.0 - theta)/dxInverse[facei];
-                force[cellO] += mask_[cellO]*n*sigma[cellO]*(1.0 - theta)/Ccf_*ratio;
-                // force[cellO] += mask_[cellO]*Ccf_*n*sigma[cellO]*(1.0 - theta)*area[facei];
+                // force[cellO] += mask_[cellO]*Ccf_*n*sigma[cellO]*(1.0 - cosTheta)/dxInverse[facei];
+                force[cellO] += mask_[cellO]*n*sigma[cellO]*(1.0 - cosTheta)/Ccf_*ratio;
+                // force[cellO] += mask_[cellO]*Ccf_*n*sigma[cellO]*(1.0 - cosTheta)*area[facei];
                 nHits[cellO]++;
             }
         }
@@ -382,7 +270,7 @@ tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
     // force /= magSf;
     tForce.ref().correctBoundaryConditions();
 
-    if (owner_.regionMesh().time().writeTime())
+    if (filmModel_.regionMesh().time().writeTime())
     {
         tForce().write();
         nHits_.primitiveFieldRef() = nHits;

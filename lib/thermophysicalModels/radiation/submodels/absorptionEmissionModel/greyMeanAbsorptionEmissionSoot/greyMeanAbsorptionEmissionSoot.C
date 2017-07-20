@@ -260,12 +260,12 @@ Foam::radiation::greyMeanAbsorptionEmissionSoot::ECont(const label bandI) const
 
     if (mesh_.foundObject<volScalarField>("qrflamelet"))
     {
-        const volScalarField& dQ_ =
-            mesh_.lookupObject<volScalarField>("dQ");
+        const volScalarField& Qdot =
+            mesh_.lookupObject<volScalarField>("Qdot");
 
-        const volScalarField& chiSoot_ =
+        const volScalarField& chiSoot =
             mesh_.lookupObject<volScalarField>("chiSoot");
-        E().internalField() = chiSoot_*dQ_;
+        E().internalField() = chiSoot*Qdot;
     }
 
 

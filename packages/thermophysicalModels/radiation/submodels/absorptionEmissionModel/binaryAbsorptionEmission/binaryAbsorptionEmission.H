@@ -85,10 +85,10 @@ public:
         // Access
 
             // Number of bands
-                virtual label nBands() const;
+                virtual label nBands() const; // ankur
 
            //- Lower and upper limit of band i
-               virtual const Vector2D<scalar>& bands(const label i) const;
+               virtual const Vector2D<scalar>& bands(const label i) const; // ankur
 
             // Absorption coefficient
 

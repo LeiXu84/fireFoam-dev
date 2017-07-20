@@ -51,10 +51,10 @@ addToRunTimeSelectionTable
 filmCoverageFunctionObject::filmCoverageFunctionObject
 (
     const dictionary& dict,
-    regionModel& owner
+    regionModel& film
 )
 :
-    regionModelFunctionObject(dict, owner, typeName),
+    regionModelFunctionObject(dict, film, typeName),
     patchNames_(dict.lookup("patches"))
 {}
 
@@ -82,7 +82,7 @@ void filmCoverageFunctionObject::write() const
     const regionModels::surfaceFilmModels::surfaceFilmModel& film =
         dynamic_cast<const regionModels::surfaceFilmModels::surfaceFilmModel&>
         (
-            owner_
+            regionModel_
         );
 
     const polyBoundaryMesh& pbm = film.regionMesh().boundaryMesh();

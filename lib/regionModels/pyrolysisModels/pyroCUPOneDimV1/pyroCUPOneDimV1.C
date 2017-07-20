@@ -835,7 +835,7 @@ tmp<volScalarField> pyroCUPOneDimV1::kappaRad() const
 }
 
 
-void pyroCUPOneDimV1::setQrad(const scalarField& qrad, label patchI)
+void pyroCUPOneDimV1::setqrad(const scalarField& qrad, label patchI)
 {
     qradBnd_.boundaryFieldRef()[patchI] = qrad;
 }

@@ -79,16 +79,16 @@ public:
             // Radiation
 
                 //- Return tmp equivalent particulate emission
-                virtual tmp<volScalarField> Ep(const label bandI) const = 0;
+                virtual tmp<volScalarField> Ep(const label bandI) const = 0; // ankur
 
                 //- Return tmp equivalent particulate absorption
-                virtual tmp<volScalarField> ap(const label bandI) const = 0;
+                virtual tmp<volScalarField> ap(const label bandI) const = 0; // ankur
 
                 //- Return tmp equivalent particulate scattering factor
-                virtual tmp<volScalarField> sigmap(const label bandI) const = 0;
+                virtual tmp<volScalarField> sigmap(const label bandI) const = 0; // ankur
 
                 //- Return tmp phase-function 
-                virtual tmp<volScalarField> phaseFunc(const label bandI, const label sour, const label dest) const = 0;
+                virtual tmp<volScalarField> phaseFunc(const label bandI, const label sour, const label dest) const = 0; // ankur
 };
 
 

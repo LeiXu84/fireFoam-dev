@@ -190,6 +190,7 @@ void Foam::ReactingLookupTableInjection<CloudType>::setPositionAndCell
     }
 
     position = injectors_[injectorI].x();
+    // Info << "ReactingLookupTableInjection::setPositionAndCell::position: " << position << endl;
     cellOwner = injectorCells_[injectorI];
     tetFacei = injectorTetFaces_[injectorI];
     tetPti = injectorTetPts_[injectorI];

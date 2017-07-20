@@ -372,15 +372,15 @@ eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::Sh() const
 
 template<class CombThermoType, class ThermoType>
 tmp<volScalarField>
-eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::dQ() const
+eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::Qdot() const
 {
-    tmp<volScalarField> tdQ
+    tmp<volScalarField> tQdot
     (
         new volScalarField
         (
             IOobject
             (
-                "dQ",
+                "Qdot",
                 this->mesh_.time().timeName(),
                 this->mesh_,
                 IOobject::NO_READ,
@@ -388,16 +388,16 @@ eddyDissMultiFuelStreamModel<CombThermoType, ThermoType>::dQ() const
                 false
             ),
             this->mesh_,
-            dimensionedScalar("dQ", dimEnergy/dimTime, 0.0)
+            dimensionedScalar("Qdot", dimEnergy/dimTime, 0.0)
         )
     );
 
     if (this->active())
     {
-        volScalarField& dQ = tdQ.ref();
-        dQ.ref() = this->mesh().V()*Sh()();
+        volScalarField& Qdot = tQdot.ref();
+        Qdot.ref() = this->mesh().V()*Sh()();
     }
-    return tdQ;
+    return tQdot;
 }
 
 //

@@ -25,13 +25,11 @@ License
 
 #include "reactingOneDim21.H"
 #include "addToRunTimeSelectionTable.H"
-#include "surfaceInterpolate.H"
 #include "fvm.H"
 #include "fvcDiv.H"
 #include "fvcVolumeIntegrate.H"
-#include "fvMatrices.H"
-#include "absorptionEmissionModel.H"
 #include "fvcLaplacian.H"
+#include "absorptionEmissionModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -60,7 +58,7 @@ void reactingOneDim21::readReactingOneDimControls()
     coeffs().lookup("minimumDelta") >> minimumDelta_;
 
     coeffs().lookup("gasHSource") >> gasHSource_;
-    coeffs().lookup("QrHSource") >> QrHSource_;
+    coeffs().lookup("qrHSource") >> qrHSource_;
     useChemistrySolvers_ =
         coeffs().lookupOrDefault<bool>("useChemistrySolvers", true);
 
@@ -95,51 +93,51 @@ bool reactingOneDim21::read(const dictionary& dict)
 }
 
 
-void reactingOneDim21::updateQr()
+void reactingOneDim21::updateqr()
 {
-    // Update local Qr from coupled Qr field
-    Qr_ == dimensionedScalar("zero", Qr_.dimensions(), 0.0);
+    // Update local qr from coupled qr field
+    qr_ == dimensionedScalar("zero", qr_.dimensions(), 0.0);
 
     // Retrieve field from coupled region using mapped boundary conditions
-    Qr_.correctBoundaryConditions();
+    qr_.correctBoundaryConditions();
 
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
+        const label patchi = intCoupledPatchIDs_[i];
 
-        scalarField& Qrp = Qr_.boundaryFieldRef()[patchI];
+        scalarField& qrp = qr_.boundaryFieldRef()[patchi];
 
-        // Qr is positive going in the solid
+        // qr is positive going in the solid
         // If the surface is emitting the radiative flux is set to zero
-        Qrp = max(Qrp, scalar(0.0));
+        qrp = max(qrp, scalar(0.0));
     }
 
     const vectorField& cellC = regionMesh().cellCentres();
 
     tmp<volScalarField> kappa = kappaRad();
 
-    // Propagate Qr through 1-D regions
-    label localPyrolysisFaceI = 0;
+    // Propagate qr through 1-D regions
+    label localPyrolysisFacei = 0;
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
+        const label patchi = intCoupledPatchIDs_[i];
 
-        const scalarField& Qrp = Qr_.boundaryField()[patchI];
-        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchI];
+        const scalarField& qrp = qr_.boundaryField()[patchi];
+        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchi];
 
-        forAll(Qrp, faceI)
+        forAll(qrp, facei)
         {
-            const scalar Qr0 = Qrp[faceI];
-            point Cf0 = Cf[faceI];
-            const labelList& cells = boundaryFaceCells_[localPyrolysisFaceI++];
+            const scalar qr0 = qrp[facei];
+            point Cf0 = Cf[facei];
+            const labelList& cells = boundaryFaceCells_[localPyrolysisFacei++];
             scalar kappaInt = 0.0;
             forAll(cells, k)
             {
-                const label cellI = cells[k];
-                const point& Cf1 = cellC[cellI];
+                const label celli = cells[k];
+                const point& Cf1 = cellC[celli];
                 const scalar delta = mag(Cf1 - Cf0);
-                kappaInt += kappa()[cellI]*delta;
-                Qr_[cellI] = Qr0*exp(-kappaInt);
+                kappaInt += kappa()[celli]*delta;
+                qr_[celli] = qr0*exp(-kappaInt);
                 Cf0 = Cf1;
             }
         }
@@ -161,36 +159,36 @@ void reactingOneDim21::updatePhiGas()
 
         const volScalarField& HsiGas = tHsiGas();
 
-        const DimensionedField<scalar, volMesh>& RRiGas =
+        const volScalarField::Internal& RRiGas =
             solidChemistry_->RRg(gasI);
 
         label totalFaceId = 0;
         forAll(intCoupledPatchIDs_, i)
         {
-            const label patchI = intCoupledPatchIDs_[i];
+            const label patchi = intCoupledPatchIDs_[i];
 
-            scalarField& phiGasp = phiGas_.boundaryFieldRef()[patchI];
+            scalarField& phiGasp = phiGas_.boundaryFieldRef()[patchi];
             const scalarField& cellVol = regionMesh().V();
 
-            forAll(phiGasp, faceI)
+            forAll(phiGasp, facei)
             {
                 const labelList& cells = boundaryFaceCells_[totalFaceId++];
                 scalar massInt = 0.0;
                 forAllReverse(cells, k)
                 {
-                    const label cellI = cells[k];
-                    massInt += RRiGas[cellI]*cellVol[cellI];
-                    phiHsGas_[cellI] += massInt*HsiGas[cellI];
+                    const label celli = cells[k];
+                    massInt += RRiGas[celli]*cellVol[celli];
+                    phiHsGas_[celli] += massInt*HsiGas[celli];
                 }
 
-                phiGasp[faceI] += massInt;
+                phiGasp[facei] += massInt;
 
                 if (debug)
                 {
                     Info<< " Gas : " << gasTable[gasI]
-                        << " on patch : " << patchI
+                        << " on patch : " << patchi
                         << " mass produced at face(local) : "
-                        <<  faceI
+                        <<  facei
                         << " is : " << massInt
                         << " [kg/s] " << endl;
                 }
@@ -203,9 +201,9 @@ void reactingOneDim21::updatePhiGas()
 
 void reactingOneDim21::updateFields()
 {
-    if (QrHSource_)
+    if (qrHSource_)
     {
-        updateQr();
+        updateqr();
     }
 
     updatePhiGas();
@@ -337,7 +335,7 @@ void reactingOneDim21::solveEnergy()
       + fvc::laplacian(alpha, h_)
       - fvc::laplacian(kappa(), T())
      ==
-        chemistrySh_
+        chemistryQdot_
 //      - fvm::Sp(solidChemistry_->RRg(), h_)
       + solidChemistry_->RRs(0)*T()*Cp0
       + solidChemistry_->RRs(1)*T()*Cp1
@@ -349,10 +347,10 @@ void reactingOneDim21::solveEnergy()
         hEqn += fvc::div(phiGas);
     }
 
-    if (QrHSource_)
+    if (qrHSource_)
     {
-        const surfaceScalarField phiQr(fvc::interpolate(Qr_)*nMagSf());
-        hEqn += fvc::div(phiQr);
+        const surfaceScalarField phiqr(fvc::interpolate(qr_)*nMagSf());
+        hEqn += fvc::div(phiqr);
     }
 
     if (regionMesh().moving())
@@ -375,13 +373,13 @@ void reactingOneDim21::calculateMassTransfer()
     totalGasMassFlux_ = 0;
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        totalGasMassFlux_ += gSum(phiGas_.boundaryField()[patchI]);
+        const label patchi = intCoupledPatchIDs_[i];
+        totalGasMassFlux_ += gSum(phiGas_.boundaryField()[patchi]);
     }
 
     if (infoOutput_)
     {
-        totalHeatRR_ = fvc::domainIntegrate(chemistrySh_);
+        totalHeatRR_ = fvc::domainIntegrate(chemistryQdot_);
 
         addedGasMass_ +=
             fvc::domainIntegrate(solidChemistry_->RRg())*time_.deltaT();
@@ -450,11 +448,11 @@ reactingOneDim21::reactingOneDim21
         dimensionedScalar("zero", dimEnergy/dimTime, 0.0)
     ),
 
-    chemistrySh_
+    chemistryQdot_
     (
         IOobject
         (
-            "chemistrySh",
+            "chemistryQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -498,11 +496,11 @@ reactingOneDim21::reactingOneDim21
         //dimensionedScalar("zero", dimless, 0.0)
     ),
 
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             time().timeName(),
             regionMesh(),
             IOobject::MUST_READ,
@@ -518,7 +516,7 @@ reactingOneDim21::reactingOneDim21
     totalGasMassFlux_(0.0),
     totalHeatRR_(dimensionedScalar("zero", dimEnergy/dimTime, 0.0)),
     gasHSource_(false),
-    QrHSource_(false),
+    qrHSource_(false),
     useChemistrySolvers_(true)
 {
     if (active_)
@@ -586,11 +584,11 @@ reactingOneDim21::reactingOneDim21
         dimensionedScalar("zero", dimEnergy/dimTime, 0.0)
     ),
 
-    chemistrySh_
+    chemistryQdot_
     (
         IOobject
         (
-            "chemistrySh",
+            "chemistryQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -634,11 +632,11 @@ reactingOneDim21::reactingOneDim21
         //dimensionedScalar("zero", dimless, 0.0)
     ),
 
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             time().timeName(),
             regionMesh(),
             IOobject::MUST_READ,
@@ -652,7 +650,7 @@ reactingOneDim21::reactingOneDim21
     totalGasMassFlux_(0.0),
     totalHeatRR_(dimensionedScalar("zero", dimEnergy/dimTime, 0.0)),
     gasHSource_(false),
-    QrHSource_(false),
+    qrHSource_(false),
     useChemistrySolvers_(true)
 {
     if (active_)
@@ -670,12 +668,12 @@ reactingOneDim21::~reactingOneDim21()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-scalar reactingOneDim21::addMassSources(const label patchI, const label faceI)
+scalar reactingOneDim21::addMassSources(const label patchi, const label facei)
 {
     label index = 0;
     forAll(primaryPatchIDs_, i)
     {
-        if (primaryPatchIDs_[i] == patchI)
+        if (primaryPatchIDs_[i] == patchi)
         {
             index = i;
             break;
@@ -684,7 +682,7 @@ scalar reactingOneDim21::addMassSources(const label patchI, const label faceI)
 
     const label localPatchId =  intCoupledPatchIDs_[index];
 
-    const scalar massAdded = phiGas_.boundaryField()[localPatchId][faceI];
+    const scalar massAdded = phiGas_.boundaryField()[localPatchId][facei];
 
     if (debug)
     {
@@ -704,9 +702,9 @@ scalar reactingOneDim21::solidRegionDiffNo() const
     {
         surfaceScalarField KrhoCpbyDelta
         (
-            regionMesh().surfaceInterpolation::deltaCoeffs()
-          * fvc::interpolate(kappa())
-          / fvc::interpolate(Cp()*rho_)
+            sqr(regionMesh().surfaceInterpolation::deltaCoeffs())
+           *fvc::interpolate(kappa())
+           /fvc::interpolate(Cp()*rho_)
         );
 
         DiNum = max(KrhoCpbyDelta.primitiveField())*time().deltaTValue();
@@ -745,18 +743,6 @@ tmp<volScalarField> reactingOneDim21::kappaRad() const
     return radiation_->absorptionEmission().a();
 }
 
-/*
-tmp<volScalarField> reactingOneDim21::emissivity() const
-{
-    return radiation_->absorptionEmission().e();
-}
-
-
-tmp<volScalarField> reactingOneDim21::absorptivity() const
-{
-    return radiation_->absorptionEmission().e();
-}
-*/
 
 tmp<volScalarField> reactingOneDim21::kappa() const
 {
@@ -775,22 +761,16 @@ void reactingOneDim21::preEvolveRegion()
     pyrolysisModel::preEvolveRegion();
 
     // Initialise all cells as able to react
-    forAll(h_, cellI)
+    forAll(h_, celli)
     {
-        solidChemistry_->setCellReacting(cellI, true);
+        solidChemistry_->setCellReacting(celli, true);
     }
-
-    // Updating emissivity and absorptivity at boundaries
-    //updateBndEmmAbs();
 }
 
 
 void reactingOneDim21::postEvolveRegion()
 {
     pyrolysisModel::postEvolveRegion();
-
-    // Updating emissivity and absorptivity at boundaries
-    //updateBndEmmAbs();
 }
 
 
@@ -809,7 +789,7 @@ void reactingOneDim21::evolveRegion()
 
     solveContinuity();
 
-    chemistrySh_ = solidChemistry_->Sh()();
+    chemistryQdot_ = solidChemistry_->Qdot()();
 
     updateFields();
 
@@ -828,14 +808,14 @@ void reactingOneDim21::evolveRegion()
     updateBndEmmAbs();
 
     Info<< "pyrolysis min/max(T) = "
-        << min(solidThermo_.T().primitiveField())
+        << gMin(solidThermo_.T().primitiveField())
         << ", "
-        << max(solidThermo_.T().primitiveField())
+        << gMax(solidThermo_.T().primitiveField())
         << endl;
 }
 
 
-void reactingOneDim21::info() const
+void reactingOneDim21::info()
 {
     Info<< "\nPyrolysis in region: " << regionMesh().name() << endl;
 

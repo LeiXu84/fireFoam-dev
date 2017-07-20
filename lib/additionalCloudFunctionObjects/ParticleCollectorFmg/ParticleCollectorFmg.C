@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2012-2014 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2012-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -219,7 +219,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
     }
     else
     {
-        // set 4 quadrants for single sector cases
+        // Set 4 quadrants for single sector cases
         nS = 4;
 
         vector tangent = Zero;
@@ -248,7 +248,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
     label nPoint = radius_.size()*nPointPerRadius;
     label nFace = radius_.size()*nS;
 
-    // add origin
+    // Add origin
     nPoint++;
 
     points_.setSize(nPoint);
@@ -261,7 +261,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
 
     points_[0] = origin;
 
-    // points
+    // Points
     forAll(radius_, radI)
     {
         label pointOffset = radI*nPointPerRadius + 1;
@@ -274,7 +274,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
         }
     }
 
-    // faces
+    // Faces
     DynamicList<label> facePts(2*nPointPerSector);
     forAll(radius_, radI)
     {
@@ -284,7 +284,7 @@ void Foam::ParticleCollectorFmg<CloudType>::initConcentricCircles()
             {
                 facePts.clear();
 
-                // append origin point
+                // Append origin point
                 facePts.append(0);
 
                 for (label ptI = 0; ptI < nPointPerSector; ptI++)
@@ -338,9 +338,6 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelPolygon
     const point& p2
 ) const
 {
-    label dummyNearType = -1;
-    label dummyNearLabel = -1;
-
     forAll(faces_, facei)
     {
         const label facePoint0 = faces_[facei][0];
@@ -352,30 +349,35 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelPolygon
 
         if (sign(d1) == sign(d2))
         {
-            // did not cross polygon plane
+            // Did not cross polygon plane
             continue;
         }
 
-        // intersection point
+        // Intersection point
         const point pIntersect = p1 + (d1/(d1 - d2))*(p2 - p1);
 
-        const List<face>& tris = faceTris_[facei];
-
-        // identify if point is within poly bounds
-        forAll(tris, triI)
+        // Identify if point is within the bounds of the face. Create triangles
+        // between the intersection point and each edge of the face. If all the
+        // triangle normals point in the same direction as the face normal, then
+        // the particle is within the face. Note that testing the decomposed
+        // triangles in turn does not work due to ambiguity along the diagonals.
+        const face& f = faces_[facei];
+        const vector n = f.normal(points_);
+        bool inside = true;
+        for (label i = 0; i < f.size(); ++ i)
         {
-            const face& tri = tris[triI];
-            triPointRef t
-            (
-                points_[tri[0]],
-                points_[tri[1]],
-                points_[tri[2]]
-            );
-
-            if (t.classify(pIntersect, dummyNearType, dummyNearLabel))
+            const label j = f.fcIndex(i);
+            const triPointRef t(pIntersect, points_[f[i]], points_[f[j]]);
+            if ((n & t.normal()) < 0)
             {
-                hitFaceIDs_.append(facei);
+                inside = false;
+                break;
             }
+        }
+
+        if (inside)
+        {
+            hitFaceIDs_.append(facei);
         }
     }
 }
@@ -395,11 +397,11 @@ void Foam::ParticleCollectorFmg<CloudType>::collectParcelConcentricCircles
 
     if (sign(d1) == sign(d2))
     {
-        // did not cross plane
+        // Did not cross plane
         return;
     }
 
-    // intersection point in cylindrical co-ordinate system
+    // Intersection point in cylindrical co-ordinate system
     const point pCyl = coordSys_.localPosition(p1 + (d1/(d1 - d2))*(p2 - p1));
 
     scalar r = pCyl[0];
@@ -450,12 +452,14 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
 
     const scalar alpha = (totalTime_ - timeElapsed)/totalTime_;
     const scalar beta = timeElapsed/(totalTime_+VSMALL);
+    // Info << "diagnose alpha: " << alpha << " beta: " << beta << " totalTime: " << totalTime_ << " timeElapsed: " << timeElapsed << " timeNew: " << timeNew  << " timeOld: " << timeOld_ << endl;
 
     forAll(faces_, facei)
     {
         massTotal_[facei] += mass_[facei];
         // kvm, massFlowRate_ calculation is wrong when resetOnWrite set to false
         massFlowRate_[facei] = alpha*massFlowRate_[facei] + beta*mass_[facei]/(timeElapsed+VSMALL);
+        // Info << "diagnose massFlowRate_[" << facei << "]: " << massFlowRate_[facei] << " mass_[" << facei << "]: " << mass_[facei] << endl;
         massFlux_[facei] = massFlowRate_[facei]/area_[facei];
         momTotal_[facei] += mom_[facei];
         momRate_[facei] = alpha*momRate_[facei] + beta*mom_[facei]/(timeElapsed+VSMALL);
@@ -463,7 +467,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
 
     const label proci = Pstream::myProcNo();
 
-    Info<< type() << " output:" << nl;
+    Info<< type() << " output for " << this->modelName() << ":" << nl;
 
     Field<scalar> faceMassTotal(mass_.size(), 0.0);
     this->getModelProperty("massTotal", faceMassTotal);
@@ -485,6 +489,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     scalar sumTotalMom = 0.0;
     scalar sumAverageMFR = 0.0;
     scalar sumAverageMomRate = 0.0;
+    scalar sumArea = 0.0;
     forAll(faces_, facei)
     {
         scalarList allProcMass(Pstream::nProcs());
@@ -500,22 +505,23 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         scalarList allProcMassFlowRate(Pstream::nProcs());
         allProcMassFlowRate[proci] = massFlowRate_[facei];
         Pstream::gatherList(allProcMassFlowRate);
-        faceMassFlowRate[facei] += sum(allProcMassFlowRate);
+        faceMassFlowRate[facei] = sum(allProcMassFlowRate);
 
         scalarList allProcMassFlux(Pstream::nProcs());
         allProcMassFlux[proci] = massFlux_[facei];
         Pstream::gatherList(allProcMassFlux);
-        faceMassFlux[facei] += sum(allProcMassFlux);
+        faceMassFlux[facei] = sum(allProcMassFlux);
 
         scalarList allProcMomRate(Pstream::nProcs());
         allProcMomRate[proci] = momRate_[facei];
         Pstream::gatherList(allProcMomRate);
-        faceMomRate[facei] += sum(allProcMomRate);
+        faceMomRate[facei] = sum(allProcMomRate);
 
         sumTotalMass += faceMassTotal[facei];
         sumTotalMom += faceMomTotal[facei];
-        sumAverageMFR += faceMassFlowRate[facei];
-        sumAverageMomRate += faceMomRate[facei];
+        sumArea += area_[facei];
+        sumAverageMFR += faceMassFlowRate[facei]*area_[facei];
+        sumAverageMomRate += faceMomRate[facei]*area_[facei];
 
         if (outputFilePtr_.valid())
         {
@@ -606,10 +612,15 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
             positions_[facei][Pstream::myProcNo()].clear();
         }
     }
+    sumAverageMFR /= sumArea;
+    sumAverageMomRate /= sumArea;
 
-    Info<< "    sum(total mass) = " << sumTotalMass << nl
+    Info<< "    accumulation time = " << totalTime_ << nl
+        << "    sum(total mass) = " << sumTotalMass << nl
         << "    sum(total momentum) = " << sumTotalMom << nl
-        << "    sum(average mass flow rate) = " << sumAverageMFR << nl
+        << "    sum(area-weighted average mass flow rate) = " << sumAverageMFR << nl
+        << "    sum(area-weighted average momentum rate) = " << sumAverageMomRate << nl
+        << "    sum(area) = " << sumArea << nl
         << endl;
 
 
@@ -687,8 +698,13 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         this->setModelProperty("massFlux", dummy);
         this->setModelProperty("momRate", dummy);
 
-        timeOld_ = timeNew;
         totalTime_ = 0.0;
+
+        forAll(faces_, facei)
+        {
+            massFlowRate_[facei] = 0.0;
+            momRate_[facei] = 0.0;
+        }
     }
     else
     {
@@ -698,6 +714,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         this->setModelProperty("massFlux", faceMassFlux);
         this->setModelProperty("momRate", faceMomRate);
     }
+    timeOld_ = timeNew;
 
     forAll(faces_, facei)
     {
@@ -705,9 +722,9 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         mom_[facei] = 0.0;
         massTotal_[facei] = 0.0;
         momTotal_[facei] = 0.0;
-        massFlowRate_[facei] = 0.0;
         massFlux_[facei] = 0.0;
-        momRate_[facei] = 0.0;
+        // not needed? collectedParticles0_[facei] = collectedParticles_[facei];
+        // not needed? collectedParticles_[facei].clear();
     }
 }
 
@@ -755,14 +772,16 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     log_(this->coeffDict().lookup("log")),
     outputFilePtr_(),
     timeOld_(owner.mesh().time().value()),
-    hitFaceIDs_()
+    hitFaceIDs_(),
+    collectedParticles_(),
+    collectedParticles0_()
 {
     normal_ /= mag(normal_);
 
     word mode(this->coeffDict().lookup("mode"));
     if (mode == "polygon")
     {
-        List<Field<point> > polygons(this->coeffDict().lookup("polygons"));
+        List<Field<point>> polygons(this->coeffDict().lookup("polygons"));
 
         initPolygons(polygons);
 
@@ -771,12 +790,12 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     }
     else if (mode == "polygonWithNormal")
     {
-        List<Tuple2<Field<point>, vector> > polygonAndNormal
+        List<Tuple2<Field<point>, vector>> polygonAndNormal
         (
             this->coeffDict().lookup("polygons")
         );
 
-        List<Field<point> > polygons(polygonAndNormal.size());
+        List<Field<point>> polygons(polygonAndNormal.size());
         normal_.setSize(polygonAndNormal.size());
 
         forAll(polygons, polyI)
@@ -797,16 +816,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     }
     else
     {
-        FatalIOErrorIn
-        (
-            "Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg"
-            "("
-                "const dictionary&,"
-                "CloudType&, "
-                "const word&"
-            ")",
-            this->coeffDict()
-        )
+        FatalIOErrorInFunction(this->coeffDict())
             << "Unknown mode " << mode << ".  Available options are "
             << "polygon, polygonWithNormal and concentricCircle"
             << exit(FatalIOError);
@@ -819,6 +829,8 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     massFlowRate_.setSize(faces_.size(), 0.0);
     massFlux_.setSize(faces_.size(), 0.0);
     momRate_.setSize(faces_.size(), 0.0);
+    // not needed? collectedParticles_.setSize(faces_.size());
+    // not needed? collectedParticles0_.setSize(faces_.size());
 
     makeLogFile(faces_, points_, area_);
 
@@ -875,7 +887,9 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     log_(pc.log_),
     outputFilePtr_(),
     timeOld_(0.0),
-    hitFaceIDs_()
+    hitFaceIDs_(),
+    collectedParticles_(pc.collectedParticles_),
+    collectedParticles0_(pc.collectedParticles0_)
 {}
 
 
@@ -903,8 +917,8 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
         return;
     }
 
-    // slightly extend end position to avoid falling within tracking tolerances
-    const point position1 = position0 + 1.0001*(p.position() - position0);
+    //not needed? // Slightly extend end position to avoid falling within tracking tolerances
+    //not needed? const point position1 = position0 + 1.0001*(p.position() - position0);
 
     hitFaceIDs_.clear();
 
@@ -912,19 +926,19 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
     {
         case mtPolygon:
         {
-            collectParcelPolygon(position0, position1);
+            //not needed? collectParcelPolygon(position0, position1);
+            collectParcelPolygon(position0, p.position());
             break;
         }
         case mtConcentricCircle:
         {
-            collectParcelConcentricCircles(position0, position1);
+            //not needed? collectParcelConcentricCircles(position0, position1);
+            collectParcelConcentricCircles(position0, p.position());
             break;
         }
         default:
-        {
-        }
+        {}
     }
-
 
     forAll(hitFaceIDs_, i)
     {
@@ -938,6 +952,7 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
         vector position = p.position();
 
         /*cout << "diameter " << d << " velocity " << u << " nParticle " << np << "\n";*/
+        // Info << "p.origId(): " << p.origId() << endl;
 
         if(sampleParticles_)
         {
@@ -969,30 +984,59 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
         if (negateParcelsOppositeNormal_)
         {
             Uhat /= mag(Uhat) + ROOTVSMALL;
+
             if (Unormal < 0)
             {
-                m *= -1.0;
+                m = -m;
             }
         }
 
-        // add mass contribution
-        mass_[facei] += m; // should be *0.25 if nSector_ == 1
-        mom_[facei] += m*Unormal; // should be *0.25 if nSector_ == 1
+        //not needed? // If not previously collected, add mass contribution
+        //not needed? Switch previouslyCollected = false;
+        //not needed? forAll(collectedParticles0_[facei],i)
+        //not needed? {
+        //not needed?     if (&p == collectedParticles0_[facei][i] )
+        //not needed?     {
+        //not needed?         previouslyCollected = true;
+        //not needed?         break;
+        //not needed?     }
+        //not needed? }
+        //not needed? forAll(collectedParticles_[facei],i)
+        //not needed? {
+        //not needed?     if (&p == collectedParticles_[facei][i] )
+        //not needed?     {
+        //not needed?         previouslyCollected = true;
+        //not needed?         break;
+        //not needed?     }
+        //not needed? }
+        //not needed? // Add mass contribution
+        //not needed? if(!previouslyCollected)
+        //not needed? {
+        //not needed?     collectedParticles_[facei].append(&p);
 
-        if (nSector_ == 1)
-        {
-            mass_[facei + 1] += m; // should be *0.25
-            mass_[facei + 2] += m; // should be *0.25
-            mass_[facei + 3] += m; // should be *0.25
-            mom_[facei + 1] += m*Unormal; // should be *0.25
-            mom_[facei + 2] += m*Unormal; // should be *0.25
-            mom_[facei + 3] += m*Unormal; // should be *0.25
-        }
+            if (nSector_ == 1)
+            {
+                mass_[facei + 0] += m*0.25; 
+                mass_[facei + 1] += m*0.25; 
+                mass_[facei + 2] += m*0.25; 
+                mass_[facei + 3] += m*0.25; 
+                mom_[facei + 0] += m*Unormal*0.25; 
+                mom_[facei + 1] += m*Unormal*0.25; 
+                mom_[facei + 2] += m*Unormal*0.25; 
+                mom_[facei + 3] += m*Unormal*0.25; 
+            }
+            else
+            {
+                mass_[facei] += m;
+                mom_[facei] += m*Unormal;
+            }
 
-        if (removeCollected_)
-        {
-            keepParticle = false;
-        }
+
+            if (removeCollected_)
+            {
+                keepParticle = false;
+            }
+        //not needed? }
     }
 }
 

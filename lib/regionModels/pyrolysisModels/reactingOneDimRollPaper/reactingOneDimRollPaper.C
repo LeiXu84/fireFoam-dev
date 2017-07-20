@@ -81,7 +81,7 @@ void reactingOneDimRollPaper::readReactingOneDimControls()
     coeffs().lookup("minimumDelta") >> minimumDelta_;
 
     coeffs().lookup("gasHSource") >> gasHSource_;
-    coeffs().lookup("QrHSource") >> QrHSource_;
+    coeffs().lookup("qrHSource") >> qrHSource_;
     useChemistrySolvers_ =
         coeffs().lookupOrDefault<bool>("useChemistrySolvers", true);
 
@@ -120,51 +120,51 @@ bool reactingOneDimRollPaper::read(const dictionary& dict)
 }
 
 
-void reactingOneDimRollPaper::updateQr()
+void reactingOneDimRollPaper::updateqr()
 {
-    // Update local Qr from coupled Qr field
-    Qr_ == dimensionedScalar("zero", Qr_.dimensions(), 0.0);
+    // Update local qr from coupled qr field
+    qr_ == dimensionedScalar("zero", qr_.dimensions(), 0.0);
 
     // Retrieve field from coupled region using mapped boundary conditions
-    Qr_.correctBoundaryConditions();
+    qr_.correctBoundaryConditions();
 
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
+        const label patchi = intCoupledPatchIDs_[i];
 
-        scalarField& Qrp = Qr_.boundaryFieldRef()[patchI];
+        scalarField& qrp = qr_.boundaryFieldRef()[patchi];
 
-        // Qr is positive going in the solid
+        // qr is positive going in the solid
         // If the surface is emitting the radiative flux is set to zero
-        Qrp = max(Qrp, scalar(0.0));
+        qrp = max(qrp, scalar(0.0));
     }
 
     const vectorField& cellC = regionMesh().cellCentres();
 
     tmp<volScalarField> kappa = kappaRad();
 
-    // Propagate Qr through 1-D regions
-    label localPyrolysisFaceI = 0;
+    // Propagate qr through 1-D regions
+    label localPyrolysisFacei = 0;
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
+        const label patchi = intCoupledPatchIDs_[i];
 
-        const scalarField& Qrp = Qr_.boundaryField()[patchI];
-        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchI];
+        const scalarField& qrp = qr_.boundaryField()[patchi];
+        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchi];
 
-        forAll(Qrp, faceI)
+        forAll(qrp, facei)
         {
-            const scalar Qr0 = Qrp[faceI];
-            point Cf0 = Cf[faceI];
-            const labelList& cells = boundaryFaceCells_[localPyrolysisFaceI++];
+            const scalar qr0 = qrp[facei];
+            point Cf0 = Cf[facei];
+            const labelList& cells = boundaryFaceCells_[localPyrolysisFacei++];
             scalar kappaInt = 0.0;
             forAll(cells, k)
             {
-                const label cellI = cells[k];
-                const point& Cf1 = cellC[cellI];
+                const label celli = cells[k];
+                const point& Cf1 = cellC[celli];
                 const scalar delta = mag(Cf1 - Cf0);
-                kappaInt += kappa()[cellI]*delta;
-                Qr_[cellI] = Qr0*exp(-kappaInt);
+                kappaInt += kappa()[celli]*delta;
+                qr_[celli] = qr0*exp(-kappaInt);
                 Cf0 = Cf1;
             }
         }
@@ -205,34 +205,34 @@ void reactingOneDimRollPaper::updatePhiGas()
         scalar virginDMax = 0.0;
         forAll(intCoupledPatchIDs_, i)
         {
-            const label patchI = intCoupledPatchIDs_[i];
+            const label patchi = intCoupledPatchIDs_[i];
 
-            scalarField& phiGasp = phiGas_.boundaryFieldRef()[patchI];
+            scalarField& phiGasp = phiGas_.boundaryFieldRef()[patchi];
             const scalarField& cellVol = regionMesh().V();
 
-            forAll(phiGasp, faceI)
+            forAll(phiGasp, facei)
             {
                 const labelList& cells = boundaryFaceCells_[totalFaceId++];
                 scalar massInt = 0.0;
                 forAllReverse(cells, k)
                 {
-                    const label cellI = cells[k];
-                    massInt += RRiGas[cellI]*cellVol[cellI];
-                    phiHsGas_[cellI] += massInt*HsiGas[cellI];
+                    const label celli = cells[k];
+                    massInt += RRiGas[celli]*cellVol[celli];
+                    phiHsGas_[celli] += massInt*HsiGas[celli];
                 }
                 massIntMax = max(massIntMax,massInt);
 
-                phiGasp[faceI] += massInt;
+                phiGasp[facei] += massInt;
                 const label cell0 = cells[0];
-                phiGasp[faceI] = massReleaseRate_[cell0];
-                phiGaspMax = max(phiGaspMax, phiGasp[faceI]);
+                phiGasp[facei] = massReleaseRate_[cell0];
+                phiGaspMax = max(phiGaspMax, phiGasp[facei]);
 
                 if (debug)
                 {
                     Info<< " Gas : " << gasTable[gasI]
-                        << " on patch : " << patchI
+                        << " on patch : " << patchi
                         << " mass produced at face(local) : "
-                        <<  faceI
+                        <<  facei
                         << " is : " << massInt
                         << " [kg/s] " << endl;
                 }
@@ -251,9 +251,9 @@ void reactingOneDimRollPaper::updatePhiGas()
 
 void reactingOneDimRollPaper::updateFields()
 {
-    if (QrHSource_)
+    if (qrHSource_)
     {
-        updateQr();
+        updateqr();
     }
 
     updatePhiGas();
@@ -290,7 +290,7 @@ void reactingOneDimRollPaper::solveContinuity()
 {
     if (debug)
     {
-        Info<< "reactingOneDimRollPaper::solveContinuity()" << endl;
+        InfoInFunction << endl;
     }
 
     const scalarField mass0 = rho_*regionMesh().V();
@@ -323,7 +323,7 @@ void reactingOneDimRollPaper::solveSpeciesMass()
 {
     if (debug)
     {
-        Info<< "reactingOneDimRollPaper::solveSpeciesMass()" << endl;
+        InfoInFunction << endl;
     }
 
     volScalarField Yt(0.0*Ys_[0]);
@@ -357,17 +357,17 @@ void reactingOneDimRollPaper::solveSpeciesMass()
     }
 
     Ys_[Ys_.size() - 1] = 1.0 - Yt;
-    
+
     //-Correct density from mixture density
-    forAll(rho_, cellI)
+    forAll(rho_, celli)
     {
         scalar rc = 0;
         forAll(Ys_, i)
         {
-            rc += Ys_[i][cellI]/solidThermo_.composition().rho(i, 1.0e5, 300.0);
+            rc += Ys_[i][celli]/solidThermo_.composition().rho(i, 1.0e5, 300.0);
         }
-        //Info<<"dbg-rho: "<<rho_[cellI]<<tab<<1.0/rc<<endl;
-        rho_[cellI] = 1.0/rc;
+        //Info<<"dbg-rho: "<<rho_[celli]<<tab<<1.0/rc<<endl;
+        rho_[celli] = 1.0/rc;
     }
 }
 
@@ -376,7 +376,7 @@ void reactingOneDimRollPaper::solveEnergy()
 {
     if (debug)
     {
-        Info<< "reactingOneDimRollPaper::solveEnergy()" << endl;
+        InfoInFunction << endl;
     }
 
     tmp<volScalarField> alpha(solidThermo_.alpha());
@@ -392,7 +392,7 @@ void reactingOneDimRollPaper::solveEnergy()
       + fvc::laplacian(alpha, h_)
       - fvc::laplacian(kappa(), T())
      ==
-        chemistrySh_
+        chemistryQdot_
 //      - fvm::Sp(solidChemistry_->RRg(), h_)
       + solidChemistry_->RRs(0)*T()*Cp0
       + solidChemistry_->RRs(1)*T()*Cp1
@@ -404,10 +404,10 @@ void reactingOneDimRollPaper::solveEnergy()
         hEqn += fvc::div(phiGas);
     }
 
-    if (QrHSource_)
+    if (qrHSource_)
     {
-        const surfaceScalarField phiQr(fvc::interpolate(Qr_)*nMagSf());
-        hEqn += fvc::div(phiQr);
+        const surfaceScalarField phiqr(fvc::interpolate(qr_)*nMagSf());
+        hEqn += fvc::div(phiqr);
     }
 
     if (regionMesh().moving())
@@ -430,13 +430,13 @@ void reactingOneDimRollPaper::calculateMassTransfer()
     totalGasMassFlux_ = 0;
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        totalGasMassFlux_ += gSum(phiGas_.boundaryField()[patchI]);
+        const label patchi = intCoupledPatchIDs_[i];
+        totalGasMassFlux_ += gSum(phiGas_.boundaryField()[patchi]);
     }
 
     if (infoOutput_)
     {
-        totalHeatRR_ = fvc::domainIntegrate(chemistrySh_);
+        totalHeatRR_ = fvc::domainIntegrate(chemistryQdot_);
 
         addedGasMass_ +=
             fvc::domainIntegrate(solidChemistry_->RRg())*time_.deltaT();
@@ -506,11 +506,11 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         dimensionedScalar("zero", dimEnergy/dimTime, 0.0)
     ),
 
-    chemistrySh_
+    chemistryQdot_
     (
         IOobject
         (
-            "chemistrySh",
+            "chemistryQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -520,11 +520,11 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         dimensionedScalar("zero", dimEnergy/dimTime/dimVolume, 0.0)
     ),
 
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             time().timeName(),
             regionMesh(),
             IOobject::MUST_READ,
@@ -719,7 +719,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
     totalGasMassFlux_(0.0),
     totalHeatRR_(dimensionedScalar("zero", dimEnergy/dimTime, 0.0)),
     gasHSource_(false),
-    QrHSource_(false),
+    qrHSource_(false),
     useChemistrySolvers_(true)
 {
     if (active_)
@@ -727,6 +727,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         read();
     }
 }
+
 
 reactingOneDimRollPaper::reactingOneDimRollPaper
 (
@@ -751,7 +752,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
             IOobject::AUTO_WRITE
         ),
         solidThermo_.rho(),
-            zeroGradientFvPatchScalarField::typeName
+        zeroGradientFvPatchScalarField::typeName
     ),
     Ys_(solidThermo_.composition().Y()),
     h_(solidThermo_.he()),
@@ -787,11 +788,11 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         dimensionedScalar("zero", dimEnergy/dimTime, 0.0)
     ),
 
-    chemistrySh_
+    chemistryQdot_
     (
         IOobject
         (
-            "chemistrySh",
+            "chemistryQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -801,11 +802,11 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
         dimensionedScalar("zero", dimEnergy/dimTime/dimVolume, 0.0)
     ),
 
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             time().timeName(),
             regionMesh(),
             IOobject::MUST_READ,
@@ -1002,7 +1003,7 @@ reactingOneDimRollPaper::reactingOneDimRollPaper
     totalGasMassFlux_(0.0),
     totalHeatRR_(dimensionedScalar("zero", dimEnergy/dimTime, 0.0)),
     gasHSource_(false),
-    QrHSource_(false),
+    qrHSource_(false),
     useChemistrySolvers_(true)
 {
     if (active_)
@@ -1020,12 +1021,12 @@ reactingOneDimRollPaper::~reactingOneDimRollPaper()
 
 // * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
 
-scalar reactingOneDimRollPaper::addMassSources(const label patchI, const label faceI)
+scalar reactingOneDimRollPaper::addMassSources(const label patchi, const label facei)
 {
     label index = 0;
     forAll(primaryPatchIDs_, i)
     {
-        if (primaryPatchIDs_[i] == patchI)
+        if (primaryPatchIDs_[i] == patchi)
         {
             index = i;
             break;
@@ -1034,7 +1035,7 @@ scalar reactingOneDimRollPaper::addMassSources(const label patchI, const label f
 
     const label localPatchId =  intCoupledPatchIDs_[index];
 
-    const scalar massAdded = phiGas_.boundaryField()[localPatchId][faceI];
+    const scalar massAdded = phiGas_.boundaryField()[localPatchId][facei];
 
     if (debug)
     {
@@ -1054,9 +1055,9 @@ scalar reactingOneDimRollPaper::solidRegionDiffNo() const
     {
         surfaceScalarField KrhoCpbyDelta
         (
-            regionMesh().surfaceInterpolation::deltaCoeffs()
-          * fvc::interpolate(kappa())
-          / fvc::interpolate(Cp()*rho_)
+            sqr(regionMesh().surfaceInterpolation::deltaCoeffs())
+           *fvc::interpolate(kappa())
+           /fvc::interpolate(Cp()*rho_)
         );
 
         DiNum = max(KrhoCpbyDelta.primitiveField())*time().deltaTValue();
@@ -1113,9 +1114,9 @@ void reactingOneDimRollPaper::preEvolveRegion()
     pyrolysisModel::preEvolveRegion();
 
     // Initialise all cells as able to react
-    forAll(h_, cellI)
+    forAll(h_, celli)
     {
-        solidChemistry_->setCellReacting(cellI, true);
+        solidChemistry_->setCellReacting(celli, true);
     }
 
     updateRollPaper();
@@ -1128,10 +1129,7 @@ void reactingOneDimRollPaper::evolveRegion()
 
     if (useChemistrySolvers_)
     {
-        solidChemistry_->solve
-        (
-            time().deltaTValue()
-        );
+        solidChemistry_->solve(time().deltaTValue());
     }
     else
     {
@@ -1140,7 +1138,7 @@ void reactingOneDimRollPaper::evolveRegion()
 
     solveContinuity();
 
-    chemistrySh_ = solidChemistry_->Sh()();
+    chemistryQdot_ = solidChemistry_->Qdot()();
 
     updateFields();
 
@@ -1173,17 +1171,17 @@ void reactingOneDimRollPaper::evolveRegion()
 void reactingOneDimRollPaper::updateRollPaper()
 {
     const polyBoundaryMesh& bm = regionMesh().boundaryMesh();
-    label localPyrolysisFaceI = 0;
+    label localPyrolysisFacei = 0;
 
     scalar QnetMax = -VGREAT;
     scalar QnetMin =  VGREAT;
 
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        const polyPatch pp = bm[patchI];
-        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchI];
-        const scalarField& QnetFace = Qnet_.boundaryField()[patchI];
+        const label patchi = intCoupledPatchIDs_[i];
+        const polyPatch pp = bm[patchi];
+        const vectorField& Cf = regionMesh().Cf().boundaryField()[patchi];
+        const scalarField& QnetFace = Qnet_.boundaryField()[patchi];
 
         typedef regionModels::surfaceFilmModels::surfaceFilmModel 
         surfaceFilmModelType;
@@ -1200,7 +1198,7 @@ void reactingOneDimRollPaper::updateRollPaper()
                          (
                              surFilm,
                              "peelingZone",
-                             patchI,
+                             patchi,
                              true
                          );
 
@@ -1209,20 +1207,20 @@ void reactingOneDimRollPaper::updateRollPaper()
                   (
                       surFilm,
                       "deltaf",
-                      patchI,
+                      patchi,
                       true
                   );
 
-        forAll(pp, faceI)
+        forAll(pp, facei)
         {
-            const labelList& cells = boundaryFaceCells_[localPyrolysisFaceI];
-            const labelList& faces = boundaryFaceFaces_[localPyrolysisFaceI];
-            localPyrolysisFaceI++;
-            const vector sf = pp.faceAreas()[faceI];
+            const labelList& cells = boundaryFaceCells_[localPyrolysisFacei];
+            const labelList& faces = boundaryFaceFaces_[localPyrolysisFacei];
+            localPyrolysisFacei++;
+            const vector sf = pp.faceAreas()[facei];
             const label cell0 = cells[0];
         
             scalar zmag = sf.z()/mag(sf);
-            // Info << "faceI: " << faceI << " zmag: " << zmag << endl;
+            // Info << "facei: " << facei << " zmag: " << zmag << endl;
             if(zmag > 0.1)
             {
                 continue;
@@ -1239,7 +1237,7 @@ void reactingOneDimRollPaper::updateRollPaper()
         // Get thermally-thick surface temperature 
             scalar TsurfaceThick = T()[cell0];
 
-            Qnet_[cell0] = QnetFace[faceI];
+            Qnet_[cell0] = QnetFace[facei];
             Qnet_[cell0] = min(Qnet_[cell0], 2e5);
             QnetMax = max(QnetMax,Qnet_[cell0]);
             QnetMin = min(QnetMin,Qnet_[cell0]);
@@ -1303,7 +1301,7 @@ void reactingOneDimRollPaper::updateRollPaper()
 
                 if(haveVirginPaper) // Heat up vrigin thin paper until ignition
                 {
-                    //scalar qpaper(qExtra[faceI]+QnetMovingAverage_[cell0]);
+                    //scalar qpaper(qExtra[facei]+QnetMovingAverage_[cell0]);
                     TDelVirginPaper_[cell0] += (1.0-blockFactor_[cell0])*time().deltaTValue()
                         *Qnet_[cell0]/paperThermoInertia;
                     TDelVirginPaper_[cell0] = max(TDelVirginPaper_[cell0],273.15);
@@ -1323,7 +1321,7 @@ void reactingOneDimRollPaper::updateRollPaper()
                         del_1D = true;
                     }
 
-                    if(latestThinArea[faceI] > 0.5)
+                    if(latestThinArea[facei] > 0.5)
                     {
                         del_2D = true;
                     }
@@ -1404,7 +1402,7 @@ void reactingOneDimRollPaper::updateRollPaper()
     //Info<<"PhiPyrolysis: \n"<<phiPyrolysis_<<endl;
 }
 
-void reactingOneDimRollPaper::info() const
+void reactingOneDimRollPaper::info()
 {
     Info<< "\nPyrolysis in region: " << regionMesh().name() << endl;
 

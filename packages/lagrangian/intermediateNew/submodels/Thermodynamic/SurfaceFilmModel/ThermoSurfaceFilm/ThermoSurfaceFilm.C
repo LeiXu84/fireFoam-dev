@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -81,6 +81,8 @@ Foam::word Foam::ThermoSurfaceFilm<CloudType>::interactionTypeStr
 }
 
 
+// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
+
 template<class CloudType>
 Foam::vector Foam::ThermoSurfaceFilm<CloudType>::tangentVector
 (
@@ -111,13 +113,13 @@ Foam::vector Foam::ThermoSurfaceFilm<CloudType>::splashDirection
     const scalar& beta // kvm
 ) const
 {
-    // azimuthal angle [rad]
+    // Azimuthal angle [rad]
     const scalar phiSi = twoPi*rndGen_.sample01<scalar>();
 
-    // ejection angle [rad]
+    // Ejection angle [rad]
     const scalar thetaSi = pi/180.0*(rndGen_.sample01<scalar>()*(50 - 5) + 5);
 
-    // direction vector of new parcel
+    // Direction vector of new parcel
     const scalar alpha = sin(thetaSi);
     const scalar dcorr = cos(thetaSi);
     const vector normal = alpha*(tanVec1*cos(phiSi) + tanVec2*sin(phiSi));
@@ -228,7 +230,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::drySplashInteraction
     const vector& Up = this->owner().U().boundaryField()[pp.index()][facei];
     const vector& nf = pp.faceNormals()[facei];
 
-    // local pressure
+    // Local pressure
     const scalar pc = thermo_.thermo().p()[p.cell()];
 
     // Retrieve parcel properties
@@ -254,13 +256,13 @@ void Foam::ThermoSurfaceFilm<CloudType>::drySplashInteraction
     // Critical Weber number
     const scalar Wec = Adry_*pow(La, -0.183);
 
-    if (We < Wec) // adhesion - assume absorb
+    if (We < Wec) // Adhesion - assume absorb
     {
         absorbInteraction(filmModel, p, pp, facei, m, keepParticle);
     }
-    else // splash
+    else // Splash
     {
-        // ratio of incident mass to splashing mass
+        // Ratio of incident mass to splashing mass
         const scalar mRatio = 0.2 + 0.6*rndGen_.sample01<scalar>();
         splashInteraction
             (filmModel, p, pp, facei, mRatio, We, Wec, sigma, keepParticle);
@@ -289,7 +291,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::wetSplashInteraction
     const vector& Up = this->owner().U().boundaryField()[pp.index()][facei];
     const vector& nf = pp.faceNormals()[facei];
 
-    // local pressure
+    // Local pressure
     const scalar pc = thermo_.thermo().p()[p.cell()];
 
     // Retrieve parcel properties
@@ -318,25 +320,25 @@ void Foam::ThermoSurfaceFilm<CloudType>::wetSplashInteraction
     }
     else if ((We >= 1) && (We < 20)) // bounce
     {
-        // incident angle of impingement
+        // Incident angle of impingement
         const scalar theta = pi/2 - acos(U/mag(U) & nf);
 
-        // restitution coefficient
+        // Restitution coefficient
         const scalar epsilon = 0.993 - theta*(1.76 - theta*(1.56 - theta*0.49));
 
-        // update parcel velocity
+        // Update parcel velocity
         U = -epsilon*(Un) + 5/7*(Ut);
 
         keepParticle = true;
         return;
     }
-    else if ((We >= 20) && (We < Wec)) // spread - assume absorb
+    else if ((We >= 20) && (We < Wec)) // Spread - assume absorb
     {
         absorbInteraction(filmModel, p, pp, facei, m, keepParticle);
     }
-    else    // splash
+    else    // Splash
     {
-        // ratio of incident mass to splashing mass
+        // Ratio of incident mass to splashing mass
         // splash mass can be > incident mass due to film entrainment
         const scalar mRatio = 0.2 + 0.9*rndGen_.sample01<scalar>();
         splashInteraction
@@ -383,21 +385,21 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
     // total mass of (all) splashed parcels
     const scalar mSplash = m*mRatio;
 
-    // number of splashed particles per incoming particle
+    // Number of splashed particles per incoming particle
     const scalar Ns = 5.0*(We/Wec - 1.0);
 
-    // average diameter of splashed particles
+    // Average diameter of splashed particles
     const scalar dBarSplash = 1/cbrt(6.0)*cbrt(mRatio/Ns)*d + ROOTVSMALL;
 
-    // cumulative diameter splash distribution
+    // Cumulative diameter splash distribution
     const scalar dMax = 0.9*cbrt(mRatio)*d;
     const scalar dMin = 0.1*dMax;
     const scalar K = exp(-dMin/dBarSplash) - exp(-dMax/dBarSplash);
 
-    // surface energy of secondary parcels [J]
+    // Surface energy of secondary parcels [J]
     scalar ESigmaSec = 0;
 
-    // sample splash distribution to determine secondary parcel diameters
+    // Sample splash distribution to determine secondary parcel diameters
     scalarList dNew(parcelsPerSplash_);
     scalarList npNew(parcelsPerSplash_);
     forAll(dNew, i)
@@ -408,26 +410,26 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
         ESigmaSec += npNew[i]*sigma*p.areaS(dNew[i]);
     }
 
-    // incident kinetic energy [J]
+    // Incident kinetic energy [J]
     const scalar EKIn = 0.5*m*magSqr(Urel);
 
-    // incident surface energy [J]
+    // Incident surface energy [J]
     const scalar ESigmaIn = np*sigma*p.areaS(d);
 
-    // dissipative energy
+    // Dissipative energy
     const scalar Ed = max(0.8*EKIn, np*Wec/12*pi*sigma*sqr(d));
 
-    // total energy [J]
+    // Total energy [J]
     const scalar EKs = EKIn + ESigmaIn - ESigmaSec - Ed;
 
-    // switch to absorb if insufficient energy for splash
+    // Switch to absorb if insufficient energy for splash
     if (EKs <= 0)
     {
         absorbInteraction(filmModel, p, pp, facei, m, keepParticle);
         return;
     }
 
-    // helper variables to calculate magUns0
+    // Helper variables to calculate magUns0
     const scalar logD = log(d);
     const scalar coeff2 = log(dNew[0]) - logD + ROOTVSMALL;
     scalar coeff1 = 0.0;
@@ -436,7 +438,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
         coeff1 += sqr(log(dNew[i]) - logD);
     }
 
-    // magnitude of the normal velocity of the first splashed parcel
+    // Magnitude of the normal velocity of the first splashed parcel
     const scalar magUns0 =
         sqrt(2.0*parcelsPerSplash_*EKs/mSplash/(1.0 + coeff1/sqr(coeff2)));
 
@@ -457,7 +459,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
             pPtr->typeId() = splashParcelType_;
         }
 
-        // perturb new parcels towards the owner cell centre
+        // Perturb new parcels towards the owner cell centre
         pPtr->position() += 0.5*rndGen_.sample01<scalar>()*(posC - posCf);
 
         pPtr->nParticle() = npNew[i];
@@ -475,7 +477,7 @@ void Foam::ThermoSurfaceFilm<CloudType>::splashInteraction
         nParcelsSplashed_++;
     }
 
-    // transfer remaining part of parcel to film 0 - splashMass can be -ve
+    // Transfer remaining part of parcel to film 0 - splashMass can be -ve
     // if entraining from the film
     const scalar mDash = m - mSplash;
     absorbInteraction(filmModel, p, pp, facei, mDash, keepParticle);
@@ -622,11 +624,11 @@ bool Foam::ThermoSurfaceFilm<CloudType>::transferParcel
             }
         }
 
-        // transfer parcel/parcel interactions complete
+        // Transfer parcel/parcel interactions complete
         return true;
     }
 
-    // parcel not interacting with film
+    // Parcel not interacting with film
     return false;
 }
 

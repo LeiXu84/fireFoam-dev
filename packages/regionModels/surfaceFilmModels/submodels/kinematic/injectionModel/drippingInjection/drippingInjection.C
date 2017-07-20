@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -50,23 +50,23 @@ addToRunTimeSelectionTable(injectionModel, drippingInjection, dictionary);
 
 drippingInjection::drippingInjection
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    injectionModel(type(), owner, dict),
+    injectionModel(type(), film, dict),
     deltaStable_(readScalar(coeffDict_.lookup("deltaStable"))),
     particlesPerParcel_(readScalar(coeffDict_.lookup("particlesPerParcel"))),
     rndGen_(label(0), -1),
     parcelDistribution_
     (
-        distributionModels::distributionModel::New
+        distributionModel::New
         (
             coeffDict_.subDict("parcelDistribution"),
             rndGen_
         )
     ),
-    diameter_(owner.regionMesh().nCells(), 0.0) // kvm
+    diameter_(film.regionMesh().nCells(), 0.0) // kvm
 {
     forAll(diameter_, faceI) // kvm
     { // kvm
@@ -91,7 +91,7 @@ void drippingInjection::correct
 )
 {
     const kinematicSingleLayer& film =
-        refCast<const kinematicSingleLayer>(this->owner());
+        refCast<const kinematicSingleLayer>(this->film());
 
     const scalar pi = constant::mathematical::pi;
 

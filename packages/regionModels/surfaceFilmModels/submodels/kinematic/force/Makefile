@@ -1,3 +1,3 @@
 default:
-	cd ../../.. && wmake libso
+	wmake libso 2>&1 | tee log
 

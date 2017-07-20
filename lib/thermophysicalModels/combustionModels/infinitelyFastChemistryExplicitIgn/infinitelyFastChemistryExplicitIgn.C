@@ -152,7 +152,7 @@ infinitelyFastChemistryExplicitIgn<CombThermoType, ThermoType>::R(const volScala
 //
 template<class CombThermoType, class ThermoType>
 tmp<volScalarField>
-infinitelyFastChemistryExplicitIgn<CombThermoType, ThermoType>::dQ() const
+infinitelyFastChemistryExplicitIgn<CombThermoType, ThermoType>::Qdot() const
 {
     const label fuelI = this->singleMixture_.fuelIndex();
     const volScalarField& YFuel = this->thermo_->composition().Y()[fuelI];

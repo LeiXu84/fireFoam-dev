@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -89,7 +89,7 @@ class fvDOM
         volScalarField G_;
 
         //- Total radiative heat flux [W/m2]
-        volScalarField Qr_;
+        volScalarField qr_;
 
          //- Emmited radiative heat flux [W/m2]
         volScalarField Qem_;
@@ -116,10 +116,10 @@ class fvDOM
         PtrList<volScalarField> aLambda_;
 
         //- Incident radiation for different bands
-        PtrList<volScalarField> GLambda_;
+        PtrList<volScalarField> GLambda_; // ankur
 
         // Ptr List for energy fraction field for each wavelength
-        PtrList<volScalarField> enFracLambda_;
+        PtrList<volScalarField> enFracLambda_; // ankur
 
         //- Black body
         blackBodyEmission blackBody_;
@@ -137,7 +137,7 @@ class fvDOM
         scalar omegaMax_;
 
         //- Switch for uniform solid angles
-        Switch uniSolidAngles_;
+        Switch uniSolidAngles_; // ankur
 
 
     // Private Member Functions
@@ -155,7 +155,7 @@ class fvDOM
         void updateBlackBodyEmission();
 
         //- over-all absorption coefficient for continuous phase (for energy eqn source term..  sum_over_lambda(enFracLambda(lambda)*aCont(lambda)) )
-        tmp<volScalarField> aDispCumm() const;
+        tmp<volScalarField> aDispCumm() const; // ankur
 
 
 public:
@@ -237,19 +237,19 @@ public:
             inline const volScalarField& aLambda(const label lambdaI) const;
 
             //- Const access to incident radiation for different bands
-            inline const volScalarField& GLambda(const label lambdaI) const;
+            inline const volScalarField& GLambda(const label lambdaI) const; // ankur
 
             //- Const access to energy fraction for different bands
-            inline const volScalarField& enFracLambda(const label lambdaI) const;
+            inline const volScalarField& enFracLambda(const label lambdaI) const; // ankur
 
             //- Const access to temperature field
-            inline const volScalarField& T() const;
+            inline const volScalarField& T() const; // ankur
 
             //- Const access to incident radiation field
             inline const volScalarField& G() const;
 
             //- Const access to total radiative heat flux field
-            inline const volScalarField& Qr() const;
+            inline const volScalarField& qr() const;
 
             //- Const access to incident radiative heat flux field
             inline const volScalarField& Qin() const;
@@ -264,7 +264,7 @@ public:
             inline scalar omegaMax() const;
 
             //- In-scattered energy 
-            tmp<volScalarField> inScatEnergy(const label bandI, const label sourDir) const;
+            tmp<volScalarField> inScatEnergy(const label bandI, const label sourDir) const; // ankur
 };
 
 

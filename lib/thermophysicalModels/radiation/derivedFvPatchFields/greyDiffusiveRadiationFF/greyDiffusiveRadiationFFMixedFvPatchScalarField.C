@@ -194,7 +194,7 @@ updateCoeffs()
 
     const scalarField nAve(n & ray.dAve());
 
-    ray.Qr().boundaryFieldRef()[patchI] += Iw*nAve;
+    ray.qr().boundaryFieldRef()[patchI] += Iw*nAve;
 
     const scalarField temissivity = emissivity();
   

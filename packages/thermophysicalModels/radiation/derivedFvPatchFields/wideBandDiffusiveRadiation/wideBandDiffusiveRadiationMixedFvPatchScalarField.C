@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -186,8 +186,9 @@ updateCoeffs()
 
     const scalarField nAve(n & ray.dAve());
 
-    ray.Qr().boundaryFieldRef()[patchi] += Iw*nAve;
+    ray.qr().boundaryFieldRef()[patchi] += Iw*nAve;
 
+    // ankur
     const scalarField pT
     (
         dom.T().boundaryField()[patchi]
@@ -195,10 +196,9 @@ updateCoeffs()
 
     const scalarField Eb
     (
-        dom.enFracLambda(lambdaId).boundaryField()[patchi]*Foam::pow(pT,4.)*physicoChemical::sigma.value() 
+        dom.enFracLambda(lambdaId).boundaryField()[patchi]*Foam::pow(pT,4.)*physicoChemical::sigma.value()  // ankur
         //dom.blackBody().bLambda(lambdaId).boundaryField()[patchi] // making code generic for wide-band and WSGG banded models.. 
     );
-
 
     scalarField temissivity = emissivity();
 

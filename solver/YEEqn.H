@@ -30,7 +30,7 @@ tmp<fv::convectionScheme<scalar>> mvConvection
     // dQ is only for diagnostic purposes.
     // TODO: set dQ = combustoin->dQ(); once OpenCFD updates
     //       greyAbsorptionEmission model in OpenFOAM source
-    dQ = combustion->Sh(); // kvm
+    Qdot = combustion->Qdot();
 
     volScalarField Yt(0.0*Y[0]);
 
@@ -97,8 +97,8 @@ tmp<fv::convectionScheme<scalar>> mvConvection
         )
       - fvm::laplacian(turbulence->alphaEff(), he)
      ==
-        combustion->Sh()
-      + radiation->Sh(thermo)
+        combustion->Qdot()
+      + radiation->Sh(thermo, he)
       + parcels.Sh(he)
       + surfaceFilm.Sh()
       + fvOptions(rho, he)

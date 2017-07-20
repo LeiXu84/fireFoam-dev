@@ -15,9 +15,11 @@ EXE_INC = \
     -I$(LIB_SRC)/thermophysicalModels/specie/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/solid/lnInclude \
-    -I$(LIB_SRC)/thermophysicalModels/basicSolidThermo/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/SLGThermo/lnInclude\
     -I$(LIB_SRC)/thermophysicalModels/solidChemistryModel/lnInclude \
     -I$(DEV_PATH)/thermophysicalModels/radiation/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/thermophysicalProperties/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/properties/liquidProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/liquidProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/liquidMixtureProperties/lnInclude \
     -I$(LIB_SRC)/thermophysicalModels/properties/solidProperties/lnInclude \

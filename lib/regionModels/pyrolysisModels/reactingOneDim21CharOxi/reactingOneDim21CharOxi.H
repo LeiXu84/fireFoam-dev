@@ -71,7 +71,7 @@ protected:
             volScalarField mCharBurnt_;
 
             //- Heat release due to char oxidation [J/s/m3]
-            volScalarField charOxiSh_;
+            volScalarField charOxiQdot_;
 
             //- Total O2 mass flux from the primary region [kg/s]
             volScalarField phiO2_;

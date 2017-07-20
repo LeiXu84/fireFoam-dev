@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -48,7 +48,7 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
     const scalar deltaTheta,
     const label nLambda,
     const absorptionEmissionModel& absorptionEmission,
-    const scatterModel& scatter,
+    const scatterModel& scatter, // ankur
     const blackBodyEmission& blackBody,
     const label rayId
 )
@@ -56,7 +56,7 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
     dom_(dom),
     mesh_(mesh),
     absorptionEmission_(absorptionEmission),
-    scatter_(scatter),
+    scatter_(scatter), // ankur
     blackBody_(blackBody),
     I_
     (
@@ -71,18 +71,18 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
         mesh_,
         dimensionedScalar("I", dimMass/pow3(dimTime), 0.0)
     ),
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr" + name(rayId),
+            "qr" + name(rayId),
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
         mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+        dimensionedScalar("qr", dimMass/pow3(dimTime), 0.0)
     ),
     Qin_
     (
@@ -208,18 +208,18 @@ Foam::radiation::radiativeIntensityRay::~radiativeIntensityRay()
 Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
 {
     // Reset boundary heat flux to zero
-    Qr_.boundaryFieldRef() = 0.0;
+    qr_.boundaryFieldRef() = 0.0;
 
     scalar maxResidual = -GREAT;
 
     forAll(ILambda_, lambdaI)
     {
         //const volScalarField& k = dom_.aLambda(lambdaI);
-        const volScalarField k(absorptionEmission_.a(lambdaI));
+        const volScalarField k(absorptionEmission_.a(lambdaI)); // ankur
 
         const surfaceScalarField Ji(dAve_ & mesh_.Sf());
 
-        const volScalarField sigmaEff(scatter_.sigmaEff(lambdaI));
+        const volScalarField sigmaEff(scatter_.sigmaEff(lambdaI)); // ankur
 
  
         //Info << " k: " << k << endl;
@@ -229,18 +229,18 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
         (
             fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
           + fvm::Sp(k*omega_, ILambda_[lambdaI])
-          + fvm::Sp(sigmaEff*omega_, ILambda_[lambdaI])
+          + fvm::Sp(sigmaEff*omega_, ILambda_[lambdaI]) // ankur
         ==
             1.0/constant::mathematical::pi*omega_
            *(
                 // Remove aDisp from k
                 (k - absorptionEmission_.aDisp(lambdaI))
-                *physicoChemical::sigma*pow4(dom_.T())*dom_.enFracLambda(lambdaI)
-               // *blackBody_.bLambda(lambdaI)   // the above expression computes banded emmision
+                *physicoChemical::sigma*pow4(dom_.T())*dom_.enFracLambda(lambdaI) // ankur
+               // *blackBody_.bLambda(lambdaI)   // ankur, the above expression computes banded emmision
 
               + absorptionEmission_.E(lambdaI)/4
             )
-          + dom_.inScatEnergy(lambdaI,myRayId_)
+          + dom_.inScatEnergy(lambdaI,myRayId_) // ankur
         );
 
         IiEq.relax();

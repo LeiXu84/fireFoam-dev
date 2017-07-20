@@ -71,7 +71,7 @@ public:
     // Constructors
 
         //- Construct from dictionary
-        filmCoverageFunctionObject(const dictionary& dict, regionModel& owner);
+        filmCoverageFunctionObject(const dictionary& dict, regionModel& film);
 
         //- Construct copy
         filmCoverageFunctionObject(const filmCoverageFunctionObject& ppm);

@@ -44,23 +44,23 @@ addToRunTimeSelectionTable ( heatTransferModel, conductionHeatTransfer, dictiona
 
 conductionHeatTransfer::conductionHeatTransfer
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    heatTransferModel(typeName, owner, dict),
+    heatTransferModel(typeName, film, dict),
     c0_(readScalar(coeffDict_.lookup("c0"))),
     htcConvFilm_
     (
         IOobject
         (
             "htcConvWall",
-            owner_.time().timeName(),
-            owner_.regionMesh(),
+            filmModel_.time().timeName(),
+            filmModel_.regionMesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        owner_.regionMesh(),
+        filmModel_.regionMesh(),
         dimensionedScalar("zero", dimMass/pow3(dimTime)/dimTemperature, 0.0),
         zeroGradientFvPatchScalarField::typeName
     )
@@ -77,7 +77,7 @@ conductionHeatTransfer::~conductionHeatTransfer()
 
 void conductionHeatTransfer::correct()
 {
-const thermoSingleLayer& film = refCast<const thermoSingleLayer>(owner_); //kvm
+const thermoSingleLayer& film = refCast<const thermoSingleLayer>(filmModel_); //kvm
 
 // retrieve fields from film model
 const scalarField& delta = film.delta();

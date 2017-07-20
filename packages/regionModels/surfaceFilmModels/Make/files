@@ -15,7 +15,11 @@ KINEMATICMODELS=submodels/kinematic
 $(KINEMATICMODELS)/force/force/force.C
 $(KINEMATICMODELS)/force/force/forceNew.C
 $(KINEMATICMODELS)/force/forceList/forceList.C
-$(KINEMATICMODELS)/force/contactAngleForce/contactAngleForce.C
+$(KINEMATICMODELS)/force/contactAngleForces/contactAngleForce/contactAngleForce.C
+$(KINEMATICMODELS)/force/contactAngleForces/distribution/distributionContactAngleForce.C
+$(KINEMATICMODELS)/force/contactAngleForces/distributionFF/distributionContactAngleForceFF.C
+$(KINEMATICMODELS)/force/contactAngleForces/temperatureDependent/temperatureDependentContactAngleForce.C
+$(KINEMATICMODELS)/force/contactAngleForces/perturbedTemperatureDependent/perturbedTemperatureDependentContactAngleForce.C
 /* $(KINEMATICMODELS)/force/surfaceShearForce/surfaceShearForce.C */
 $(KINEMATICMODELS)/force/thermocapillaryForce/thermocapillaryForce.C
 $(KINEMATICMODELS)/functionObjects/filmCoverage/filmCoverageFunctionObject.C

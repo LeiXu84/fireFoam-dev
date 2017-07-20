@@ -58,7 +58,7 @@ Foam::radiation::noScatter::~noScatter()
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
-Foam::tmp<Foam::volScalarField> Foam::radiation::noScatter::sigmaEff(const label bandI) const
+Foam::tmp<Foam::volScalarField> Foam::radiation::noScatter::sigmaEff(const label bandI) const // ankur
 {
     return tmp<volScalarField>
     (
@@ -79,6 +79,7 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::noScatter::sigmaEff(const label
     );
 }
 
+// ankur
 Foam::tmp<Foam::volScalarField>
 Foam::radiation::noScatter::pFunc(const label bandI, const label sour, const label dest) const
 {

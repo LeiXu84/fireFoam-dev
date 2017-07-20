@@ -38,7 +38,7 @@ Description
 #include "runTimeSelectionTables.H"
 #include "volFields.H"
 #include "Vector2D.H"
-#include "blackBodyEmission.H"
+#include "blackBodyEmission.H" // ankur
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -178,6 +178,7 @@ public:
                 PtrList<volScalarField>& aj
             ) const;
 
+            // ankur
             //- Correct energy fraction in various bands
             virtual void correctEnFrac
             (

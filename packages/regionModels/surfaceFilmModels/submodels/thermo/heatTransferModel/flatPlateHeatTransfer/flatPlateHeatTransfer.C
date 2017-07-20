@@ -71,23 +71,23 @@ scalar flatPlateHeatTransfer::Nu
 
 flatPlateHeatTransfer::flatPlateHeatTransfer
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    heatTransferModel(typeName, owner, dict),
+    heatTransferModel(typeName, film, dict),
     L_(readScalar(coeffDict_.lookup("L"))),
     htcConvFilm_
     (
         IOobject
         (
             "htcConvGas",
-            owner.time().timeName(),
-            owner_.regionMesh(),
+            film.time().timeName(),
+            filmModel_.regionMesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        owner_.regionMesh(),
+        filmModel_.regionMesh(),
         dimensionedScalar("zero", dimMass/pow3(dimTime)/dimTemperature, 0.0),
         zeroGradientFvPatchScalarField::typeName
     )
@@ -104,7 +104,7 @@ flatPlateHeatTransfer::~flatPlateHeatTransfer()
 
 void flatPlateHeatTransfer::correct()
 {
-    const thermoSingleLayer& film = refCast<const thermoSingleLayer>(owner_); //kvm
+    const thermoSingleLayer& film = refCast<const thermoSingleLayer>(filmModel_); //kvm
 
     // retrieve fields from film model
     /*const scalarField& delta = film.delta();*/

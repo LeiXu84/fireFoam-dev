@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -58,8 +58,9 @@ void Foam::radiation::fvDOM::initialise()
         scalar deltaTheta = pi/nTheta_;
         label i = 0;
         for (label n = 1; n <= nTheta_; n++)
-        {  
-            scalar thetai = (2.0*n - 1.0)*deltaTheta/2.0;
+        {
+            scalar thetai = (2.0*n - 1.0)*deltaTheta/2.0; // ankur
+            // ankur
             if (uniSolidAngles_)
             {
               scalar muBeg = 1. - (n - 1.)*2./nTheta_;   // mu is cos(theta)
@@ -85,7 +86,7 @@ void Foam::radiation::fvDOM::initialise()
                         deltaTheta,
                         nLambda_,
                         absorptionEmission_,
-                        scatter_,
+                        scatter_, // ankur
                         blackBody_,
                         i
                     )
@@ -127,7 +128,7 @@ void Foam::radiation::fvDOM::initialise()
                     deltaTheta,
                     nLambda_,
                     absorptionEmission_,
-                    scatter_,
+                    scatter_, // ankur
                     blackBody_,
                     i
                 )
@@ -168,7 +169,7 @@ void Foam::radiation::fvDOM::initialise()
                     deltaTheta,
                     nLambda_,
                     absorptionEmission_,
-                    scatter_,
+                    scatter_, // ankur
                     blackBody_,
                     i
                 )
@@ -199,7 +200,7 @@ void Foam::radiation::fvDOM::initialise()
         );
     }
 
-    // Construct incident radiation for each band
+    // ankur, construct incident radiation for each band
     forAll(GLambda_, lambdaI)
     {
         GLambda_.set
@@ -220,7 +221,7 @@ void Foam::radiation::fvDOM::initialise()
         );
     }
 
-    // Construct energy fraction for each band
+    // ankur, construct energy fraction for each band
     forAll(enFracLambda_, lambdaI)
     {
         enFracLambda_.set
@@ -278,18 +279,18 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
         mesh_,
         dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
     ),
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             mesh_.time().timeName(),
             mesh_,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+        dimensionedScalar("qr", dimMass/pow3(dimTime), 0.0)
     ),
     Qem_
     (
@@ -335,14 +336,14 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
     nRay_(0),
     nLambda_(absorptionEmission_->nBands()),
     aLambda_(nLambda_),
-    GLambda_(nLambda_),
-    enFracLambda_(nLambda_),
+    GLambda_(nLambda_), // ankur
+    enFracLambda_(nLambda_), // ankur
     blackBody_(nLambda_, T),
     IRay_(0),
     convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
     maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
     omegaMax_(0),
-    uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false))
+    uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false)) // ankur
 {
     initialise();
 }
@@ -368,18 +369,18 @@ Foam::radiation::fvDOM::fvDOM
         mesh_,
         dimensionedScalar("G", dimMass/pow3(dimTime), 0.0)
     ),
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             mesh_.time().timeName(),
             mesh_,
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+        dimensionedScalar("qr", dimMass/pow3(dimTime), 0.0)
     ),
     Qem_
     (
@@ -425,14 +426,14 @@ Foam::radiation::fvDOM::fvDOM
     nRay_(0),
     nLambda_(absorptionEmission_->nBands()),
     aLambda_(nLambda_),
-    GLambda_(nLambda_),
-    enFracLambda_(nLambda_),
+    GLambda_(nLambda_), // ankur
+    enFracLambda_(nLambda_), // ankur
     blackBody_(nLambda_, T),
     IRay_(0),
     convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
     maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
     omegaMax_(0),
-    uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false))
+    uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false)) // ankur
 {
     initialise();
 }
@@ -467,9 +468,9 @@ void Foam::radiation::fvDOM::calculate()
 {
     absorptionEmission_->correct(a_, aLambda_);
 
-    absorptionEmission_->correctEnFrac(enFracLambda_, blackBody_); // to update energy fraction 
+    absorptionEmission_->correctEnFrac(enFracLambda_, blackBody_); // ankur, to update energy fraction 
     
-    // updateBlackBodyEmission();  // This not needed now, since the above call updates the fraction.. Also, the data for storing spectral fraction has now been defined in fvDOM class itself now.. 
+    // updateBlackBodyEmission();  // ankur, this not needed now, since the above call updates the fraction.. Also, the data for storing spectral fraction has now been defined in fvDOM class itself now.. 
 
     // Set rays convergence false
     List<bool> rayIdConv(nRay_, false);
@@ -518,14 +519,14 @@ Foam::tmp<Foam::volScalarField> Foam::radiation::fvDOM::Rp() const
                 false
             ),
             // Only include continuous phase emission
-            //4*absorptionEmission_->aCont()*physicoChemical::sigma  // Commenting this line.. not correct for wide-band/WSGG models
-            4*aDispCumm()*physicoChemical::sigma     //  aDispCumm function computes aDisp appropriately for wide-band/WSGG models
+            //4*absorptionEmission_->aCont()*physicoChemical::sigma  // ankur, commenting this line.. not correct for wide-band/WSGG models
+            4*aDispCumm()*physicoChemical::sigma     //  ankur, aDispCumm function computes aDisp appropriately for wide-band/WSGG models
         )
     );
 }
 
 
-Foam::tmp<Foam::volScalarField::Internal>
+Foam::tmp<Foam::volScalarField::Internal> // ankur
 Foam::radiation::fvDOM::Ru() const
 {
 
@@ -541,6 +542,7 @@ Foam::radiation::fvDOM::Ru() const
 //
 //    return a*G - E;
 
+    // ankur
     tmp<volScalarField::Internal> tRu
     (
         new volScalarField::Internal
@@ -559,12 +561,13 @@ Foam::radiation::fvDOM::Ru() const
         )
     );
 
+    // ankur
     for (label j=0; j < nLambda_; j++)
     {
         tRu.ref() += absorptionEmission_->aCont(j)()()*GLambda_[j]() - absorptionEmission_->ECont(j)()();
     }
 
-    return tRu;
+    return tRu; // ankur
 
 }
 
@@ -578,6 +581,7 @@ void Foam::radiation::fvDOM::updateBlackBodyEmission()
 }
 
 
+// ankur
 Foam::tmp<Foam::volScalarField>
 Foam::radiation::fvDOM::aDispCumm() const
 {
@@ -611,9 +615,10 @@ Foam::radiation::fvDOM::aDispCumm() const
 void Foam::radiation::fvDOM::updateG()
 {
     G_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
-    Qr_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+    qr_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
     Qem_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
     Qin_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
+    // ankur
     forAll(GLambda_,iLambda)
     {
     	GLambda_[iLambda] = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
@@ -623,9 +628,10 @@ void Foam::radiation::fvDOM::updateG()
     {
         IRay_[rayI].addIntensity();
         G_ += IRay_[rayI].I()*IRay_[rayI].omega();
-        Qr_.boundaryFieldRef() += IRay_[rayI].Qr().boundaryField();
+        qr_.boundaryFieldRef() += IRay_[rayI].qr().boundaryField();
         Qem_.boundaryFieldRef() += IRay_[rayI].Qem().boundaryField();
         Qin_.boundaryFieldRef() += IRay_[rayI].Qin().boundaryField();
+        // ankur
         forAll(GLambda_,iLambda)
         {
           GLambda_[iLambda] += IRay_[rayI].ILambda(iLambda)*IRay_[rayI].omega();
@@ -649,6 +655,7 @@ void Foam::radiation::fvDOM::setRayIdLambdaId
     lambdaId = readLabel(IStringStream(name.substr(i2+1, name.size()-1))());
 }
 
+// ankur
 Foam::tmp<Foam::volScalarField> Foam::radiation::fvDOM::inScatEnergy(const label iLambda, const label sourDir) const
 {
     tmp<volScalarField> tInScatEn

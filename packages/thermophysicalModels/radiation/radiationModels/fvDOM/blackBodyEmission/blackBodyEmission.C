@@ -227,12 +227,12 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
     }
     else
     {
+        // ankur
         scalarField& Ebif   = Eb.ref().primitiveFieldRef();
         const scalarField& TCells = T.primitiveField();
 
         forAll(TCells, i)
         {
-            Info << "i val: " << i << endl;
             scalar T1 = fLambdaT(band[1]*TCells[i]);
             scalar T2 = fLambdaT(band[0]*TCells[i]);
             Ebif[i] *= T1 - T2;
@@ -255,7 +255,6 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
         	fvPatchScalarField& pEb = Ebf[patchi];
                 forAll(pT, facei)
                 {
-                	Info << "facei val: " << facei << endl;
                 	scalar T1 = fLambdaT(band[1]*pT[facei]);
                 	scalar T2 = fLambdaT(band[0]*pT[facei]);
                 	pEb[facei] *= T1 - T2;
@@ -265,6 +264,7 @@ Foam::radiation::blackBodyEmission::EbDeltaLambdaT
     return Eb;
 }
 
+// ankur
 Foam::scalar Foam::radiation::blackBodyEmission::fDeltaLambdaT
 (
     const scalar T,
@@ -297,6 +297,7 @@ void Foam::radiation::blackBodyEmission::correct
     bLambda_[lambdaI] = EbDeltaLambdaT(T_, band);
 }
 
+// ankur
 void Foam::radiation::blackBodyEmission::correctEnFrac
 (
     volScalarField& enFracLambda,
@@ -342,7 +343,6 @@ Foam::radiation::blackBodyEmission::fracDeltaLambdaT
 
         forAll(TCells, i)
         {
-            Info << "i val: " << i << endl;
             scalar T1 = fLambdaT(band[1]*TCells[i]);
             scalar T2 = fLambdaT(band[0]*TCells[i]);
             fracif[i] *= T1 - T2;
@@ -361,7 +361,6 @@ Foam::radiation::blackBodyEmission::fracDeltaLambdaT
         	fvPatchScalarField& pfrac = fracf[patchi];
                 forAll(pT, facei)
                 {
-                	Info << "facei val: " << facei << endl;
                 	scalar T1 = fLambdaT(band[1]*pT[facei]);
                 	scalar T2 = fLambdaT(band[0]*pT[facei]);
                 	pfrac[facei] *= T1 - T2;

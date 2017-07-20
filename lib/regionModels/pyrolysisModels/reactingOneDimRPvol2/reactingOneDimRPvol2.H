@@ -117,10 +117,10 @@ protected:
             //- Sensible enthalpy gas flux [J/m2/s]
             volScalarField phiHsGas_;
 
-            //- Heat release [J/s/m3]
-            volScalarField chemistrySh_;
+            //- Heat release rate [J/s/m3]
+            volScalarField chemistryQdot_;
 
-	// Added for roll paper moving material model
+    // Added for roll paper moving material model
             // Non-const access to surface temperautre
             volScalarField blockFactor_;
             volScalarField page_;
@@ -128,27 +128,27 @@ protected:
             volScalarField virginD_;
             volScalarField Qnet_;
             volScalarField QnetSmooth_;
-            volScalarField TdFirst_;	    //First paper delamination temperature
+            volScalarField TdFirst_;        //First paper delamination temperature
             volScalarField Tsurface_;
             volScalarField wd_;
             volScalarField thermallyThin_;
 
-	    volVectorField Upyrolysis_;
-	    surfaceScalarField phiPyrolysis_;
-	    
-            scalar Tcrt_;		    //Critical Ignition temperature
-	    scalar paperToFuelRatio_;
-	    scalar Hpyro_;
-        scalar deltat_;
+            volVectorField Upyrolysis_;
+            surfaceScalarField phiPyrolysis_;
+        
+            scalar Tcrt_;           //Critical Ignition temperature
+            scalar paperToFuelRatio_;
+            scalar Hpyro_;
+            scalar deltat_;
 
         // Source term fields
 
             //- Coupled region radiative heat flux [W/m2]
             //  Requires user to input mapping info for coupled patches
-            //volScalarField QrCoupled_;
+            //volScalarField qrCoupled_;
 
             //- In depth radiative heat flux [W/m2]
-            volScalarField Qr_;
+            volScalarField qr_;
 
 
         // Checks
@@ -172,7 +172,7 @@ protected:
             bool  gasHSource_;
 
             //- Add in depth radiation source term
-            bool  QrHSource_;
+            bool  qrHSource_;
 
             //- Use chemistry solvers (ode or sequential)
             bool useChemistrySolvers_;
@@ -187,13 +187,13 @@ protected:
         bool read(const dictionary& dict);
 
         //- Update submodels
-        virtual void updateFields();
+        void updateFields();
 
         //- Update/move mesh based on change in mass
         void updateMesh(const scalarField& mass0);
 
         //- Update radiative flux in pyrolysis region
-        void updateQr();
+        void updateqr();
 
         //- Update enthalpy flux for pyrolysis gases
         void updatePhiGas();
@@ -250,7 +250,7 @@ public:
 
         // Access
 
-		//- Fields
+        //- Fields
 
                 //- Return const density [Kg/m3]
                 const volScalarField& rho() const;
@@ -285,8 +285,8 @@ public:
             //- External hook to add mass to the primary region
             virtual scalar addMassSources
             (
-                const label patchI,            // patchI on primary region
-                const label faceI              // faceI of patchI
+                const label patchi,            // patchi on primary region
+                const label facei              // facei of patchi
             );
 
             //- Mean diffusion number of the solid region
@@ -305,7 +305,7 @@ public:
        // I-O
 
             //- Provide some feedback
-            virtual void info() const;
+            virtual void info();
 };
 
 

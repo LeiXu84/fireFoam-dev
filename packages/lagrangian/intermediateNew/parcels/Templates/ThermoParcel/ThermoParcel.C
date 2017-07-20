@@ -231,6 +231,7 @@ void Foam::ThermoParcel<ParcelType>::calc
         // Update radiation fields
         if (td.cloud().radiation())
         {
+            // ankur
             //const scalar ap = this->areaP();
             //const scalar T4 = pow4(T0);
             //const label nBands=td.cloud().nBands();
@@ -238,9 +239,9 @@ void Foam::ThermoParcel<ParcelType>::calc
 
 //            for(label bandI=0; bandI < nBands; bandI++)
 //            {
-//		    td.cloud().radAreaP(bandI)[celli] += dt*np0*ap;
-//		    td.cloud().radT4(bandI)[celli] += dt*np0*T4;
-//		    td.cloud().radAreaPT4(bandI)[celli] += dt*np0*ap*T4;
+//          td.cloud().radAreaP(bandI)[celli] += dt*np0*ap;
+//          td.cloud().radT4(bandI)[celli] += dt*np0*T4;
+//          td.cloud().radAreaPT4(bandI)[celli] += dt*np0*ap*T4;
 //            }
 
 //            td.cloud().radAreaP()[celli] += dt*np0*ap;
@@ -298,22 +299,22 @@ Foam::scalar Foam::ThermoParcel<ParcelType>::calcHeatTransfer
         tetIndices tetIs = this->currentTetIndices();
 
         //- The call below updates radiation fields and computes parcel specific terms for radiative src calculations 
-        List<scalar> kgAndkEmm(td.cloud().radCalc(celli,this->areaP(),this->nParticle_,pow4(T_),dt));
+        List<scalar> kgAndkEmm(td.cloud().radCalc(celli,this->areaP(),this->nParticle_,pow4(T_),dt)); // ankur
 
-        if (td.cloud().coupledRadiation())
+        if (td.cloud().coupledRadiation()) // ankur
         {
-	//        const scalar Gc = td.GInterp().interpolate(this->position(), tetIs);
-		const scalar kG = kgAndkEmm[0]; // td.cloud().getkG(d);    // multiple of k*G   // unit of k here is dimensionless
-		const scalar kEmm = kgAndkEmm[1]; // td.cloud().getEmm(d);  //   emissivity of the particle // dimensionless number
-		const scalar sigma = physicoChemical::sigma.value();
-	//        const scalar epsilon = td.cloud().constProps().epsilon0();
+            // const scalar Gc = td.GInterp().interpolate(this->position(), tetIs);
+            const scalar kG = kgAndkEmm[0]; // td.cloud().getkG(d);    // multiple of k*G   // unit of k here is dimensionless // ankur
+            const scalar kEmm = kgAndkEmm[1]; // td.cloud().getEmm(d);  //   emissivity of the particle // dimensionless number // ankur
+            const scalar sigma = physicoChemical::sigma.value(); // ankur
+            // const scalar epsilon = td.cloud().constProps().epsilon0();
 
-		// Assume constant source
-	//        scalar s = epsilon*(Gc/4.0 - sigma*pow4(T_));
-		scalar s = (kG/4.) - sigma*kEmm*pow4(T_); 
-	 
-		ap += s/htc;
-		bp += 6.0*s;
+            // Assume constant source
+            // scalar s = epsilon*(Gc/4.0 - sigma*pow4(T_));
+            scalar s = (kG/4.) - sigma*kEmm*pow4(T_);  // ankur
+
+            ap += s/htc;
+            bp += 6.0*s;
         }
     }
     bp /= rho*d*Cp_*(ap - T_) + ROOTVSMALL;

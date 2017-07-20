@@ -586,6 +586,7 @@ void Foam::ReactingParcel<ParcelType>::calc
         td.cloud().hsTrans()[celli] += np0*dhsTrans;
         td.cloud().hsCoeff()[celli] += np0*Sph;
 
+        // ankur
 //        // Update radiation fields
 //        if (td.cloud().radiation())
 //        {

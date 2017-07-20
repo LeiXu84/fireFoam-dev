@@ -111,7 +111,7 @@ public:
 //            virtual tmp<fvScalarMatrix> R2(volScalarField& Y) const;
 
             //- Heat release rate calculated from fuel consumption rate matrix
-            virtual tmp<volScalarField> dQ() const;
+            virtual tmp<volScalarField> Qdot() const;
 
             //- Return normalised consumption rate of (fu - fres)
             virtual tmp<volScalarField> wFuelNorm() const;

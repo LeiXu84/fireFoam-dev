@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -45,11 +45,11 @@ addToRunTimeSelectionTable(force, thermocapillaryForce, dictionary);
 
 thermocapillaryForce::thermocapillaryForce
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    force(owner)
+    force(film)
 {}
 
 
@@ -63,8 +63,8 @@ thermocapillaryForce::~thermocapillaryForce()
 
 tmp<fvVectorMatrix> thermocapillaryForce::correct(volVectorField& U)
 {
-    const volScalarField& sigma = owner_.sigma();
-    const volScalarField& deltaf = owner_.delta(); // kvm
+    const volScalarField& sigma = filmModel_.sigma();
+    const volScalarField& deltaf = filmModel_.delta(); // kvm
     const dimensionedScalar delta0("d0", dimLength, 1e-4); // kvm
 
     tmp<volScalarField> // kvm
@@ -77,7 +77,7 @@ tmp<fvVectorMatrix> thermocapillaryForce::correct(volVectorField& U)
     // TODO: use estimated surface temperature here instead of mean film temperature
     tfvm.ref() += fvc::grad(sigma)*tRatio; // kvm
 
-    if(owner_.time().outputTime()){ // kvm
+    if(filmModel_.time().outputTime()){ // kvm
         // tmp<volVectorField> tGradSigma(fvc::grad(sigma));
         // tGradSigma->write();
     } // kvm

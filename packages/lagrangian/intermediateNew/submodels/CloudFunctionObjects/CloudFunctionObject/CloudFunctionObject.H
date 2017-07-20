@@ -43,7 +43,7 @@ SourceFiles
 
 #include "point.H" // kvm
 
-#include "Switch.H"
+#include "Switch.H" // ankur
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -67,7 +67,7 @@ class CloudFunctionObject
         fileName outputDir_;
 
         //- Boolean flag to call write() function every time step
-        Switch callWriteEveryTime_;
+        Switch callWriteEveryTime_; // ankur
 
     // Private Member Functions
 

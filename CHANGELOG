@@ -1,3 +1,6 @@
+2017-07-20: Version 17.07.20
+    compiled against OpenFOAM-dev commit a884a44e4729ae662fa1e4361ccf67e7c498ca (2017-05-04)
+
 2017-06-01: Version 17.06.01
     added treatment for radiation attenuation due to spray
     compiled against OpenFOAM-dev commit 8dafde6048ab9c7302712447a0d3bb49f800f8f6 (2016-12-07)

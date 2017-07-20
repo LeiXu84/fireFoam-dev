@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -33,7 +33,6 @@ License
 template<class CloudType>
 void Foam::ThermoCloud<CloudType>::setModels()
 {
-
     heatTransferModel_.reset
     (
         HeatTransferModel<ThermoCloud<CloudType>>::New
@@ -59,52 +58,52 @@ void Foam::ThermoCloud<CloudType>::setModels()
 
     if (radiation_)
     {
-
+        // ankur
         coupledRadiation_ = this->subModelProperties().lookupOrDefault("coupledRadiation",true);
 
-       //radModel_ = this->mesh().template lookupObject<radiation::radiationModel>("radiationProperties");
+        // radModel_ = this->mesh().template lookupObject<radiation::radiationModel>("radiationProperties");
        
-       this->subModelProperties().lookup("nBands") >> nBands_;
+        this->subModelProperties().lookup("nBands") >> nBands_;
+
+        //this->subModelProperties().lookup("radiationProperty") >> radProp_;
+        radProp_ = this->subModelProperties().template lookupOrDefault< word >("radiationProperty","constRad");
+
+        word radPropCoeffs = radProp_ + "Coeffs";
+        const dictionary&  radProp = this->subModelProperties().subDict(radPropCoeffs);
+
+        if (radProp_ == "constRad")
+        {
+            constAbsEff_  = radProp.lookupOrDefault<scalar>("absEfficiency",0.5);
+            constSctEff_  = radProp.lookupOrDefault<scalar>("sctEfficiency",0.5);
+        }
+        else if (radProp_ == "diaBanded")
+        {
+            radProp.lookup("numPropBands") >> numPropBands_;
+            beamLen_ = radProp.lookupOrDefault<scalar>("beamLength",0.2);
+
+            List<scalar> energyFrac(radProp.lookup("energyFraction")); 
+            List<scalar> diaVal(radProp.lookup("diaList"));
+            List<List<scalar>> absEff(radProp.lookup("absEfficiency"));
+            List<List<scalar>> sctEff(radProp.lookup("sctEfficiency"));
+            List<List<scalar>> asyFac(radProp.lookup("asymmetryFactor"));
+          
+            energyFrac_ = energyFrac;
+            diaVal_     = diaVal;
+            absEff_     = absEff;
+            sctEff_     = sctEff;
+            asyFac_     = asyFac; 
  
-       //this->subModelProperties().lookup("radiationProperty") >> radProp_;
-       radProp_ = this->subModelProperties().template lookupOrDefault< word >("radiationProperty","constRad");
+            // Info << "energyFrac: " << energyFrac_ << endl;
+            // Info << "diaVal: " << diaVal_ << endl;
+            // Info << "absEff: " << absEff_ << endl;
+            // Info << "sctEff: " <<< sctEff_ << endl;
+            // Info << "asyFac: " << asyFac_ << endl;
+        } 
+        else
+        {
+            Info << "Need to abort the run. Invalid option" << endl;
+        }
 
-       word radPropCoeffs = radProp_ + "Coeffs";
-       const dictionary&  radProp = this->subModelProperties().subDict(radPropCoeffs);
-
-      if (radProp_ == "constRad")
-      {
-        constAbsEff_  = radProp.lookupOrDefault<scalar>("absEfficiency",0.5);
-        constSctEff_  = radProp.lookupOrDefault<scalar>("sctEfficiency",0.5);
-      }
-      else if (radProp_ == "diaBanded")
-      {
-         radProp.lookup("numPropBands") >> numPropBands_;
-         beamLen_ = radProp.lookupOrDefault<scalar>("beamLength",0.2);
-
-         List<scalar> energyFrac(radProp.lookup("energyFraction")); 
-         List<scalar> diaVal(radProp.lookup("diaList"));
-         List<List<scalar>> absEff(radProp.lookup("absEfficiency"));
-         List<List<scalar>> sctEff(radProp.lookup("sctEfficiency"));
-         List<List<scalar>> asyFac(radProp.lookup("asymmetryFactor"));
-      
-        energyFrac_ = energyFrac;
-        diaVal_     = diaVal;
-        absEff_     = absEff;
-        sctEff_     = sctEff;
-        asyFac_     = asyFac; 
- 
-         //Info << "energyFrac: " << energyFrac_ << endl;
-         //Info << "diaVal: " << diaVal_ << endl;
-         //Info << "absEff: " << absEff_ << endl;
-         //Info << "sctEff: " <<< sctEff_ << endl;
-         //Info << "asyFac: " << asyFac_ << endl;
-
-      } 
-     else
-      {
-         Info << "Need to abort the run. Invalid option" << endl;
-      }
         radAreaP_.setSize(nBands_);
         radAreaPSc_.setSize(nBands_);
         radT4_.setSize(nBands_);
@@ -118,128 +117,128 @@ void Foam::ThermoCloud<CloudType>::setModels()
 
         forAll(radAreaP_, bandI)
         {
-         radAreaP_.set
-         (
-           bandI,
-           new volScalarField::Internal
+            radAreaP_.set
             (
-                IOobject
-                (
-                    this->name() + ":radAreaP" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )           
-         );
+                bandI,
+                new volScalarField::Internal
+                 (
+                     IOobject
+                     (
+                         this->name() + ":radAreaP" + "_" + name(bandI),
+                         this->db().time().timeName(),
+                         this->db(),
+                         IOobject::READ_IF_PRESENT,
+                         IOobject::AUTO_WRITE
+                     ),
+                     this->mesh(),
+                     dimensionedScalar("zero", dimArea, 0.0)
+                 )           
+            );
         }
 
         forAll(radAreaPSc_, bandI)
         {
-         radAreaPSc_.set
-         (
-           bandI,
-           new volScalarField::Internal
+            radAreaPSc_.set
             (
-                IOobject
+             bandI,
+             new volScalarField::Internal
                 (
-                    this->name() + ":radAreaPSc" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )
-         );
+                    IOobject
+                    (
+                        this->name() + ":radAreaPSc" + "_" + name(bandI),
+                        this->db().time().timeName(),
+                        this->db(),
+                        IOobject::READ_IF_PRESENT,
+                        IOobject::AUTO_WRITE
+                    ),
+                    this->mesh(),
+                    dimensionedScalar("zero", dimArea, 0.0)
+                )
+            );
         }
 
-       forAll(radT4_, bandI)
+        forAll(radT4_, bandI)
         {
-         radT4_.set
-         (
-           bandI,
-           new volScalarField::Internal
-            (
-                IOobject
+            radT4_.set
                 (
-                    this->name() + ":radT4" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )
-         );
+                    bandI,
+                    new volScalarField::Internal
+                    (
+                        IOobject
+                        (
+                            this->name() + ":radT4" + "_" + name(bandI),
+                            this->db().time().timeName(),
+                            this->db(),
+                            IOobject::READ_IF_PRESENT,
+                            IOobject::AUTO_WRITE
+                        ),
+                        this->mesh(),
+                        dimensionedScalar("zero", dimArea, 0.0)
+                    )
+                );
         }
 
         forAll(radAreaPT4_, bandI)
         {
-         radAreaPT4_.set
-         (
-           bandI,
-           new volScalarField::Internal
-            (
-                IOobject
+            radAreaPT4_.set
                 (
-                    this->name() + ":radAreaPT4" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )
-         );
+                 bandI,
+                 new volScalarField::Internal
+                 (
+                  IOobject
+                  (
+                   this->name() + ":radAreaPT4" + "_" + name(bandI),
+                   this->db().time().timeName(),
+                   this->db(),
+                   IOobject::READ_IF_PRESENT,
+                   IOobject::AUTO_WRITE
+                  ),
+                  this->mesh(),
+                  dimensionedScalar("zero", dimArea, 0.0)
+                 )
+                );
         }
 
         forAll(radAreaPScAsy_, bandI)
         {
-         radAreaPScAsy_.set
-         (
-           bandI,
-           new volScalarField::Internal
-            (
-                IOobject
+            radAreaPScAsy_.set
                 (
-                    this->name() + ":radAreaPScAsy" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )
-         );
+                 bandI,
+                 new volScalarField::Internal
+                 (
+                  IOobject
+                  (
+                   this->name() + ":radAreaPScAsy" + "_" + name(bandI),
+                   this->db().time().timeName(),
+                   this->db(),
+                   IOobject::READ_IF_PRESENT,
+                   IOobject::AUTO_WRITE
+                  ),
+                  this->mesh(),
+                  dimensionedScalar("zero", dimArea, 0.0)
+                 )
+                );
         }
 
         forAll(CScat_, bandI)
         {
-         CScat_.set
-         (
-           bandI,
-           new volScalarField::Internal
-            (
-                IOobject
+            CScat_.set
                 (
-                    this->name() + ":CScat" + "_" + name(bandI),
-                    this->db().time().timeName(),
-                    this->db(),
-                    IOobject::READ_IF_PRESENT,
-                    IOobject::AUTO_WRITE
-                ),
-                this->mesh(),
-                dimensionedScalar("zero", dimArea, 0.0)
-            )
-         );
+                 bandI,
+                 new volScalarField::Internal
+                 (
+                  IOobject
+                  (
+                   this->name() + ":CScat" + "_" + name(bandI),
+                   this->db().time().timeName(),
+                   this->db(),
+                   IOobject::READ_IF_PRESENT,
+                   IOobject::AUTO_WRITE
+                  ),
+                  this->mesh(),
+                  dimensionedScalar("zero", dimArea, 0.0)
+                 )
+                );
         }
 
 //       radAreaP_.reset
@@ -344,25 +343,25 @@ Foam::ThermoCloud<CloudType>::ThermoCloud
     heatTransferModel_(nullptr),
     TIntegrator_(nullptr),
     radiation_(false),
-    coupledRadiation_(false),
+    coupledRadiation_(false), // ankur
     //radModel_(T_),
-    nBands_(0),
-    radProp_(),
-    constAbsEff_(),
-    constSctEff_(),
-    numPropBands_(),
-    beamLen_(0.2),
-    energyFrac_(),
-    diaVal_(),
-    absEff_(),
-    sctEff_(),
-    asyFac_(),
-//    radAreaP_(nullptr),
-//    radT4_(nullptr),
-//    radAreaPT4_(nullptr),
-    CScatCoeffs_(),
-    setCScat_(true),
-    setCScatCoeffs_(true),
+    nBands_(0), // ankur
+    radProp_(), // ankur
+    constAbsEff_(), // ankur
+    constSctEff_(), // ankur
+    numPropBands_(), // ankur
+    beamLen_(0.2), // ankur
+    energyFrac_(), // ankur
+    diaVal_(), // ankur
+    absEff_(), // ankur
+    sctEff_(), // ankur
+    asyFac_(), // ankur
+//    radAreaP_(nullptr), // ankur
+//    radT4_(nullptr), // ankur
+//    radAreaPT4_(nullptr), // ankur
+    CScatCoeffs_(), // ankur
+    setCScat_(true), // ankur
+    setCScatCoeffs_(true), // ankur
     hsTrans_
     (
         new volScalarField::Internal
@@ -431,26 +430,26 @@ Foam::ThermoCloud<CloudType>::ThermoCloud
     heatTransferModel_(c.heatTransferModel_->clone()),
     TIntegrator_(c.TIntegrator_->clone()),
     radiation_(c.radiation_),
-    coupledRadiation_(c.coupledRadiation_),
-    //radModel_(c.radModel_),
-    nBands_(c.nBands_),
-    //nBands_(0),
-    radProp_(c.radProp_),
-    constAbsEff_(c.constAbsEff_),
-    constSctEff_(c.constSctEff_),
-    numPropBands_(c.numPropBands_),
-    beamLen_(c.beamLen_),
-    energyFrac_(c.energyFrac_),
-    diaVal_(c.diaVal()),
-    absEff_(c.absEff_),
-    sctEff_(c.sctEff_),
-    asyFac_(c.asyFac_),
-//    radAreaP_(nullptr),
-//    radT4_(nullptr),
-//    radAreaPT4_(nullptr),
-    CScatCoeffs_(c.CScatCoeffs_),
-    setCScat_(c.setCScat_),
-    setCScatCoeffs_(c.setCScatCoeffs_),
+    coupledRadiation_(c.coupledRadiation_), // ankur
+    //radModel_(c.radModel_), // ankur
+    nBands_(c.nBands_), // ankur
+    //nBands_(0), // ankur
+    radProp_(c.radProp_), // ankur
+    constAbsEff_(c.constAbsEff_), // ankur
+    constSctEff_(c.constSctEff_), // ankur
+    numPropBands_(c.numPropBands_), // ankur
+    beamLen_(c.beamLen_), // ankur
+    energyFrac_(c.energyFrac_), // ankur
+    diaVal_(c.diaVal()), // ankur
+    absEff_(c.absEff_), // ankur
+    sctEff_(c.sctEff_), // ankur
+    asyFac_(c.asyFac_), // ankur
+//    radAreaP_(nullptr), // ankur
+//    radT4_(nullptr), // ankur
+//    radAreaPT4_(nullptr), // ankur
+    CScatCoeffs_(c.CScatCoeffs_), // ankur
+    setCScat_(c.setCScat_), // ankur
+    setCScatCoeffs_(c.setCScatCoeffs_), // ankur
     hsTrans_
     (
         new volScalarField::Internal
@@ -486,6 +485,7 @@ Foam::ThermoCloud<CloudType>::ThermoCloud
 {
     if (radiation_)
     {
+        // ankur
         nBands_=c.nBands();
         radAreaP_(nBands_);
         radAreaPSc_(nBands_);
@@ -766,14 +766,15 @@ void Foam::ThermoCloud<CloudType>::resetSourceTerms()
 
     if (radiation_)
     {
+        // ankur
         forAll(radAreaP_, bandI)
         {
-		radAreaP_[bandI].field() = 0.0;
-		radAreaPSc_[bandI].field() = 0.0;
-		radT4_[bandI].field() = 0.0;
-		radAreaPT4_[bandI].field() = 0.0;
-		radAreaPScAsy_[bandI].field() = 0.0;
-		CScat_[bandI].field() = 0.0;
+            radAreaP_[bandI].field() = 0.0;
+            radAreaPSc_[bandI].field() = 0.0;
+            radT4_[bandI].field() = 0.0;
+            radAreaPT4_[bandI].field() = 0.0;
+            radAreaPScAsy_[bandI].field() = 0.0;
+            CScat_[bandI].field() = 0.0;
         }
         setCScat_ = false;
     }
@@ -793,14 +794,15 @@ void Foam::ThermoCloud<CloudType>::relaxSources
 
     if (radiation_)
     {
+        // ankur
         forAll(radAreaP_, bandI)
         {
-		this->relax(radAreaP_[bandI], cloudOldTime.radAreaP(bandI), "radiation");
-		this->relax(radAreaPSc_[bandI], cloudOldTime.radAreaPSc(bandI), "radiation");
-		this->relax(radT4_[bandI], cloudOldTime.radT4(bandI), "radiation");
-		this->relax(radAreaPT4_[bandI], cloudOldTime.radAreaPT4(bandI), "radiation");
-		this->relax(radAreaPScAsy_[bandI], cloudOldTime.radAreaPScAsy(bandI), "radiation");
-		this->relax(CScat_[bandI], cloudOldTime.CScat(bandI), "radiation");
+            this->relax(radAreaP_[bandI], cloudOldTime.radAreaP(bandI), "radiation");
+            this->relax(radAreaPSc_[bandI], cloudOldTime.radAreaPSc(bandI), "radiation");
+            this->relax(radT4_[bandI], cloudOldTime.radT4(bandI), "radiation");
+            this->relax(radAreaPT4_[bandI], cloudOldTime.radAreaPT4(bandI), "radiation");
+            this->relax(radAreaPScAsy_[bandI], cloudOldTime.radAreaPScAsy(bandI), "radiation");
+            this->relax(CScat_[bandI], cloudOldTime.CScat(bandI), "radiation");
         }
     }
 }
@@ -816,14 +818,15 @@ void Foam::ThermoCloud<CloudType>::scaleSources()
 
     if (radiation_)
     {
+        // ankur
         forAll(radAreaP_, bandI)
         {
-		this->scale(radAreaP_[bandI], "radiation");
-		this->scale(radAreaPSc_[bandI], "radiation");
-		this->scale(radT4_[bandI], "radiation");
-		this->scale(radAreaPT4_[bandI], "radiation");
-		this->scale(radAreaPScAsy_[bandI], "radiation");
-		this->scale(CScat_[bandI], "radiation");
+            this->scale(radAreaP_[bandI], "radiation");
+            this->scale(radAreaPSc_[bandI], "radiation");
+            this->scale(radT4_[bandI], "radiation");
+            this->scale(radAreaPT4_[bandI], "radiation");
+            this->scale(radAreaPScAsy_[bandI], "radiation");
+            this->scale(CScat_[bandI], "radiation");
         }
     }
 }
@@ -848,34 +851,29 @@ void Foam::ThermoCloud<CloudType>::evolve()
 
         this->solve(td);
     }
-
 }
 
 template<class CloudType>
-void Foam::ThermoCloud<CloudType>::updateProp()
+void Foam::ThermoCloud<CloudType>::updateProp() // ankur
 {
 
-  if (this->solution().active() && (radiation_) )
-  {
-    if (setCScatCoeffs_) 
+    if (this->solution().active() && (radiation_) )
     {
-       setCScatCoeffs();
-       setCScatCoeffs_ = false;
-    }
+        if (setCScatCoeffs_) 
+        {
+            setCScatCoeffs();
+            setCScatCoeffs_ = false;
+        }
 
-    setCScat();
-  }
+        setCScat();
+    }
 
 }
 
 template<class CloudType>
 void Foam::ThermoCloud<CloudType>::autoMap(const mapPolyMesh& mapper)
 {
-    typedef typename particle::TrackingData<ThermoCloud<CloudType>> tdType;
-
-    tdType td(*this);
-
-    Cloud<parcelType>::template autoMap<tdType>(td, mapper);
+    Cloud<parcelType>::autoMap(mapper);
 
     this->updateMesh();
 }

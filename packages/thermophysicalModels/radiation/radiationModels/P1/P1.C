@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,18 +62,18 @@ Foam::radiation::P1::P1(const volScalarField& T)
         ),
         mesh_
     ),
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+        dimensionedScalar("qr", dimMass/pow3(dimTime), 0.0)
     ),
     a_
     (
@@ -132,18 +132,18 @@ Foam::radiation::P1::P1(const dictionary& dict, const volScalarField& T)
         ),
         mesh_
     ),
-    Qr_
+    qr_
     (
         IOobject
         (
-            "Qr",
+            "qr",
             mesh_.time().timeName(),
             mesh_,
             IOobject::NO_READ,
             IOobject::AUTO_WRITE
         ),
         mesh_,
-        dimensionedScalar("Qr", dimMass/pow3(dimTime), 0.0)
+        dimensionedScalar("qr", dimMass/pow3(dimTime), 0.0)
     ),
     a_
     (
@@ -215,8 +215,8 @@ void Foam::radiation::P1::calculate()
     a_ = absorptionEmission_->a();
     e_ = absorptionEmission_->e();
     E_ = absorptionEmission_->E();
-    label bandI = 0;
-    const volScalarField sigmaEff(scatter_->sigmaEff(bandI));
+    label bandI = 0; // ankur
+    const volScalarField sigmaEff(scatter_->sigmaEff(bandI)); // ankur
 
     const dimensionedScalar a0 ("a0", a_.dimensions(), ROOTVSMALL);
 
@@ -231,7 +231,7 @@ void Foam::radiation::P1::calculate()
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        1.0/(3.0*a_ + 3.0*sigmaEff + a0)
+        1.0/(3.0*a_ + 3.0*sigmaEff + a0) // ankur
     );
 
     // Solve G transport equation
@@ -243,14 +243,14 @@ void Foam::radiation::P1::calculate()
       - 4.0*(e_*physicoChemical::sigma*pow4(T_) ) - E_
     );
 
-    volScalarField::Boundary& QrBf = Qr_.boundaryFieldRef();
+    volScalarField::Boundary& qrBf = qr_.boundaryFieldRef();
 
     // Calculate radiative heat flux on boundaries.
     forAll(mesh_.boundaryMesh(), patchi)
     {
         if (!G_.boundaryField()[patchi].coupled())
         {
-            QrBf[patchi] =
+            qrBf[patchi] =
                 -gamma.boundaryField()[patchi]
                 *G_.boundaryField()[patchi].snGrad();
         }

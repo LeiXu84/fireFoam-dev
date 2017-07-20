@@ -52,34 +52,34 @@ addToRunTimeSelectionTable
 
 rampingRadiation::rampingRadiation
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    filmRadiationModel(typeName, owner, dict),
+    filmRadiationModel(typeName, film, dict),
     QrConst_
     (
         IOobject
         (
             typeName + "_QrConst",
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        owner.regionMesh()
+        film.regionMesh()
     ),
     mask_
     (
         IOobject
         (
             typeName + "_mask",
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::MUST_READ,
             IOobject::AUTO_WRITE
         ),
-        owner.regionMesh()//,
+        film.regionMesh()//,
         // dimensionedScalar("one", dimless, 1.0)//,
         // zeroGradientFvPatchScalarField::typeName
     ),
@@ -93,12 +93,12 @@ rampingRadiation::rampingRadiation
         IOobject
         (
             "Qin", // same name as Qin on primary region to enable mapping
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::NO_READ,
             IOobject::NO_WRITE
         ),
-        owner.regionMesh(),
+        film.regionMesh(),
         dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0),
         zeroGradientFvPatchScalarField::typeName
         ),
@@ -106,12 +106,12 @@ rampingRadiation::rampingRadiation
     duration_(readScalar(coeffDict_.lookup("duration")))
 {
     mask_ = pos(mask_ - 0.5);
-    rampStartTime_=max(timeStart_,owner.time().value());
+    rampStartTime_=max(timeStart_,film.time().value());
 
     // for non-uniform heat flux (2d parabolic profile)
     // forAll(QrConst_,cellI){
-    //     scalar x=owner.regionMesh().cellCentres()[cellI][0];
-    //     scalar y=owner.regionMesh().cellCentres()[cellI][1];
+    //     scalar x=film.regionMesh().cellCentres()[cellI][0];
+    //     scalar y=film.regionMesh().cellCentres()[cellI][1];
     //     scalar xCenter = 0.255;
     //     scalar yCenter = 0.605;
     //     QrConst_[cellI] = (-26.02*pow(x-xCenter,2)-25.94*pow(y-yCenter,2)+54.98)*1e3;
@@ -140,18 +140,18 @@ tmp<volScalarField> rampingRadiation::Shs()
             IOobject
             (
                 typeName + "_Shs",
-                owner().time().timeName(),
-                owner().regionMesh(),
+                film().time().timeName(),
+                film().regionMesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            owner().regionMesh(),
+            film().regionMesh(),
             dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0),
             zeroGradientFvPatchScalarField::typeName
         )
     );
 
-    const scalar time = owner().time().value();
+    const scalar time = film().time().value();
 
     if ((time >= timeStart_) && (time <= timeStart_ + duration_))
     {
@@ -164,7 +164,7 @@ tmp<volScalarField> rampingRadiation::Shs()
 
         scalarField& Shs = tShs.ref();
         const scalarField& Qr = QrConst_.internalField();
-        // const scalarField& alpha = owner_.alpha().internalField();
+        // const scalarField& alpha = film.alpha().internalField();
 
         // Shs = mask_*Qr*alpha*absorptivity_;
         Shs = mask_*Qr*absorptivity_;
@@ -186,24 +186,24 @@ tmp<volScalarField> rampingRadiation::ShsConst() const
             IOobject
             (
                 typeName + "_Shs",
-                owner().time().timeName(),
-                owner().regionMesh(),
+                film().time().timeName(),
+                film().regionMesh(),
                 IOobject::NO_READ,
                 IOobject::NO_WRITE
             ),
-            owner().regionMesh(),
+            film().regionMesh(),
             dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0),
             zeroGradientFvPatchScalarField::typeName
         )
     );
 
-    const scalar time = owner().time().value();
+    const scalar time = film().time().value();
 
     if ((time >= timeStart_) && (time <= timeStart_ + duration_))
     {
         scalarField& Shs = tShs.ref();
         const scalarField& Qr = QrConst_.internalField();
-        const scalarField& alpha = owner_.alpha().internalField();
+        const scalarField& alpha = film().alpha().internalField();
 
         // Shs = mask_*Qr*alpha*absorptivity_;
         Shs = mask_*Qr*absorptivity_;

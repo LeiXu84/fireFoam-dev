@@ -72,15 +72,15 @@ void reactingOneDim21CharOxi::updateCharOxi()
 
     forAll(intCoupledPatchIDs_, i)
     {
-        const label patchI = intCoupledPatchIDs_[i];
-        scalarField& Xcharp = Xchar_.boundaryFieldRef()[patchI];
-        scalarField& mCharp = mChar_.boundaryFieldRef()[patchI];
-        scalarField& mCharBurntp = mCharBurnt_.boundaryFieldRef()[patchI];
-        scalarField& charOxiShp = charOxiSh_.boundaryFieldRef()[patchI];
-        scalarField& phiO2p = phiO2_.boundaryFieldRef()[patchI];
-        scalarField& phiCO2p = phiCO2_.boundaryFieldRef()[patchI];
+        const label patchi = intCoupledPatchIDs_[i];
+        scalarField& Xcharp = Xchar_.boundaryFieldRef()[patchi];
+        scalarField& mCharp = mChar_.boundaryFieldRef()[patchi];
+        scalarField& mCharBurntp = mCharBurnt_.boundaryFieldRef()[patchi];
+        scalarField& charOxiQdotp = charOxiQdot_.boundaryFieldRef()[patchi];
+        scalarField& phiO2p = phiO2_.boundaryFieldRef()[patchi];
+        scalarField& phiCO2p = phiCO2_.boundaryFieldRef()[patchi];
 
-        const fvPatch& patch = regionMesh().boundary()[patchI];
+        const fvPatch& patch = regionMesh().boundary()[patchi];
 
         // Get the coupling information from the mappedPatchBase
         const mappedPatchBase& mpp = refCast<const mappedPatchBase>
@@ -140,12 +140,12 @@ void reactingOneDim21CharOxi::updateCharOxi()
             mCharBurntp[faceI] += dmCharBurnt;
 
             //compute energy release rate in the first cell [kW/m3]
-            charOxiSh_[cells[0]] = HocChar.value() * dmCharBurnt
+            charOxiQdot_[cells[0]] = HocChar.value() * dmCharBurnt
                                    / cellV[cells[0]]
                                    / time_.deltaT().value();
 
             //for HRR diagnostics (sum at the patch is the HRR) [kW]
-            charOxiShp[faceI] = charOxiSh_[cells[0]] * cellV[cells[0]];
+            charOxiQdotp[faceI] = charOxiQdot_[cells[0]] * cellV[cells[0]];
 
             localPyrolysisFaceI++;
         }
@@ -180,11 +180,11 @@ void reactingOneDim21CharOxi::solveEnergy()
       + fvc::laplacian(alpha, h_)
       - fvc::laplacian(kappa(), T())
      ==
-        chemistrySh_
+        chemistryQdot_
 //      - fvm::Sp(solidChemistry_->RRg(), h_)
       + solidChemistry_->RRs(0)*T()*Cp0
       + solidChemistry_->RRs(1)*T()*Cp1
-      + charOxiSh_
+      + charOxiQdot_
     );
 
     if (gasHSource_)
@@ -193,10 +193,10 @@ void reactingOneDim21CharOxi::solveEnergy()
         hEqn += fvc::div(phiGas);
     }
 
-    if (QrHSource_)
+    if (qrHSource_)
     {
-        const surfaceScalarField phiQr(fvc::interpolate(Qr_)*nMagSf());
-        hEqn += fvc::div(phiQr);
+        const surfaceScalarField phiqr(fvc::interpolate(qr_)*nMagSf());
+        hEqn += fvc::div(phiqr);
     }
 
     if (regionMesh().moving())
@@ -266,11 +266,11 @@ reactingOneDim21CharOxi::reactingOneDim21CharOxi
         regionMesh(),
         dimensionedScalar("zero", dimMass, 0.0)
     ),
-    charOxiSh_
+    charOxiQdot_
     (
         IOobject
         (
-            "charOxiSh",
+            "charOxiQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -363,11 +363,11 @@ reactingOneDim21CharOxi::reactingOneDim21CharOxi
         dimensionedScalar("zero", dimMass, 0.0)
     ),
 
-    charOxiSh_
+    charOxiQdot_
     (
         IOobject
         (
-            "charOxiSh",
+            "charOxiQdot",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,

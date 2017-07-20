@@ -212,17 +212,17 @@ Foam::radiation::constRadFractionEmission::ECont(const label bandI) const
     }
 
 
-    if (mesh_.foundObject<volScalarField>("dQ"))
+    if (mesh_.foundObject<volScalarField>("Qdot"))
     {
-        const volScalarField& dQ =
-            mesh_.lookupObject<volScalarField>("dQ");
-        if (dQ.dimensions() == dimEnergy/dimTime/dimVolume)
+        const volScalarField& Qdot =
+            mesh_.lookupObject<volScalarField>("Qdot");
+        if (Qdot.dimensions() == dimEnergy/dimTime/dimVolume)
         {
-            E.ref().ref() = RadFraction*dQ;
+            E.ref().ref() = RadFraction*Qdot;
         }
         else
         {
-            Info << "dQ dimensions incorrect" << endl;
+            Info << "Qdot dimensions incorrect" << endl;
         }
 
         static word timeName = "null";

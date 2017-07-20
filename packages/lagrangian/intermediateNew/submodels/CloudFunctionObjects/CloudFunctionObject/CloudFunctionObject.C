@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -62,7 +62,7 @@ Foam::CloudFunctionObject<CloudType>::CloudFunctionObject(CloudType& owner)
 :
     CloudSubModelBase<CloudType>(owner),
     outputDir_(),
-    callWriteEveryTime_()
+    callWriteEveryTime_() // ankur
 {}
 
 
@@ -77,7 +77,7 @@ Foam::CloudFunctionObject<CloudType>::CloudFunctionObject
 :
     CloudSubModelBase<CloudType>(modelName, owner, dict, typeName, objectType),
     outputDir_(owner.mesh().time().path()),
-    callWriteEveryTime_(this->coeffDict().lookupOrDefault("callWriteEveryTime",false))
+    callWriteEveryTime_(this->coeffDict().lookupOrDefault("callWriteEveryTime",false)) // ankur
 {
     const fileName relPath =
         "postProcessing"/cloud::prefix/owner.name()/this->modelName();
@@ -104,7 +104,7 @@ Foam::CloudFunctionObject<CloudType>::CloudFunctionObject
 :
     CloudSubModelBase<CloudType>(ppm),
     outputDir_(ppm.outputDir_),
-    callWriteEveryTime_(ppm.callWriteEveryTime_)
+    callWriteEveryTime_(ppm.callWriteEveryTime_) // ankur
 {}
 
 
@@ -119,17 +119,15 @@ Foam::CloudFunctionObject<CloudType>::~CloudFunctionObject()
 
 template<class CloudType>
 void Foam::CloudFunctionObject<CloudType>::preEvolve()
-{
-    // do nothing
-}
+{}
 
 
 template<class CloudType>
 void Foam::CloudFunctionObject<CloudType>::postEvolve()
 {
-    if (callWriteEveryTime_)
+    if (callWriteEveryTime_) // ankur
     {
-        this->write();
+        this->write(); // ankur
     }
     else if (this->owner().time().writeTime())
     {
@@ -147,9 +145,7 @@ void Foam::CloudFunctionObject<CloudType>::postMove
     const point&,
     bool&
 )
-{
-    // do nothing
-}
+{}
 
 
 template<class CloudType>
@@ -161,9 +157,7 @@ void Foam::CloudFunctionObject<CloudType>::postPatch
     const tetIndices&,
     bool&
 )
-{
-    // do nothing
-}
+{}
 
 
 template<class CloudType>
@@ -173,9 +167,7 @@ void Foam::CloudFunctionObject<CloudType>::postFace
     const label,
     bool&
 )
-{
-    // do nothing
-}
+{}
 
 
 template<class CloudType>

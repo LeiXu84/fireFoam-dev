@@ -280,7 +280,7 @@ public:
             virtual tmp<volScalarField> kappaRad() const;
 
             //- Public member functions to set the qradBnd and qconvBnd fieldss
-            void setQrad(const scalarField& Qradin, label patchI);
+            void setqrad(const scalarField& qradin, label patchI);
             void setQconv(const scalarField& Qconvin, label patchI);
 
             //- Public member function to get the HOC for pyrolsate from the pyrolysis model

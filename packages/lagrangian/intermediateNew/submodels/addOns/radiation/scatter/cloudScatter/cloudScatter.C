@@ -68,7 +68,7 @@ Foam::radiation::cloudScatter::~cloudScatter()
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 
 Foam::tmp<Foam::volScalarField>
-Foam::radiation::cloudScatter::sigmaEff(const label bandI) const
+Foam::radiation::cloudScatter::sigmaEff(const label bandI) const // ankur
 {
     tmp<volScalarField> tsigma
     (
@@ -88,7 +88,6 @@ Foam::radiation::cloudScatter::sigmaEff(const label bandI) const
         )
     );
 
-    //scalar bandI=0;
     forAll(cloudNames_, i)
     {
         const thermoCloud& tc
@@ -96,13 +95,15 @@ Foam::radiation::cloudScatter::sigmaEff(const label bandI) const
             mesh_.objectRegistry::lookupObject<thermoCloud>(cloudNames_[i])
         );
 
-        tsigma.ref() += tc.sigmap(bandI);
+        tsigma.ref() += tc.sigmap(bandI); // ankur
     }
 
-    //return 3.0*tsigma;
-    return tsigma;     // removing 3.0 here, to make it generic for P1 and fvDOM
+    // return 3.0*tsigma;
+    // ankur, removing 3.0 here, to make it generic for P1 and fvDOM
+    return tsigma;
 }
 
+// ankur
 Foam::tmp<Foam::volScalarField>
 Foam::radiation::cloudScatter::pFunc(const label bandI, const label sour, const label dest) const
 {

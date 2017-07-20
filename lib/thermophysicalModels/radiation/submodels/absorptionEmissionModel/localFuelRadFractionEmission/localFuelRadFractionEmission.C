@@ -255,18 +255,18 @@ Foam::radiation::localFuelRadFractionEmission::ECont(const label bandI) const
     //    RadFraction = EhrrCoeff_;
     //}
 
-    if (mesh_.foundObject<volScalarField>("dQ"))
+    if (mesh_.foundObject<volScalarField>("Qdot"))
     {
-        const volScalarField& dQ =
-            mesh_.lookupObject<volScalarField>("dQ");
+        const volScalarField& Qdot =
+            mesh_.lookupObject<volScalarField>("Qdot");
 
         if (radScaling)
         {
-          E.ref().ref() = localRadFrac_*dQ;
+          E.ref().ref() = localRadFrac_*Qdot;
         }
         else
         {
-          E.ref().ref() = EhrrCoeff_*dQ;
+          E.ref().ref() = EhrrCoeff_*Qdot;
         }
 
     }

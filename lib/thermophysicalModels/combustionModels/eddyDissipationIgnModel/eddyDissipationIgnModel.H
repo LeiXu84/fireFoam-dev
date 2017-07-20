@@ -78,8 +78,8 @@ protected:
 		//- Igniter fuel consumption rate
 		volScalarField wFuelIgn_;
 
-		//- Temporary dQ field
-		volScalarField dQI;
+		//- Temporary Qdot field
+		volScalarField QdotI;
 
 public:
 

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -172,7 +172,7 @@ bool Foam::InjectionModel<CloudType>::findCellAtPosition
             FatalErrorInFunction
                 << "Cannot find parcel injection cell. "
                 << "Parcel position = " << p0 << nl
-                << abort(FatalError);
+                << exit(FatalError);
         }
         else
         {
@@ -202,7 +202,7 @@ Foam::scalar Foam::InjectionModel<CloudType>::setNumberOfParticles
             scalar volumeTot = massTotal_/rho;
 
             nP = (volumeFraction*volumeTot + delayedVolume_)/(parcels*volumep);
-            if(nP<0.)
+            if(nP<0.) // kvm
             {
                 DEBUG(nP);
                 DEBUG(volumeFraction);
@@ -227,8 +227,8 @@ Foam::scalar Foam::InjectionModel<CloudType>::setNumberOfParticles
         {
             nP = 0.0;
             FatalErrorInFunction
-             << "Unknown parcelBasis type" << nl
-             << exit(FatalError);
+                << "Unknown parcelBasis type" << nl
+                << exit(FatalError);
         }
     }
 
@@ -358,8 +358,8 @@ Foam::InjectionModel<CloudType>::InjectionModel
     else
     {
         FatalErrorInFunction
-         << "parcelBasisType must be either 'number', 'mass' or 'fixed'" << nl
-         << exit(FatalError);
+            << "parcelBasisType must be either 'number', 'mass' or 'fixed'"
+            << nl << exit(FatalError);
     }
 }
 
@@ -459,7 +459,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
         const scalar padTime = max(0.0, SOI_ - time0_);
 
         // Introduce new parcels linearly across carrier phase timestep
-        label added = -1;
+        label added = -1; // kvm
         for (label parcelI = 0; parcelI < newParcels; parcelI++)
         {
             if (validInjection(parcelI))
@@ -495,8 +495,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                     meshTools::constrainToMeshCentre(mesh, pos);
 
                     // Create a new parcel
-                    parcelType* pPtr =
-                        new parcelType(mesh, pos, celli, tetFacei, tetPti);
+                    parcelType* pPtr = new parcelType(mesh, pos, celli);
 
                     // Check/set new parcel thermo properties
                     cloud.setParcelThermoProperties(*pPtr, dt);
@@ -525,14 +524,14 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                             pPtr->rho()
                         );
 
-                    npMax = max(npMax,pPtr->nParticle());
-                    npMin = min(npMin,pPtr->nParticle());
+                    npMax = max(npMax,pPtr->nParticle()); // kvm
+                    npMin = min(npMin,pPtr->nParticle()); // kvm
 
-                    dMax = max(dMax,pPtr->d());
-                    dMin = min(dMin,pPtr->d());
+                    dMax = max(dMax,pPtr->d()); // kvm
+                    dMin = min(dMin,pPtr->d()); // kvm
 
-                    UMax = max(UMax,mag(pPtr->U()));
-                    UMin = min(UMin,mag(pPtr->U()));
+                    UMax = max(UMax,mag(pPtr->U())); // kvm
+                    UMin = min(UMin,mag(pPtr->U())); // kvm
 
                     // This value does not need to be 1.0, kvm
                     if (pPtr->nParticle() >= 0.001) // kvm
@@ -543,7 +542,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                         if (pPtr->move(td, dt))
                         {
                             td.cloud().addParticle(pPtr);
-                            added = 1;
+                            added = 1; // kvm
                         }
                         else
                         {
@@ -552,7 +551,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
                     }
                     else
                     {
-                        Info << "parcel not added, nParticle(): " << pPtr->nParticle() << nl;
+                        Info << "parcel not added, nParticle(): " << pPtr->nParticle() << nl; // kvm
                         delayedVolume += pPtr->nParticle()*pPtr->volume();
                         delete pPtr;
                     }
@@ -563,6 +562,7 @@ void Foam::InjectionModel<CloudType>::inject(TrackData& td)
         delayedVolume_ = delayedVolume;
         
         // output diagnostic info for parcels
+        // kvm
         reduce(added,maxOp<scalar>());
         if(added>0)
         {
@@ -645,8 +645,7 @@ void Foam::InjectionModel<CloudType>::injectSteadyState
             meshTools::constrainToMeshCentre(mesh, pos);
 
             // Create a new parcel
-            parcelType* pPtr =
-                new parcelType(mesh, pos, celli, tetFacei, tetPti);
+            parcelType* pPtr = new parcelType(mesh, pos, celli);
 
             // Check/set new parcel thermo properties
             cloud.setParcelThermoProperties(*pPtr, 0.0);

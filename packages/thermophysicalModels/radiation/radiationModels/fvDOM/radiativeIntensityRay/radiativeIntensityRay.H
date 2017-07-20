@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -36,7 +36,7 @@ SourceFiles
 #define radiativeIntensityRay_H
 
 #include "absorptionEmissionModel.H"
-#include "scatterModel.H"
+#include "scatterModel.H" // ankur
 #include "blackBodyEmission.H"
 
 
@@ -75,7 +75,7 @@ private:
         const absorptionEmissionModel& absorptionEmission_;
 
         //- Scatter model
-        const scatterModel& scatter_;
+        const scatterModel& scatter_; // ankur
 
         //- Black body
         const blackBodyEmission& blackBody_;
@@ -84,7 +84,7 @@ private:
         volScalarField I_;
 
         //- Total radiative heat flux on boundary
-        volScalarField Qr_;
+        volScalarField qr_;
 
         //- Incident radiative heat flux on boundary
         volScalarField Qin_;
@@ -144,7 +144,7 @@ public:
             const scalar deltaTheta,
             const label lambda,
             const absorptionEmissionModel& absEmmModel_,
-            const scatterModel& sctModel_,
+            const scatterModel& sctModel_, // ankur
             const blackBodyEmission& blackBody,
             const label rayId
         );
@@ -181,10 +181,10 @@ public:
             inline const volScalarField& I() const;
 
             //- Return const access to the boundary heat flux
-            inline const volScalarField& Qr() const;
+            inline const volScalarField& qr() const;
 
             //- Return non-const access to the boundary heat flux
-            inline volScalarField& Qr();
+            inline volScalarField& qr();
 
             //- Return non-const access to the boundary incident heat flux
             inline volScalarField& Qin();

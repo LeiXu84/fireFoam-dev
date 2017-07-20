@@ -221,6 +221,12 @@ private:
         //- Work list to store which faces are hit
         mutable DynamicList<label> hitFaceIDs_;
 
+        //- Work list to store which particles are collected at current time step
+        List<DynamicList<typename CloudType::parcelType*>> collectedParticles_;
+
+        //- Work list to store which particles are collected at previous time step
+        List<DynamicList<typename CloudType::parcelType*>> collectedParticles0_;
+
 
     // Private Member Functions
 

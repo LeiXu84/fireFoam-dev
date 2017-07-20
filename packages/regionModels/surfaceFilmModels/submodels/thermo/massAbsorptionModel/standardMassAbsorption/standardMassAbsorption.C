@@ -57,23 +57,23 @@ addToRunTimeSelectionTable
 
 standardMassAbsorption::standardMassAbsorption
 (
-    surfaceFilmModel& owner,
+    surfaceFilmModel& film,
     const dictionary& dict
 )
 :
-    massAbsorptionModel(typeName, owner, dict),
+    massAbsorptionModel(typeName, film, dict),
     deltaMin_(readScalar(coeffDict_.lookup("deltaMin"))),
     massAbsorption_
     (
         IOobject
         (
             "massAbsorption",
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::NO_READ, 
             IOobject::AUTO_WRITE
         ),
-        owner.regionMesh(),
+        film.regionMesh(),
         dimensionedScalar("zero", dimMass, 0.0)
     ),
     cummulativeMassAbsorption_
@@ -81,12 +81,12 @@ standardMassAbsorption::standardMassAbsorption
         IOobject
         (
             "cummulativeMassAbsorption",
-            owner.time().timeName(),
-            owner.regionMesh(),
+            film.time().timeName(),
+            film.regionMesh(),
             IOobject::READ_IF_PRESENT,
             IOobject::AUTO_WRITE
         ),
-        owner.regionMesh(),
+        film.regionMesh(),
         dimensionedScalar("zero", dimMass, 0.0)
     )
 
@@ -114,7 +114,7 @@ void standardMassAbsorption::correctModel
         Info<< "standardMassAbsorption::correctModel()" << endl;
     }
 
-    const thermoSingleLayer& film = refCast<const thermoSingleLayer>(owner_);
+    const thermoSingleLayer& film = refCast<const thermoSingleLayer>(filmModel_);
 
     // retrieve fields from film model
     const scalarField& rho = film.rho();

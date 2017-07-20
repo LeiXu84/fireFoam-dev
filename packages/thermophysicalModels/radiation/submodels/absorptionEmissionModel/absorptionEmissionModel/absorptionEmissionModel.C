@@ -245,6 +245,7 @@ void Foam::radiation::absorptionEmissionModel::correct
     aj[0] =  a;
 }
 
+// ankur
 void Foam::radiation::absorptionEmissionModel::correctEnFrac
 (
     PtrList<volScalarField>& enFrac,
