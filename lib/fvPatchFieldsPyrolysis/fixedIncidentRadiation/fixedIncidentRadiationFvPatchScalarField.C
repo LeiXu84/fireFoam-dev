@@ -173,7 +173,7 @@ void fixedIncidentRadiationFvPatchScalarField::updateCoeffs()
                 if (iter()->regionMesh().name() == patch().boundaryMesh().mesh().name())
                 {
                    Foam::regionModels::pyrolysisModels::pyroCUPOneDimV1& CUPModelObj = const_cast<Foam::regionModels::pyrolysisModels::pyroCUPOneDimV1&>(*iter());
-                   CUPModelObj.setQrad(QrIncident_,patch().index());
+                   CUPModelObj.setqrad(QrIncident_,patch().index());
                    CUPModelObj.setQconv(scalarField(patch().size(),0.0),patch().index());
                    //iter()->setQrad(QrIncident_,patch().index());
                  //pyroModelType&  pyroModelObj = const_cast<pyroModelType&>(pyroModel(mesh,mesh.name()));

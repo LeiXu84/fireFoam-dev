@@ -314,11 +314,11 @@ void Foam::ThermoSurfaceFilm<CloudType>::wetSplashInteraction
     // Critical Weber number
     const scalar Wec = Awet_*pow(La, -0.183);
 
-    if (We < 1) // adhesion - assume absorb
+    if (We < 2) // Adhesion - assume absorb
     {
         absorbInteraction(filmModel, p, pp, facei, m, keepParticle);
     }
-    else if ((We >= 1) && (We < 20)) // bounce
+    else if ((We >= 2) && (We < 20)) // Bounce
     {
         // Incident angle of impingement
         const scalar theta = pi/2 - acos(U/mag(U) & nf);

@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -292,10 +292,12 @@ void thermoSingleLayer::transferPrimaryRegionSourceFields()
     const scalar deltaT = time_.deltaTValue();
     forAll(hsSpPrimaryBf, patchi)
     {
-        const scalarField& priMagSf =
-            primaryMesh().magSf().boundaryField()[patchi];
+        scalarField rpriMagSfdeltaT
+        (
+            (1.0/deltaT)/primaryMesh().magSf().boundaryField()[patchi]
+        );
 
-        hsSpPrimaryBf[patchi] /= priMagSf*deltaT;
+        hsSpPrimaryBf[patchi] *= rpriMagSfdeltaT;
     }
 
     // Retrieve the source fields from the primary region via direct mapped
@@ -333,7 +335,7 @@ void thermoSingleLayer::correctAlpha()
     else
     {
         alpha_ ==
-            pos(delta_ - dimensionedScalar("deltaWet", dimLength, deltaWet_));
+            pos0(delta_ - dimensionedScalar("deltaWet", dimLength, deltaWet_));
     }
 }
 
@@ -354,13 +356,13 @@ void thermoSingleLayer::updateSubmodels()
     (
         time_.deltaTValue(),
         availableMass_,
-        primaryMassPCTrans_,
-        primaryEnergyPCTrans_
+        primaryMassTrans_,
+        primaryEnergyTrans_
     );
 
     //for diagnostics
-    primaryMassPCTrans_.correctBoundaryConditions();
-    primaryEnergyPCTrans_.correctBoundaryConditions();
+    primaryMassTrans_.correctBoundaryConditions();
+    primaryEnergyTrans_.correctBoundaryConditions();
 
     // Update massAbsorption
     massAbsorption_->correct
@@ -381,15 +383,18 @@ void thermoSingleLayer::updateSubmodels()
     // Update kinematic sub-models
     kinematicSingleLayer::updateSubmodels();
 
+    // Update transfer model - mass returned is mass available for transfer
+    transfer_.correct(availableMass_, primaryMassTrans_, primaryEnergyTrans_);
+
     // Update source fields (phase change)
-    hsSp_ += primaryEnergyPCTrans_/magSf()/time().deltaT();
-    rhoSp_ += primaryMassPCTrans_/magSf()/time().deltaT();
+    hsSp_ += primaryEnergyTrans_/magSf()/time().deltaT();
+    rhoSp_ += primaryMassTrans_/magSf()/time().deltaT();
 
     // Update source fields (mass absorption)
     rhoSp_ += massAbs_/magSf()/time().deltaT();
 
     // Vapour recoil pressure (can become unstable for wild oscillations in vaporization rate)
-    // pSp_ -= sqr(primaryMassPCTrans_/magSf()/time_.deltaT())/2.0/rhoPrimary_;
+    // pSp_ -= sqr(primaryMassTrans_/magSf()/time_.deltaT())/2.0/rhoPrimary_;
     // Info << "vaporRecoilPressure " << gMin(pSp_) << " " << gAverage(pSp_) << " " << gMax(pSp_) << nl;
 }
 
@@ -603,25 +608,11 @@ thermoSingleLayer::thermoSingleLayer
         zeroGradientFvPatchScalarField::typeName
     ),
 
-    primaryMassPCTrans_
+    primaryEnergyTrans_
     (
         IOobject
         (
-            "primaryMassPCTrans",
-            time().timeName(),
-            regionMesh(),
-            IOobject::NO_READ,
-            IOobject::NO_WRITE
-        ),
-        regionMesh(),
-        dimensionedScalar("zero", dimMass, 0),
-        zeroGradientFvPatchScalarField::typeName
-    ),
-    primaryEnergyPCTrans_
-    (
-        IOobject
-        (
-            "primaryEnergyPCTrans",
+            "primaryEnergyTrans",
             time().timeName(),
             regionMesh(),
             IOobject::NO_READ,
@@ -826,8 +817,8 @@ void thermoSingleLayer::preEvolveRegion()
     kinematicSingleLayer::preEvolveRegion();
 
     // Update phase change
-    primaryMassPCTrans_ == dimensionedScalar("zero", dimMass, 0.0);
-    primaryEnergyPCTrans_ == dimensionedScalar("zero", dimEnergy, 0.0);
+    primaryMassTrans_ == dimensionedScalar("zero", dimMass, 0.0);
+    primaryEnergyTrans_ == dimensionedScalar("zero", dimEnergy, 0.0);
     // Update mass absorption
     massAbs_ == dimensionedScalar("zero", dimMass, 0.0); // kvm
     energyAbs_ == dimensionedScalar("zero", dimEnergy, 0.0); // kvm
@@ -937,7 +928,7 @@ tmp<volScalarField> thermoSingleLayer::massAbs() const // kvm
 
 tmp<volScalarField> thermoSingleLayer::primaryMassTrans() const
 {
-    return primaryMassPCTrans_;
+    return primaryMassTrans_;
 }
 
 
@@ -986,7 +977,7 @@ tmp<volScalarField::Internal> thermoSingleLayer::Srho() const
         const label filmPatchi = intCoupledPatchIDs()[i];
 
         scalarField patchMass =
-            primaryMassPCTrans_.boundaryField()[filmPatchi];
+            primaryMassTrans_.boundaryField()[filmPatchi];
 
         toPrimary(filmPatchi, patchMass);
 
@@ -1040,7 +1031,7 @@ tmp<volScalarField::Internal> thermoSingleLayer::Srho
             const label filmPatchi = intCoupledPatchIDs_[i];
 
             scalarField patchMass =
-                primaryMassPCTrans_.boundaryField()[filmPatchi];
+                primaryMassTrans_.boundaryField()[filmPatchi];
 
             toPrimary(filmPatchi, patchMass);
 
@@ -1090,13 +1081,12 @@ tmp<volScalarField::Internal> thermoSingleLayer::Sh() const
         const label filmPatchi = intCoupledPatchIDs_[i];
 
         scalarField patchEnergy =
-            primaryEnergyPCTrans_.boundaryField()[filmPatchi];
+            primaryEnergyTrans_.boundaryField()[filmPatchi];
 
         toPrimary(filmPatchi, patchEnergy);
 
-        const label primaryPatchi = primaryPatchIDs()[i];
         const unallocLabelList& cells =
-            primaryMesh().boundaryMesh()[primaryPatchi].faceCells();
+            primaryMesh().boundaryMesh()[primaryPatchIDs()[i]].faceCells();
 
         forAll(patchEnergy, j)
         {

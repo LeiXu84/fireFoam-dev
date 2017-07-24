@@ -56,11 +56,11 @@ constantRadiation::constantRadiation
 )
 :
     filmRadiationModel(typeName, film, dict),
-    QrConst_
+    qrConst_
     (
         IOobject
         (
-            typeName + ":QrConst",
+            typeName + ":qrConst",
             film.time().timeName(),
             film.regionMesh(),
             IOobject::MUST_READ,
@@ -82,11 +82,11 @@ constantRadiation::constantRadiation
         dimensionedScalar("one", dimless, 1.0)
     ),
     absorptivity_(readScalar(coeffDict_.lookup("absorptivity"))),
-    Qin_ // kvm
+    qin_ // kvm
     (
         IOobject
         (
-            "Qin", // same name as Qin on primary region to enable mapping
+            "qin", // same name as qin on primary region to enable mapping
             film.time().timeName(),
             film.regionMesh(),
             IOobject::NO_READ,
@@ -98,7 +98,7 @@ constantRadiation::constantRadiation
     timeStart_(readScalar(coeffDict_.lookup("timeStart"))),
     duration_(readScalar(coeffDict_.lookup("duration")))
 {
-    mask_ = pos(mask_ - 0.5); // kvm
+    mask_ = pos0(mask_ - 0.5); // kvm
 }
 
 
@@ -138,15 +138,15 @@ tmp<volScalarField> constantRadiation::Shs()
     if ((time >= timeStart_) && (time <= timeStart_ + duration_))
     {
         scalarField& Shs = tShs.ref();
-        const scalarField& Qr = QrConst_;
+        const scalarField& qr = qrConst_;
         // const scalarField& alpha = film.alpha();
 
-        // Shs = mask_*Qr*alpha*absorptivity_;
-        Shs = mask_*Qr*absorptivity_;
-        // Qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
+        // Shs = mask_*qr*alpha*absorptivity_;
+        Shs = mask_*qr*absorptivity_;
+        // qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
         // boundary condition
-        Qin_.primitiveFieldRef() = mask_*Qr;
-        Qin_.correctBoundaryConditions();
+        qin_.primitiveFieldRef() = mask_*qr;
+        qin_.correctBoundaryConditions();
     }
 
     return tShs;
@@ -176,12 +176,12 @@ tmp<volScalarField> constantRadiation::ShsConst() const
     if ((time >= timeStart_) && (time <= timeStart_ + duration_))
     {
         scalarField& Shs = tShs.ref();
-        const scalarField& Qr = QrConst_;
+        const scalarField& qr = qrConst_;
         const scalarField& alpha = filmModel_.alpha();
 
-        // Shs = mask_*Qr*alpha*absorptivity_;
-        Shs = mask_*Qr*absorptivity_;
-        // Qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
+        // Shs = mask_*qr*alpha*absorptivity_;
+        Shs = mask_*qr*absorptivity_;
+        // qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
         // boundary condition
     }
 

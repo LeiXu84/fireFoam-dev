@@ -63,7 +63,7 @@ private:
     // Private data
 
         //- Constant radiative flux [kg/s3]
-        volScalarField QrConst_;
+        volScalarField qrConst_;
 
         //- Radiation mask
         volScalarField mask_;
@@ -84,7 +84,7 @@ private:
         scalar rampStartTime_;
 
         //- Incident radiation (used for turbulentTemp.. BC)
-        volScalarField Qin_;
+        volScalarField qin_;
 
         //- Time start [s]
         const scalar timeStart_;

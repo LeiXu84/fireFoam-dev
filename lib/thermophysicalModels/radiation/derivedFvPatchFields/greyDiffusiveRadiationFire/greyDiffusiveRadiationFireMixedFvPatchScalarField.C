@@ -340,7 +340,7 @@ updateCoeffs()
                /constant::mathematical::pi;
 
             // Emmited heat flux from this ray direction
-            ray.Qem().boundaryField()[patchI][faceI] =
+            ray.qem().boundaryField()[patchI][faceI] =
                 refValue()[faceI]*(n[faceI] & ray.dAve());
 
         }
@@ -353,7 +353,7 @@ updateCoeffs()
 
 
             // Incident heat flux on this ray direction
-            ray.Qin().boundaryField()[patchI][faceI] =
+            ray.qin().boundaryField()[patchI][faceI] =
                 Iw[faceI]*(n[faceI] & ray.dAve());
         }
     }

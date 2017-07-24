@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -43,9 +43,9 @@ void Foam::ThermoParcel<ParcelType>::setCellValues
 
     tetIndices tetIs = this->currentTetIndices();
 
-    Cpc_ = td.CpInterp().interpolate(this->position(), tetIs);
+    Cpc_ = td.CpInterp().interpolate(this->coordinates(), tetIs);
 
-    Tc_ = td.TInterp().interpolate(this->position(), tetIs);
+    Tc_ = td.TInterp().interpolate(this->coordinates(), tetIs);
 
     if (Tc_ < td.cloud().constProps().TMin())
     {
@@ -124,8 +124,8 @@ void Foam::ThermoParcel<ParcelType>::calcSurfaceValues
     rhos = this->rhoc_*TRatio;
 
     tetIndices tetIs = this->currentTetIndices();
-    mus = td.muInterp().interpolate(this->position(), tetIs)/TRatio;
-    kappas = td.kappaInterp().interpolate(this->position(), tetIs)/TRatio;
+    mus = td.muInterp().interpolate(this->coordinates(), tetIs)/TRatio;
+    kappas = td.kappaInterp().interpolate(this->coordinates(), tetIs)/TRatio;
 
     Pr = Cpc_*mus/kappas;
     Pr = max(ROOTVSMALL, Pr);
@@ -239,9 +239,9 @@ void Foam::ThermoParcel<ParcelType>::calc
 
 //            for(label bandI=0; bandI < nBands; bandI++)
 //            {
-//          td.cloud().radAreaP(bandI)[celli] += dt*np0*ap;
-//          td.cloud().radT4(bandI)[celli] += dt*np0*T4;
-//          td.cloud().radAreaPT4(bandI)[celli] += dt*np0*ap*T4;
+//                td.cloud().radAreaP(bandI)[celli] += dt*np0*ap;
+//                td.cloud().radT4(bandI)[celli] += dt*np0*T4;
+//                td.cloud().radAreaPT4(bandI)[celli] += dt*np0*ap*T4;
 //            }
 
 //            td.cloud().radAreaP()[celli] += dt*np0*ap;

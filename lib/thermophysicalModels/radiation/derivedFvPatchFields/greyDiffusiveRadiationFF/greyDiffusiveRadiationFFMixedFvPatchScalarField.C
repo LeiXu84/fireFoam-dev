@@ -209,18 +209,18 @@ updateCoeffs()
     tabsorptivity = absorptivity();
     }
 
-    scalarField& Qem = ray.Qem().boundaryFieldRef()[patchI];
-    scalarField& Qin = ray.Qin().boundaryFieldRef()[patchI];
+    scalarField& qem = ray.qem().boundaryFieldRef()[patchI];
+    scalarField& qin = ray.qin().boundaryFieldRef()[patchI];
 
     const vector& myRayId = dom.IRay(rayId).d();
 
     // Use updated Ir while iterating over rays
-    // avoids to used lagged Qin
-    scalarField Ir = dom.IRay(0).Qin().boundaryField()[patchI];
+    // avoids to used lagged qin
+    scalarField Ir = dom.IRay(0).qin().boundaryField()[patchI];
 
     for (label rayI=1; rayI < dom.nRay(); rayI++)
     {
-        Ir += dom.IRay(rayI).Qin().boundaryField()[patchI];
+        Ir += dom.IRay(rayI).qin().boundaryField()[patchI];
     }
 
     forAll(Iw, faceI)
@@ -238,7 +238,7 @@ updateCoeffs()
                 )/pi;
 
             // Emmited heat flux from this ray direction
-            Qem[faceI] = refValue()[faceI]*nAve[faceI];
+            qem[faceI] = refValue()[faceI]*nAve[faceI];
         }
         else
         {
@@ -248,7 +248,7 @@ updateCoeffs()
             refValue()[faceI] = 0.0; //not used
 
             // Incident heat flux on this ray direction
-            Qin[faceI] = Iw[faceI]*nAve[faceI];
+            qin[faceI] = Iw[faceI]*nAve[faceI];
         }
     }
 

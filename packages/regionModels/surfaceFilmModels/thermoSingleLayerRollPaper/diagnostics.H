@@ -19,9 +19,9 @@
 //        dimensionedScalar Cpi("Cpi", dimEnergy/dimMass/dimTemperature, liq.cp(Patm.value(), Tinlet.value()));
 //        /*Info << "Cp " << Cpi << endl;*/
 //
-//        energyPhaseChangeDiagnostic_ = primaryEnergyPCTrans_/magSf()/time().deltaT() + primaryMassPCTrans_/magSf()/time().deltaT()*hs_ 
-//        //energyPhaseChangeDiagnostic_ = primaryEnergyPCTrans_/magSf()/time().deltaT() + primaryMassPCTrans_/magSf()/time().deltaT()*hs_ //works with wallVaporization case
-//        //energyPhaseChangeDiagnostic_ = primaryEnergyPCTrans_/magSf()/time().deltaT() //+ massPhaseChangeForPrimary_/magSf()/time().deltaT()*hs_
+//        energyPhaseChangeDiagnostic_ = primaryEnergyTrans_/magSf()/time().deltaT() + primaryMassTrans_/magSf()/time().deltaT()*hs_ 
+//        //energyPhaseChangeDiagnostic_ = primaryEnergyTrans_/magSf()/time().deltaT() + primaryMassTrans_/magSf()/time().deltaT()*hs_ //works with wallVaporization case
+//        //energyPhaseChangeDiagnostic_ = primaryEnergyTrans_/magSf()/time().deltaT() //+ massPhaseChangeForPrimary_/magSf()/time().deltaT()*hs_
 //            ;//- (Cpb*(Tb-Tstd)-Cpi*(Tinlet-Tstd))*massPhaseChangeForPrimary_/magSf()/time().deltaT(); //sensible enthalpy portion
 //        energyPhaseChangeDiagnostic_.correctBoundaryConditions();
 //    }
@@ -45,7 +45,7 @@
         sprintf(buffer,"%15s %10.5f % 10.5e\n","qConvGas",time_.value(),qConvGas.value());
         Info << buffer;
 //        static dimensionedScalar qPhaseChange("qPhaseChange", dimEnergy, 0.0);
-//        qPhaseChange-=sum(primaryEnergyPCTrans_);   
+//        qPhaseChange-=sum(primaryEnergyTrans_);   
 ////        Info << "qPhaseChange " << time_.value() << " " << qPhaseChange.value() << endl;
 //        sprintf(buffer,"%15s %10.5f % 10.5e\n","qPhaseChange",time_.value(),qPhaseChange.value());
 //        Info << buffer;

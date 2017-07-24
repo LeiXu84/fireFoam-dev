@@ -57,11 +57,11 @@ rampingRadiation::rampingRadiation
 )
 :
     filmRadiationModel(typeName, film, dict),
-    QrConst_
+    qrConst_
     (
         IOobject
         (
-            typeName + "_QrConst",
+            typeName + "_qrConst",
             film.time().timeName(),
             film.regionMesh(),
             IOobject::MUST_READ,
@@ -88,11 +88,11 @@ rampingRadiation::rampingRadiation
     rampTimeInterval_(readScalar(coeffDict_.lookup("rampTimeInterval"))),
     rampStep_(readScalar(coeffDict_.lookup("rampStep"))),
     rampStartTime_(0.0),
-    Qin_
+    qin_
     (
         IOobject
         (
-            "Qin", // same name as Qin on primary region to enable mapping
+            "qin", // same name as qin on primary region to enable mapping
             film.time().timeName(),
             film.regionMesh(),
             IOobject::NO_READ,
@@ -109,12 +109,12 @@ rampingRadiation::rampingRadiation
     rampStartTime_=max(timeStart_,film.time().value());
 
     // for non-uniform heat flux (2d parabolic profile)
-    // forAll(QrConst_,cellI){
+    // forAll(qrConst_,cellI){
     //     scalar x=film.regionMesh().cellCentres()[cellI][0];
     //     scalar y=film.regionMesh().cellCentres()[cellI][1];
     //     scalar xCenter = 0.255;
     //     scalar yCenter = 0.605;
-    //     QrConst_[cellI] = (-26.02*pow(x-xCenter,2)-25.94*pow(y-yCenter,2)+54.98)*1e3;
+    //     qrConst_[cellI] = (-26.02*pow(x-xCenter,2)-25.94*pow(y-yCenter,2)+54.98)*1e3;
     // }
 }
 
@@ -157,21 +157,21 @@ tmp<volScalarField> rampingRadiation::Shs()
     {
 
         if(time > rampStartTime_ + rampTimeInterval_ ){
-            QrConst_.primitiveFieldRef() += rampStep_;
+            qrConst_.primitiveFieldRef() += rampStep_;
             rampStartTime_ += rampTimeInterval_;
-            Info << "time, QrConst = " << time << ", " << gMax(QrConst_) << endl;
+            Info << "time, qrConst = " << time << ", " << gMax(qrConst_) << endl;
         }
 
         scalarField& Shs = tShs.ref();
-        const scalarField& Qr = QrConst_.internalField();
+        const scalarField& qr = qrConst_.internalField();
         // const scalarField& alpha = film.alpha().internalField();
 
-        // Shs = mask_*Qr*alpha*absorptivity_;
-        Shs = mask_*Qr*absorptivity_;
-        // Qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
+        // Shs = mask_*qr*alpha*absorptivity_;
+        Shs = mask_*qr*absorptivity_;
+        // qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
         // boundary condition
-        Qin_.primitiveFieldRef() = mask_*Qr;
-        Qin_.correctBoundaryConditions();
+        qin_.primitiveFieldRef() = mask_*qr;
+        qin_.correctBoundaryConditions();
     }
 
     return tShs;
@@ -202,12 +202,12 @@ tmp<volScalarField> rampingRadiation::ShsConst() const
     if ((time >= timeStart_) && (time <= timeStart_ + duration_))
     {
         scalarField& Shs = tShs.ref();
-        const scalarField& Qr = QrConst_.internalField();
+        const scalarField& qr = qrConst_.internalField();
         const scalarField& alpha = film().alpha().internalField();
 
-        // Shs = mask_*Qr*alpha*absorptivity_;
-        Shs = mask_*Qr*absorptivity_;
-        // Qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
+        // Shs = mask_*qr*alpha*absorptivity_;
+        Shs = mask_*qr*absorptivity_;
+        // qin_ is used in turbulentTemperatureRadiationCoupledMixedST 
         // boundary condition
     }
 

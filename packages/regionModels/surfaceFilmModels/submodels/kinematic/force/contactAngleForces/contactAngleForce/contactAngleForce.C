@@ -87,7 +87,7 @@ void contactAngleForce::initialise()
         );
         dist.correct(y);
 
-        mask_ = pos(y - dimensionedScalar("dLim", dimLength, dLim));
+        mask_ = pos0(y - dimensionedScalar("dLim", dimLength, dLim));
     }
 }
 
@@ -168,7 +168,7 @@ tmp<fvVectorMatrix> contactAngleForce::correct(volVectorField& U)
         )
     );
 
-    vectorField& force = tForce.ref();
+    vectorField& force = tForce.ref().primitiveFieldRef();
 
     const labelUList& own = filmModel_.regionMesh().owner();
     const labelUList& nbr = filmModel_.regionMesh().neighbour();

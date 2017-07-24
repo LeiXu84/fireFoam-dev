@@ -57,11 +57,11 @@ standardRadiation::standardRadiation
 )
 :
     filmRadiationModel(typeName, film, dict),
-    QinPrimary_
+    qinPrimary_
     (
         IOobject
         (
-            "Qin", // same name as Qin on primary region to enable mapping
+            "qin", // same name as qin on primary region to enable mapping
             film.time().timeName(),
             film.regionMesh(),
             IOobject::NO_READ,
@@ -87,8 +87,8 @@ standardRadiation::~standardRadiation()
 
 void standardRadiation::correct()
 {
-    // Transfer Qin from primary region
-    QinPrimary_.correctBoundaryConditions();
+    // Transfer qin from primary region
+    qinPrimary_.correctBoundaryConditions();
 }
 
 
@@ -113,12 +113,12 @@ tmp<volScalarField> standardRadiation::Shs()
     );
 
     scalarField& Shs = tShs.ref();
-    const scalarField& QinP = QinPrimary_;
+    const scalarField& qinP = qinPrimary_;
     const scalarField& delta = filmModel_.delta();
     const scalarField& alpha = filmModel_.alpha();
 
     // kvm, for now assume if surface is wet, then radiation is absorbed by film
-    Shs = QinP*alpha;
+    Shs = qinP*alpha;
 
     return tShs;
 }
@@ -144,12 +144,12 @@ tmp<volScalarField> standardRadiation::ShsConst() const
     );
 
     scalarField& Shs = tShs.ref();
-    const scalarField& QinP = QinPrimary_;
+    const scalarField& qinP = qinPrimary_;
     const scalarField& delta = filmModel_.delta();
     const scalarField& alpha = filmModel_.alpha();
 
     // kvm, for now assume if surface is wet, then radiation is absorbed by film
-    Shs = QinP*alpha;
+    Shs = qinP*alpha;
 
     return tShs;
 }

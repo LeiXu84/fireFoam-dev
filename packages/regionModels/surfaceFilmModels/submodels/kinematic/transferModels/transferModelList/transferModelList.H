@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2017 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2017 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,21 +22,22 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Class
-    Foam::standardRadiation
+    Foam::transferModelList
 
 Description
-    Standard radiation model
+    List container for film transfer models
 
 SourceFiles
-    standardRadiation.C
+    transferModelList.C
 
 \*---------------------------------------------------------------------------*/
 
-#ifndef standardRadiation_H
-#define standardRadiation_H
+#ifndef transferModelList_H
+#define transferModelList_H
 
-#include "filmRadiationModel.H"
-#include "volFieldsFwd.H"
+#include "PtrList.H"
+#include "transferModel.H"
+#include "filmSubModelBase.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -48,51 +49,38 @@ namespace surfaceFilmModels
 {
 
 /*---------------------------------------------------------------------------*\
-                     Class standardRadiation Declaration
+                    Class transferModelList Declaration
 \*---------------------------------------------------------------------------*/
 
-class standardRadiation
+class transferModelList
 :
-    public filmRadiationModel
+    public PtrList<transferModel>,
+    public filmSubModelBase
 {
-private:
-
     // Private data
 
-        //- Radiative incident flux mapped from  the primary region / [kg/s3]
-        volScalarField qinPrimary_;
-
-        //- Reference to the film thickness field / [m]
-        const volScalarField& delta_;
-
-        // Model coefficients
-
-            //- Beta coefficient
-            scalar beta_;
-
-            //- Bar(kappa) coefficient
-            scalar kappaBar_;
+        //- List of mass transferred per patch
+        scalarField massTransferred_;
 
 
-    // Private member functions
+    // Private Member Functions
 
         //- Disallow default bitwise copy construct
-        standardRadiation(const standardRadiation&);
+        transferModelList(const transferModelList&);
 
         //- Disallow default bitwise assignment
-        void operator=(const standardRadiation&);
+        void operator=(const transferModelList&);
 
 
 public:
 
-    //- Runtime type information
-    TypeName("standardRadiation");
-
-
     // Constructors
 
-        //- Construct from surface film model and dictionary
-        standardRadiation
+        //- Construct null
+        transferModelList(surfaceFilmModel& film);
+
+        //- Construct from type name, dictionary and surface film model
+        transferModelList
         (
             surfaceFilmModel& film,
             const dictionary& dict
@@ -100,21 +88,28 @@ public:
 
 
     //- Destructor
-    virtual ~standardRadiation();
+    virtual ~transferModelList();
 
 
     // Member Functions
 
-        // Evolution
+        //- Correct kinematic transfers
+        virtual void correct
+        (
+            scalarField& availableMass,
+            volScalarField& massToTransfer
+        );
 
-            //- Correct
-            virtual void correct();
+        //- Correct kinematic and thermodynamic transfers
+        virtual void correct
+        (
+            scalarField& availableMass,
+            volScalarField& massToTransfer,
+            volScalarField& energyToTransfer
+        );
 
-            //- Return the radiation sensible enthalpy source
-            virtual tmp<volScalarField> Shs();
-
-            //- Return const access to the radiation sensible enthalpy source
-            virtual tmp<volScalarField> ShsConst() const;
+        //- Provide some info
+        virtual void info(Ostream& os);
 };
 
 

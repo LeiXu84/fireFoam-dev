@@ -28,9 +28,15 @@ $(KINEMATICMODELS)/injectionModel/injectionModel/injectionModel.C
 $(KINEMATICMODELS)/injectionModel/injectionModel/injectionModelNew.C
 $(KINEMATICMODELS)/injectionModel/injectionModelList/injectionModelList.C
 $(KINEMATICMODELS)/injectionModel/drippingInjection/drippingInjection.C
+$(KINEMATICMODELS)/injectionModel/BrunDrippingInjection/BrunDrippingInjection.C
+$(KINEMATICMODELS)/injectionModel/patchInjection/patchInjection.C
 /*$(KINEMATICMODELS)/injectionModel/exfoliationInjection/exfoliationInjection.C*/
 $(KINEMATICMODELS)/injectionModel/removeInjection/removeInjection.C
 $(KINEMATICMODELS)/injectionModel/curvatureSeparation/curvatureSeparation.C
+
+$(KINEMATICMODELS)/transferModels/transferModel/transferModel.C
+$(KINEMATICMODELS)/transferModels/transferModel/transferModelNew.C
+$(KINEMATICMODELS)/transferModels/transferModelList/transferModelList.C
 
 $(KINEMATICMODELS)/filmThermoModel/filmThermoModel/filmThermoModel.C
 $(KINEMATICMODELS)/filmThermoModel/filmThermoModel/filmThermoModelNew.C

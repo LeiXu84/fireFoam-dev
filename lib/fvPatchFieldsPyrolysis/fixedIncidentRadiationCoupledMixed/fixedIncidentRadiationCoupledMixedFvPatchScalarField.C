@@ -332,7 +332,7 @@ updateCoeffs()
        if (typeid(pyroModelObj)  == typeid(Foam::regionModels::pyrolysisModels::pyroCUPOneDimV1))
        {
              Foam::regionModels::pyrolysisModels::pyroCUPOneDimV1& CUPModelObj = dynamic_cast<Foam::regionModels::pyrolysisModels::pyroCUPOneDimV1&>(pyroModelObj);
-             CUPModelObj.setQrad(-nbrTotalFlux,patch().index());
+             CUPModelObj.setqrad(-nbrTotalFlux,patch().index());
              CUPModelObj.setQconv(scalarField(0.0,patch().size()),patch().index());
        }
 

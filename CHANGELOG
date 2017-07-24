@@ -1,3 +1,7 @@
+2017-07-24: Version 17.07.24
+    Updated to 2017-07-05 OpenFOAM-dev commit
+    compiled against OpenFOAM-dev commit 1ff57870007ac317d95a1756b41fd76c5a1e8f26 (2017-07-05)
+
 2017-07-20: Version 17.07.20
     compiled against OpenFOAM-dev commit a884a44e4729ae662fa1e4361ccf67e7c498ca (2017-05-04)
 

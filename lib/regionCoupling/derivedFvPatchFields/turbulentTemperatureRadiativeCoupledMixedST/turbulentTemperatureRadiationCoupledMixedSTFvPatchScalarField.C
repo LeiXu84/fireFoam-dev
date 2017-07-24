@@ -398,7 +398,7 @@ updateCoeffs()
             pyrolysis.mapRegionPatchField<scalar>
             (
                 film,
-                "Qin",
+                "qin",
                 patchI,
                 true
             );
