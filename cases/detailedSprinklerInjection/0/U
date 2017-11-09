@@ -21,42 +21,39 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    "(top|side.*)"
+    outlet
     {
-
         type            pressureInletOutletVelocity;
-        value           uniform (0 0 0);
-
+        value           $internalField;
     }
 
-    ground
+    sides
+    {
+        type            pressureInletOutletVelocity;
+        value           $internalField;
+    }
+
+    walls
     {
         type            noSlip;
     }
 
-    burner
+    inlet
     {
-        type flowRateInletVelocity;
-        massFlowRate table
-        (
-            (0  0.006)
-            (60  0.006)
-            (100 0)
-        );
+        type            flowRateInletVelocity;
+        //flowRate        0.0001;       
+        flowRate        0.0002;       
         value           uniform (0 0 0);
+/*
+        type            fixedValue;
+        value           uniform (0 0.05 0);
+*/
     }
 
-    "(region0_to.*)"
+    frontAndBack
     {
-        //type            flowRateInletVelocityCoupled;
-        // type            flowRateInletVelocityFuelConvertCoupled;
-        // phi             phi;
-        // nbrPhi          phiGas;
-        // rho             rho;
-        // hocPyr          2.0229e+07; // DeltaHcVirgin = 1.767e+07 J/kg // (rhoVirgin*DeltaHcVirgin)/(rhoVirgin - rhoChar) //HEAT OF COMBUSTION OF PYROLYSATE IS IN J/kg. 
-        // value           uniform (0 0 0);
         type            fixedValue;
-        value           uniform (0 0 0);
+        value           $internalField;
     }
 }
 

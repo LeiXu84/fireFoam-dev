@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,28 +21,33 @@ internalField   uniform 298.15;
 
 boundaryField
 {
+
     top
     {
         type                inletOutlet;
         inletValue          $internalField;
         value               $internalField;
     }
+
     sides
     {
         type                inletOutlet;
         inletValue          $internalField;
         value               $internalField;
     }
+
     base
     {
         type                fixedValue;
         value               $internalField;
     }
+
     burner          
     {
         type                fixedValue;
         value               $internalField;
     }
+
     "(region0_to.*)"
     {
         type                compressible::turbulentTemperatureRadiationCoupledMixedST;
@@ -50,11 +55,11 @@ boundaryField
         pyrolysisRegion     pyrolysisRegion;
         Tnbr                T;
         K                   none;
-        kappa               fluidThermo;
+        kappaMethod         fluidThermo;
         kappaName           none;
         emissivityMode      solidRadiation;
         neighbourFieldRadiativeName none;
-        fieldRadiativeName  Qin; //Qr;
+        fieldRadiativeName  qin; //Qr;
         convectiveScaling   1.0;
         value               $internalField;
     }

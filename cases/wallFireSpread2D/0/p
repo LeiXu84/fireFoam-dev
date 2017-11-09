@@ -29,7 +29,7 @@ internalField   uniform 101325;
 
 boundaryField
 {
-    wall           
+    solid           
     {
         type            calculated;
         value           $internalField;

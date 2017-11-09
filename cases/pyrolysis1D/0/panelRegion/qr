@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      Qr;
+    object      qr;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -21,24 +21,30 @@ internalField   uniform 0;
 
 boundaryField
 {
-    "(box_.*_top)"
+    panel_top
     {
         type            zeroGradient;
     }
 
-    "(region0_to_pyrolysisRegion_box_.*)"
+    panel_side
     {
-        // type            zeroGradient;
+        type            empty;
+    }
+
+    region0_to_panelRegion_panel
+    {
+        type            zeroGradient;
+/*
         type            mappedField;
-        sampleRegion    filmRegion;
+        sampleRegion    region0;
         sampleMode      nearestPatchFaceAMI;
         samplePatch     region0_to_panelRegion_panel;
-        flipNormals     yes;
         offset          (0 0 0);
-        fieldName       QrNet;
+        fieldName       qr;
         setAverage      no;
         average         0;
         value           uniform 0;
+*/
     }
 }
 

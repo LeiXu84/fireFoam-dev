@@ -21,25 +21,25 @@ internalField   uniform 0;
 
 boundaryField
 {
-    top
+    outlet
     {
         type            fixedValue;
         value           $internalField;
     }
 
-    "(side.*)"
+    sides
     {
         type            fixedFluxPressure;
         value           $internalField;
     }
 
-    "(ground.*)"
+    walls
     {
         type            fixedFluxPressure;
         value           $internalField;
     }
 
-    burner
+    inlet
     {
         type            fixedFluxPressure;
         value           $internalField;
@@ -47,8 +47,10 @@ boundaryField
 
     frontAndBack
     {
-        type            empty;
+        type            fixedFluxPressure;
+        value           $internalField;
     }
 }
+
 
 // ************************************************************************* //

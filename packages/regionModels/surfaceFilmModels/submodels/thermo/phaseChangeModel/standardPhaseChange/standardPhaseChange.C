@@ -135,7 +135,7 @@ void standardPhaseChange::correctModel
     // Info << "us " << film.Us();
     const scalarField limMass
     (
-        max(scalar(0.0), availableMass - deltaMin_*rho*magSf)
+        max(scalar(0), availableMass - deltaMin_*rho*magSf)
     );
     // const scalarField qRad(film.qRad());
     

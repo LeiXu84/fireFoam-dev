@@ -2,7 +2,7 @@
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
 |  \\    /   O peration     | Version:  2.4.x                                 |
-|   \\  /    A nd           | Web:      www.OpenFOAM.org               |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -41,10 +41,10 @@ boundaryField
         pyrolysisRegion             pyrolysisRegion;
         Tnbr                        T;
         K                           K;
-        kappa                       solidThermo;
+        kappaMethod                 solidThermo;
         kappaName                   none;
         emissivityMode              solidRadiation;
-        neighbourFieldRadiativeName Qin;
+        neighbourFieldRadiativeName qin;
         convectiveScaling           1;
         fieldRadiativeName          none;
         value                       $internalField;

@@ -1,25 +1,23 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
     version     2.0;
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      alphaSgs;
+    object      nut;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 -1 -1 0 0 0 0];
+dimensions      [0  2 -1 0 0 0 0];
 
-internalField   uniform 0;
+internalField   uniform 1e-8;
 
 boundaryField
 {
@@ -27,26 +25,32 @@ boundaryField
     {
         type            zeroGradient;
     }
+
     sides
     {
         type            zeroGradient;
     }
+
     base
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           uniform 0;
     }
-    burner          
+
+    burner
     {
         type            zeroGradient;
     }
+
     "(region0_to_pyrolysisRegion_box_.*)"
     {
-        type            alphaSgsFireWallFunction;
-        QcFlame         16000.0; //22000.0;
-        QcThreshold     4000.0; //400.0;
-        value           uniform 0;
+        type            nutFireWallFunction;
+        value           uniform 1e-8;
+        // type            fixedValue;
+        // value           uniform 1e-8;
     }
 }
 
 
 // ************************************************************************* //
+

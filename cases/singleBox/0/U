@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,24 +21,18 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    top
-    {
-        type            inletOutlet;
-        inletValue      $internalField;
-        value           $internalField;
-    }
-    sides
+    "(top|sides)"
     {
         type            pressureInletOutletVelocity;
         value           $internalField;
-        phi             phi;
     }
+
     base
     {
-        type            fixedValue;
-        value           $internalField;
+        type            noSlip;
     }
-    burner          
+
+    burner
     {
         type flowRateInletVelocity;
         massFlowRate table
@@ -49,6 +43,7 @@ boundaryField
         );
         value           $internalField;
     }
+
     "(region0_to.*)"
     {
         //type            flowRateInletVelocityCoupled;
@@ -62,6 +57,5 @@ boundaryField
         value           uniform (0 0 0);
     }
 }
-
 
 // ************************************************************************* //

@@ -1510,6 +1510,7 @@ Foam::scalar Foam::DetailedSprinklerInjection2<CloudType>::sampleRosinRammler(co
     // minValue_ must be small enough (0.001*D_{0.1}) in order for sampling to return dv50
     scalar minValue_ = 0.001*d_*pow(0.1054,1./n_); // 0.1*D_{0.1}
     minValue_ = max(2e-6,minValue_); // set a limit on minValue_ for stability
+    minValue_ = max(1e-5,minValue_); // set a limit on minValue_ for stability
     /*Info << "minValue_ " << minValue_ << endl;*/
     scalar K = 1.0 - exp(-pow((maxValue_ - minValue_)/(d_+VSMALL), n_));
     // why cached?

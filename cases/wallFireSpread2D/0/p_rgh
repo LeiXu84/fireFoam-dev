@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,43 +17,30 @@ FoamFile
 
 dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform 101325;
+internalField   uniform 0;
 
 boundaryField
 {
-    wall           
-    {
-    //	type			fixedFluxBuoyantPressure;
-        type            fixedFluxPressure;
-        value			$internalField;
-    }
-
-    outlet          
-    {
-        //type			zeroGradient;
-        type            fixedFluxPressure;
-        value			$internalField;
-    }
-
-    ground           
+    solid
     {
         type            fixedFluxPressure;
-        value			$internalField;
+        value           $internalField;
     }
 
-    side          
+    "(outlet|side)"
     {
-        type            totalPressure;
-        U               U;
-        phi             phi;
-        rho             rho;
-        psi             none;
-        gamma           0;//1.4;
-        p0	        $internalField;
-        value		$internalField;
+        type            prghTotalHydrostaticPressure;
+        p0              $internalField;
+        value           $internalField;
     }
 
-    frontAndBack    
+    ground
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+
+    frontAndBack
     {
         type            empty;
     }
@@ -61,13 +48,13 @@ boundaryField
     burner          
     {
         type            fixedFluxPressure;
-        value			$internalField;
+        value           $internalField;
     }
+
     region0_to_panelRegion_panel
     {
-    //	type			fixedFluxBuoyantPressure;
         type            fixedFluxPressure;
-        value			$internalField;
+        value           $internalField;
     }
 }
 

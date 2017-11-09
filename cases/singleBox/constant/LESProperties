@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                  |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -32,8 +32,8 @@ WALECoeffs
 
 oneEqEddyCoeffs
 {
-    ck      0.03;
-    Prt		1;
+    ck          0.03;
+    Prt		    1;
 }
 
 cubeRootVolCoeffs

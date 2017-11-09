@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -18,98 +18,46 @@ FoamFile
 
 solvers
 {
-    "(rho|G)"
+    "rho.*"
     {
         solver          PCG;
         preconditioner  DIC;
-        tolerance       1e-05;
-        relTol          0;
-    }
-
-    rhoFinal
-    {
-        $rho;
         tolerance       1e-6;
         relTol          0;
     };
 
     p_rgh
     {
-        solver              GAMG;
-        tolerance           1e-5;
-        relTol              0.01;
-        smoother            GaussSeidel;
-        cacheAgglomeration  true;
-        nCellsInCoarsestLevel   10;
-        //nCellsInCoarsestLevel   1;
-        agglomerator    faceAreaPair;
-        mergeLevels     1;
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-6;
+        relTol          0.01;
     };
 
     p_rghFinal
     {
-        solver              GAMG;
-        tolerance           1e-6;
-        relTol              0;
-        smoother            GaussSeidel;
-        cacheAgglomeration  true;
-        nCellsInCoarsestLevel 10;
-        //nCellsInCoarsestLevel 1;
-        agglomerator     faceAreaPair;
-        mergeLevels      1;
+        $p_rgh;
+        relTol          0.0;
     };
 
-
-    "(U|h|k|epsilon)"
+    ph_rgh
     {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-05;
-        relTol          0;
-    }
-    UFinal
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-7;
-        relTol          0;
-    };
-
-    kFinal 
-    {
-        $k;
-        tolerance       1e-8;
-        relTol          0;
-    };
-
-    p
-    {
-        solver          PCG;
-        preconditioner  DIC;
-        tolerance       1e-06;
-        relTol          0;
+        $p_rgh;
     }
 
-    "(Yi|O2|N2|H2O)"
+    "U.*"
     {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-06;
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        tolerance       1e-6;
         relTol          0;
-    }
-    hs
-    {
-        solver          PBiCG;
-        preconditioner  DILU;
-        tolerance       1e-8;
-        relTol          0;
+        maxIter         10;
     };
 
-    "hFinal"
+    "(Yi|h|k).*"
     {
-        $h;
+        $U;
         tolerance       1e-8;
-        relTol          0;
     };
 
     Ii
@@ -131,23 +79,25 @@ solvers
         tolerance       1e-06;
         relTol          0;
     }
-
 }
 
 PIMPLE
 {
     momentumPredictor yes;
-    nOuterCorrectors  1;//3;
+    nOuterCorrectors  1;
     nCorrectors       2;
     nNonOrthogonalCorrectors 0;
+
+    hydrostaticInitialization yes;
+    nHydrostaticCorrectors 5;
 }
 
 relaxationFactors
 {
-    U       0.9;
-    "C3H8|CH4|O2|H2O|CO2"  0.9;       
-    hs       0.9;
-    k        0.9;
+    fields
+    {
+        ".*"       1;
+    }
 }
 
 // ************************************************************************* //

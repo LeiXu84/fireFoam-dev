@@ -21,42 +21,39 @@ internalField   uniform 298.15;
 
 boundaryField
 {
-    top
+    outlet
     {
-	    type		inletOutlet;
-	    inletValue	$internalField;
-	    value		$internalField;
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
     }
-    ground
+
+    sides
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+
+    walls
     {
         type            zeroGradient;
     }
-    "(side.*)"
-    {
-	    type		inletOutlet;
-	    inletValue	$internalField;
-	    value		$internalField;
-    }
 
-    burner          
-    {
-        type                fixedValue;
-        value               $internalField;
-    }
-
-    "(region0_to.*)"
+    inlet
     {
         type            fixedValue;
         value           $internalField;
-//        type          compressible::turbulentTemperatureRadiationCoupledMixedST;
-//        neighbourFieldName T;
-//        K               none;
-//        kappaMethod     fluidThermo;
-//        kappaName       none;
-//        emissivityMode  solidRadiation;
-//        neighbourFieldRadiativeName none;
-//        fieldRadiativeName Qin; //Qr;
-//        value           $internalField;
+/*
+        type            fixedEnthalpyFluxTemperature;
+        value           $internalField;
+        Tinf            $internalField;
+*/
+    }
+
+    frontAndBack
+    {
+        type            zeroGradient;
     }
 }
 

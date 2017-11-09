@@ -1,0 +1,151 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  2.2.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+
+
+    // Load initial cellSet
+    {
+        name    c0;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+        sourceInfo
+        {
+           p1       ( 0.0  5.238 0.0  );   // desired plane location
+           p2       ( 0.0 -1.0   0.0  );
+           radius   100.; // 1 ft2 circle 
+        }
+    }
+
+    // Get all faces in cellSet
+    {
+        name    f0;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+        sourceInfo
+        {
+            set     c0;
+            option  all;
+        }
+    }
+
+    // Make copy of c0
+    {
+        name    c1;
+        type    cellSet;
+        action  new;
+        source  cellToCell;
+        sourceInfo
+        {
+            set c0;
+        }
+    }
+    // Invert c1
+    {
+        name    c1;
+        type    cellSet;
+        action  invert;
+    }
+
+    // Keep in f0 all faces in c1
+    {
+        name    f0;
+        type    faceSet;
+        action  subset;
+        source  cellToFace;
+        sourceInfo
+        {
+            set     c1;
+            option  all;
+        }
+    }
+
+    {
+        name    plane;
+        type    faceZoneSet;
+        action  new;
+        source  setsToFaceZone;
+        sourceInfo
+        {
+            faceSet f0;       // name of faceSet
+            cellSet c1;       // name of cellSet on slave side
+            flip    false;    // optional: flip the faceZone
+        }
+    }
+
+    // ------------- circle 0.762 m below sprinkler ------------------ 
+
+    // Load initial cellSet
+    {
+        name    c0;
+        type    cellSet;
+        action  new;
+        source  cylinderToCell;
+        sourceInfo
+        {
+           p1       (  0.0  100 0.0  );   // start point on cylinder axis
+           p2       (  0.0 -100 0.0  );   // end point on cylinder axis
+           radius   0.17196217; // 1 ft2 circle, this is the radius of the sample plane faceZone
+        }
+    }
+
+    // Get all faces in cellSet
+    {
+        name    cylinder;
+        type    faceSet;
+        action  new;
+        source  cellToFace;
+        sourceInfo
+        {
+            set     c0;
+            option  all;
+        }
+    }
+
+    // Get faces in both faceSets (plane and cylinder)
+    {
+        name    cylinder;
+        type    faceSet;
+        action  subset;
+        source faceToFace;
+        sourceInfo
+        {
+            set plane;
+        }
+    }
+
+    // save faceZoneSet for circle
+    {
+        name    thrust;
+        type    faceZoneSet;
+        action  new;
+        source  setsToFaceZone;
+        sourceInfo
+        {
+            faceSet cylinder;       // name of faceSet
+            cellSet c1;       // name of cellSet on slave side
+            flip    false;    // optional: flip the faceZone
+        }
+    }
+
+
+);
+
+// ************************************************************************* //

@@ -186,7 +186,7 @@ updateCoeffs()
 
     const scalarField nAve(n & ray.dAve());
 
-    ray.qr().boundaryFieldRef()[patchi] += Iw*nAve;
+    ray.qrLambda(lambdaId).boundaryFieldRef()[patchi] += Iw*nAve;
 
     // ankur
     const scalarField pT
@@ -202,16 +202,16 @@ updateCoeffs()
 
     scalarField temissivity = emissivity();
 
-    scalarField& qem = ray.qem().boundaryFieldRef()[patchi];
-    scalarField& qin = ray.qin().boundaryFieldRef()[patchi];
+    scalarField& qem = ray.qemLambda(lambdaId).boundaryFieldRef()[patchi];
+    scalarField& qin = ray.qinLambda(lambdaId).boundaryFieldRef()[patchi];
 
     // Use updated Ir while iterating over rays
     // avoids to used lagged qin
-    scalarField Ir = dom.IRay(0).qin().boundaryField()[patchi];
+    scalarField Ir = dom.IRay(0).qinLambda(lambdaId).boundaryField()[patchi];
 
     for (label rayI=1; rayI < dom.nRay(); rayI++)
     {
-        Ir += dom.IRay(rayI).qin().boundaryField()[patchi];
+        Ir += dom.IRay(rayI).qinLambda(lambdaId).boundaryField()[patchi];
     }
 
     forAll(Iw, facei)
@@ -230,7 +230,7 @@ updateCoeffs()
                 )/pi;
 
             // Emmited heat flux from this ray direction
-            qem[facei] = refValue()[facei]*nAve[facei];
+            qem[facei] += refValue()[facei]*nAve[facei];
         }
         else
         {
@@ -240,7 +240,7 @@ updateCoeffs()
             refValue()[facei] = 0.0; //not used
 
             // Incident heat flux on this ray direction
-            qin[facei] = Iw[facei]*nAve[facei];
+            qin[facei] += Iw[facei]*nAve[facei];
         }
     }
 

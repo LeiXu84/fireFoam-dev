@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -15,21 +15,26 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-LESModel       oneEqEddy;
-//LESModel        Smagorinsky;
+LESModel        oneEqEddy;
+//LESModel        WALE;
 
-SmagorinskyCoeffs
-{
-    ck               0.0;
-    ce               0.202;
-}
-
-delta          cubeRootVol;
+//delta           vanDriest;
+delta           cubeRootVol;
 
 turbulence      on;
 
 printCoeffs     on;
 
+WALECoeffs
+{
+    cw          0.5;
+}
+
+oneEqEddyCoeffs
+{
+     ck         0.03;
+    Prt		1;
+}
 
 cubeRootVolCoeffs
 {
@@ -43,6 +48,7 @@ PrandtlCoeffs
     {
         deltaCoeff      1;
     }
+
     smoothCoeffs
     {
         delta           cubeRootVol;
@@ -50,9 +56,11 @@ PrandtlCoeffs
         {
             deltaCoeff      1;
         }
+
         maxDeltaRatio   1.1;
     }
-    Cdelta           0.158;
+
+    Cdelta          0.158;
 }
 
 vanDriestCoeffs
@@ -62,6 +70,7 @@ vanDriestCoeffs
     {
         deltaCoeff      1;
     }
+
     smoothCoeffs
     {
         delta           cubeRootVol;
@@ -69,10 +78,12 @@ vanDriestCoeffs
         {
             deltaCoeff      1;
         }
+
         maxDeltaRatio   1.1;
     }
-    Aplus            26;
-    Cdelta           0.158;
+
+    Aplus           26;
+    Cdelta          0.158;
 }
 
 smoothCoeffs
@@ -82,6 +93,7 @@ smoothCoeffs
     {
         deltaCoeff      1;
     }
+
     maxDeltaRatio   1.1;
 }
 

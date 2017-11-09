@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,33 +17,40 @@ FoamFile
 
 dimensions      [1 -1 -2 0 0 0 0];
 
-internalField   uniform 100000;
+internalField   uniform 101325;
 
 boundaryField
 {
-    top
-    {
-        type            zeroGradient;
-    }
-    ground
-    {
-        type            zeroGradient;
-    }
-    "(side.*)"
-    {
-        //type            symmetryPlane;
-        type            zeroGradient;
-    }
-    burner
+    outlet
     {
         type            calculated;
         value           $internalField;
     }
-    "(region0_to.*)"
-    {
-        type            zeroGradient;
-    }
-}
 
+    sides
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    walls
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    inlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    frontAndBack
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+}
 
 // ************************************************************************* //

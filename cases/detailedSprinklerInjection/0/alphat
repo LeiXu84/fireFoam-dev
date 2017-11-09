@@ -1,11 +1,10 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                   |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
     version     2.0;
@@ -14,9 +13,7 @@ FoamFile
     location    "0";
     object      alphat;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [1 -1 -1 0 0 0 0];
 
@@ -24,27 +21,31 @@ internalField   uniform 0;
 
 boundaryField
 {
-    top      
+    outlet
     {
         type            zeroGradient;
     }
-    ground           
+
+    sides
+    {
+        type            zeroGradient;
+    }
+
+    walls
+    {
+        type            zeroGradient;
+    }
+
+    inlet
     {
         type            fixedValue;
-        value		    uniform 0;
+        value           uniform 0;
+//        type            zeroGradient;
     }
-    "(side.*)"
+
+    frontAndBack
     {
         type            zeroGradient;
-    }
-    burner          
-    {
-        type            zeroGradient;
-    }
-    region0_to_filmRegion_coupledWall
-    {
-        type            fixedValue;
-        value		    uniform 0;
     }
 
 }

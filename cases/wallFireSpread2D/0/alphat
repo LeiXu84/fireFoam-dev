@@ -17,7 +17,7 @@ FoamFile
     local           "";
 
     class           volScalarField;
-    object          muSgs;
+    object          alphat;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -29,12 +29,15 @@ internalField   uniform 0;
 
 boundaryField
 {
-    wall           
+    solid           
     {
         //type            zeroGradient;
-        //type            muSgsWallFunction;
-        type            fixedValue;
-	value		uniform 0;
+        //type            alphaSgsWallFunction;
+        //type            fixedValue;
+        type            alphatFireWallFunction;
+        QcFlame         20000.0;
+        QcThreshold     2000.0;
+        value		uniform 0;
     }
     outlet      
     {
@@ -59,9 +62,12 @@ boundaryField
     region0_to_panelRegion_panel
     {
         //type            zeroGradient;
-        //type            muSgsWallFunction;
-        type            fixedValue;
-	value		uniform 0;
+        //type            alphaSgsWallFunction;
+        //type            fixedValue;
+        type            alphatFireWallFunction;
+        QcFlame         20000.0;
+        QcThreshold     2000.0;
+        value		uniform 0;
     }
 
 }

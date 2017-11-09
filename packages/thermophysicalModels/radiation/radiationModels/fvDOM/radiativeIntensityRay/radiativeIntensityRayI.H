@@ -67,6 +67,59 @@ inline Foam::volScalarField& Foam::radiation::radiativeIntensityRay::qem()
     return qem_;
 }
 
+inline const Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qinLambda
+(
+    const label lambdaI_
+) const
+{
+    return qinLambda_[lambdaI_];
+}
+
+inline const Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qemLambda
+(
+    const label lambdaI_
+) const
+{
+    return qemLambda_[lambdaI_];
+}
+
+inline const Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qrLambda
+(
+    const label lambdaI_
+) const
+{
+    return qrLambda_[lambdaI_];
+}
+
+inline Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qinLambda
+(
+    const label lambdaI_
+)
+{
+    return qinLambda_[lambdaI_];
+}
+
+inline Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qemLambda
+(
+    const label lambdaI_
+)
+{
+    return qemLambda_[lambdaI_];
+}
+
+inline Foam::volScalarField& Foam::radiation::
+radiativeIntensityRay::qrLambda
+(
+    const label lambdaI_
+)
+{
+    return qrLambda_[lambdaI_];
+}
 
 inline const Foam::vector& Foam::radiation::radiativeIntensityRay::d() const
 {

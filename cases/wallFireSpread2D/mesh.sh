@@ -17,5 +17,6 @@ runApplication setSet -batch system/panel.setSet
 #runApplication extrudeToRegionMeshNew -AMI -overwrite
 runApplication extrudeToRegionMesh -overwrite
 
+cp 0/ph_rgh.orig 0/ph_rgh
 
 # -----------------------------------------------------------------------------

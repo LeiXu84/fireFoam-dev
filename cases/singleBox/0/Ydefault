@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,6 +21,7 @@ internalField   uniform 0;
 
 boundaryField
 {
+
     base
     {
         type            zeroGradient;
@@ -59,6 +60,5 @@ boundaryField
     }
 
 }
-
 
 // ************************************************************************* //

@@ -1,3 +1,8 @@
+2017-11-09: Version 17.11.09
+    added sampling of particle statistics (dv50, vel) to particleCollectorFmg
+    Updated to 2017-08-24 OpenFOAM-dev commit
+    compiled against OpenFOAM-dev commit 940e28f63681c7e5b292096d8fd35a71acd52599 (2017-08-24)
+
 2017-07-24: Version 17.07.24
     Updated to 2017-07-05 OpenFOAM-dev commit
     compiled against OpenFOAM-dev commit 1ff57870007ac317d95a1756b41fd76c5a1e8f26 (2017-07-05)

@@ -47,7 +47,7 @@ edges
 
 patches         
 (
-    wall wall 
+    wall solid 
     (
         (0 3 7 4)
     )

@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.4.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,15 +21,15 @@ internalField   uniform 0;
 
 boundaryField
 {
-    top      
+    top
     {
         type            greyDiffusiveRadiation;
         T               T;
-        emissivityMode  lookup; 
+        emissivityMode  lookup;
         emissivity      uniform 1.0;
         value           uniform 0;
     }
-    base           
+    base
     {
         type            greyDiffusiveRadiation;
         T               T;
@@ -41,15 +41,15 @@ boundaryField
     {
         type            greyDiffusiveRadiation;
         T               T;
-        emissivityMode  lookup; 
+        emissivityMode  lookup;
         emissivity      uniform 1.0;
         value           uniform 0;
     }
-    burner          
+    burner
     {
         type            greyDiffusiveRadiation;
         T               T;
-        emissivityMode  lookup; 
+        emissivityMode  lookup;
         emissivity      uniform 1.0;
         value           uniform 0;
     }
@@ -57,7 +57,7 @@ boundaryField
     {
         type            greyDiffusiveRadiation;
         T               T;
-        emissivityMode  solidRadiation; //lookup; 
+        emissivityMode  solidRadiation; //lookup;
         value           uniform 0;
     }
 }

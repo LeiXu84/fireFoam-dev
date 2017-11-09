@@ -242,7 +242,68 @@ void Foam::radiation::fvDOM::initialise()
             )
         );
     }
-
+    
+    // Construct boundary fluxes for each band
+    // --incident radiation
+    forAll(qinLambda_, lambdaI)
+    {	
+        qinLambda_.set
+    	(
+	        lambdaI,
+	        new volScalarField
+	        (
+	        	IOobject
+	        	(
+	        	    "qinLambda_" + Foam::name(lambdaI) ,
+	        	    mesh_.time().timeName(),
+	        	    mesh_,
+	        	    IOobject::NO_READ,
+	        	    IOobject::NO_WRITE
+	        	),
+        		qin_
+	        )
+    	);
+    }
+    // --emitted radiation
+    forAll(qemLambda_, lambdaI)
+    {
+    	qemLambda_.set
+    	(
+	        lambdaI,
+	        new volScalarField
+	        (
+	            IOobject
+	        	(
+	                "qemLambda_" + Foam::name(lambdaI) ,
+	                mesh_.time().timeName(),
+	        	    mesh_,
+	        	    IOobject::NO_READ,
+	        	    IOobject::NO_WRITE
+	        	),
+        		qem_
+	        )
+	    );
+    }
+    // --net radiation
+    forAll(qrLambda_, lambdaI)
+    {
+    	qrLambda_.set
+    	(
+	        lambdaI,
+	        new volScalarField
+	        (
+	            IOobject
+	        	(
+	                "qrLambda_" + Foam::name(lambdaI) ,
+	                mesh_.time().timeName(),
+	        	    mesh_,
+	        	    IOobject::NO_READ,
+	        	    IOobject::NO_WRITE
+	        	),
+        		qr_
+	        )
+	    );
+    }
 
     Info<< "fvDOM : Allocated " << IRay_.size()
         << " rays with average orientation:" << nl;
@@ -338,9 +399,17 @@ Foam::radiation::fvDOM::fvDOM(const volScalarField& T)
     aLambda_(nLambda_),
     GLambda_(nLambda_), // ankur
     enFracLambda_(nLambda_), // ankur
+    qrLambda_(nLambda_),    
+    qinLambda_(nLambda_),
+    qemLambda_(nLambda_),
     blackBody_(nLambda_, T),
     IRay_(0),
-    convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
+    tolerance_
+    (
+        coeffs_.found("convergence")
+      ? readScalar(coeffs_.lookup("convergence"))
+      : coeffs_.lookupOrDefault<scalar>("tolerance", 0.0)
+    ),
     maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
     omegaMax_(0),
     uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false)) // ankur
@@ -428,9 +497,17 @@ Foam::radiation::fvDOM::fvDOM
     aLambda_(nLambda_),
     GLambda_(nLambda_), // ankur
     enFracLambda_(nLambda_), // ankur
+    qrLambda_(nLambda_),
+    qinLambda_(nLambda_),
+    qemLambda_(nLambda_),
     blackBody_(nLambda_, T),
     IRay_(0),
-    convergence_(coeffs_.lookupOrDefault<scalar>("convergence", 0.0)),
+    tolerance_
+    (
+        coeffs_.found("convergence")
+      ? readScalar(coeffs_.lookup("convergence"))
+      : coeffs_.lookupOrDefault<scalar>("tolerance", 0.0)
+    ),
     maxIter_(coeffs_.lookupOrDefault<label>("maxIter", 50)),
     omegaMax_(0),
     uniSolidAngles_(coeffs_.lookupOrDefault<Switch>("uniformSolidAngles",false)) // ankur
@@ -452,7 +529,12 @@ bool Foam::radiation::fvDOM::read()
     if (radiationModel::read())
     {
         // Only reading solution parameters - not changing ray geometry
-        coeffs_.readIfPresent("convergence", convergence_);
+
+        // For backward-compatibility
+        coeffs_.readIfPresent("convergence", tolerance_);
+
+        coeffs_.readIfPresent("tolerance", tolerance_);
+
         coeffs_.readIfPresent("maxIter", maxIter_);
 
         return true;
@@ -472,7 +554,7 @@ void Foam::radiation::fvDOM::calculate()
     
     // updateBlackBodyEmission();  // ankur, this not needed now, since the above call updates the fraction.. Also, the data for storing spectral fraction has now been defined in fvDOM class itself now.. 
 
-    // Set rays convergence false
+    // Set rays converged false
     List<bool> rayIdConv(nRay_, false);
 
     scalar maxResidual = 0.0;
@@ -490,14 +572,14 @@ void Foam::radiation::fvDOM::calculate()
                 scalar maxBandResidual = IRay_[rayI].correct();
                 maxResidual = max(maxBandResidual, maxResidual);
 
-                if (maxBandResidual < convergence_)
+                if (maxBandResidual < tolerance_)
                 {
                     rayIdConv[rayI] = true;
                 }
             }
         }
 
-    } while (maxResidual > convergence_ && radIter < maxIter_);
+    } while (maxResidual > tolerance_ && radIter < maxIter_);
 
     updateG();
 }
@@ -618,25 +700,53 @@ void Foam::radiation::fvDOM::updateG()
     qr_ = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
     qem_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
     qin_ = dimensionedScalar("zero", dimMass/pow3(dimTime), 0.0);
-    // ankur
-    forAll(GLambda_,iLambda)
-    {
-    	GLambda_[iLambda] = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
-    } 
 
-    forAll(IRay_, rayI)
+    if ( nLambda_ > 1 )
     {
-        IRay_[rayI].addIntensity();
-        G_ += IRay_[rayI].I()*IRay_[rayI].omega();
-        qr_.boundaryFieldRef() += IRay_[rayI].qr().boundaryField();
-        qem_.boundaryFieldRef() += IRay_[rayI].qem().boundaryField();
-        qin_.boundaryFieldRef() += IRay_[rayI].qin().boundaryField();
-        // ankur
+        // non-grey
         forAll(GLambda_,iLambda)
         {
-          GLambda_[iLambda] += IRay_[rayI].ILambda(iLambda)*IRay_[rayI].omega();
-        } 
+        	GLambda_[iLambda] = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+        	qinLambda_[iLambda] = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+        	qemLambda_[iLambda] = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+        	qrLambda_[iLambda]  = dimensionedScalar("zero",dimMass/pow3(dimTime), 0.0);
+        }
+
+        forAll(IRay_, rayI)
+        {
+            IRay_[rayI].addIntensity();
+            G_ += IRay_[rayI].I()*IRay_[rayI].omega();
+            
+            forAll(GLambda_,iLambda)
+            {
+                GLambda_[iLambda] += IRay_[rayI].ILambda(iLambda)*IRay_[rayI].omega();
+                // update boundary spectral heat fluxes
+                qinLambda_[iLambda].boundaryFieldRef() += IRay_[rayI].qinLambda(iLambda).boundaryField();
+                qemLambda_[iLambda].boundaryFieldRef() += IRay_[rayI].qemLambda(iLambda).boundaryField();
+                qrLambda_[iLambda].boundaryFieldRef()  += IRay_[rayI].qrLambda(iLambda).boundaryField();
+            }
+        }
+        // update boundary total heat fluxes
+        forAll(GLambda_,iLambda)
+        {
+            qin_.boundaryFieldRef() += qinLambda_[iLambda].boundaryFieldRef();
+            qem_.boundaryFieldRef() += qemLambda_[iLambda].boundaryFieldRef();
+            qr_.boundaryFieldRef()  += qrLambda_[iLambda].boundaryFieldRef();
+        }
     }
+    else
+    {
+        // grey
+        forAll(IRay_, rayI)
+        {            
+            G_ += IRay_[rayI].I()*IRay_[rayI].omega();
+            // update boundary heat fluxes
+            qin_.boundaryFieldRef() += IRay_[rayI].qin().boundaryField();
+            qem_.boundaryFieldRef() += IRay_[rayI].qem().boundaryField();
+            qr_.boundaryFieldRef()  += IRay_[rayI].qr().boundaryField();
+        }
+    }
+    
 }
 
 

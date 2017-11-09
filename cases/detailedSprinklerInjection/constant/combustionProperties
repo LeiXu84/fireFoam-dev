@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,9 +17,8 @@ FoamFile
 
 active true;
 
-/*combustionModel    eddyDissipationExplicitModel;*/
-//combustionModel  infinitelyFastChemistry<psiCombustionModel,gasThermoPhysics>;
 combustionModel  eddyDissipationModel<psiThermoCombustion,gasHThermoPhysics>;
+//combustionModel  infinitelyFastChemistry<psiCombustionModel,gasThermoPhysics>;
 
 eddyDissipationModelCoeffs
 {
@@ -39,6 +38,7 @@ eddyDissipationExplicitModelCoeffs
 infinitelyFastChemistryCoeffs
 {
     C       10.0;
+    semiImplicit false;
 }
 
 noCombustionCoeffs

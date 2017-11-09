@@ -124,7 +124,7 @@ functions
             rho
             wood
             T
-            chemistrySh
+            chemistryQdot
         );
     }
 
@@ -142,6 +142,10 @@ functions
         name            region0_to_panelRegion_panel;
         operation       sum;
         fields
+        (
+        );
+        // orientedFields needed in order to apply flipMap
+        orientedFields
         (
             phi
         );
@@ -162,6 +166,10 @@ functions
         name            region0_to_panelRegion_panel;
         operation       sum;
         fields
+        (
+        );
+        // orientedFields needed in order to apply flipMap
+        orientedFields
         (
             phiGas
         );

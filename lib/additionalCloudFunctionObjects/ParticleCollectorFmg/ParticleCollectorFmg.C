@@ -53,6 +53,10 @@ License
 #include "Time.H"
 #include "fvMesh.H"
 #include "triPointRef.H"
+#include "mathematicalConstants.H"
+#include "SortableList.H"
+
+using namespace Foam::constant;
 
 // * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
 
@@ -145,7 +149,15 @@ void Foam::ParticleCollectorFmg<CloudType>::makeLogFile
                     << tab << "mass[" << id << "]"
                     << tab << "massFlowRate[" << id << "]"
                     << tab << "mom[" << id << "]"
-                    << tab << "momRate[" << id << "]"
+                    << tab << "momRate[" << id << "]";
+
+                if(sampleParticles_)
+                {
+                    outputFilePtr_()
+                        << tab << "dv50[" << id << "]"
+                        << tab << "vel[" << id << "]";
+                }
+                outputFilePtr_()
                     << endl;
             }
         }
@@ -490,6 +502,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     scalar sumAverageMFR = 0.0;
     scalar sumAverageMomRate = 0.0;
     scalar sumArea = 0.0;
+    scalarList dv50(faces_.size());
     forAll(faces_, facei)
     {
         scalarList allProcMass(Pstream::nProcs());
@@ -516,24 +529,13 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         allProcMomRate[proci] = momRate_[facei];
         Pstream::gatherList(allProcMomRate);
         faceMomRate[facei] = sum(allProcMomRate);
+        scalar vel = faceMomRate[facei]/(faceMassFlowRate[facei]+SMALL);
 
         sumTotalMass += faceMassTotal[facei];
         sumTotalMom += faceMomTotal[facei];
         sumArea += area_[facei];
         sumAverageMFR += faceMassFlowRate[facei]*area_[facei];
         sumAverageMomRate += faceMomRate[facei]*area_[facei];
-
-        if (outputFilePtr_.valid())
-        {
-            outputFilePtr_()
-                << time.timeName()
-                << tab << facei
-                << tab << faceMassTotal[facei]
-                << tab << faceMassFlowRate[facei]
-                << tab << faceMomTotal[facei]
-                << tab << faceMomRate[facei]
-                << endl;
-        }
 
         if (sampleParticles_)
         {
@@ -559,50 +561,54 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                     localPositions.append(positions_[facei][proc]); 
                 }
 
+                dv50[facei] = computeDv50(localDiameters,localNumberParticles);
 
-                fileName  basedir(this->outputDir()/time.timeName());
-                fileName  filename(
-                             basedir/"parcels_"
-                            +Foam::name(facei)+
-                            ".dat"
-                          );
-
-                mkDir(basedir);
-
-                OFstream os(filename);
-
-                if (!os.good())
+                if(writeParticles_)
                 {
-                    FatalErrorIn
-                        (
-                         "ParticleCollectorFmg::write()"
-                        )
-                        << "Cannot open file for writing " 
-                        << filename
-                        << exit(FatalError);
-                }
+                    fileName  basedir(this->outputDir()/time.timeName());
+                    fileName  filename(
+                                 basedir/"parcels_"
+                                +Foam::name(facei)+
+                                ".dat"
+                              );
 
-                
-                os << "# center " << faces_[0].centre(points_) << nl;
-                os << "# d(m) u(m/s) nP x y z\n";
+                    mkDir(basedir);
 
-                forAll(localDiameters,d)
-                {
-                    os
-                        << localDiameters[d]
-                        << " "
-                        << localVelocityMagnitudes[d]
-                        << " "
-                        << localNumberParticles[d]
-                        << " "
-                        << localPositions[d][0]
-                        << " "
-                        << localPositions[d][1]
-                        << " "
-                        << localPositions[d][2]
-                        << nl;
+                    OFstream os(filename);
+
+                    if (!os.good())
+                    {
+                        FatalErrorIn
+                            (
+                             "ParticleCollectorFmg::write()"
+                            )
+                            << "Cannot open file for writing " 
+                            << filename
+                            << exit(FatalError);
+                    }
+
+                    
+                    os << "# center " << faces_[0].centre(points_) << nl;
+                    os << "# d(m) u(m/s) nP x y z\n";
+
+                    forAll(localDiameters,d)
+                    {
+                        os
+                            << localDiameters[d]
+                            << " "
+                            << localVelocityMagnitudes[d]
+                            << " "
+                            << localNumberParticles[d]
+                            << " "
+                            << localPositions[d][0]
+                            << " "
+                            << localPositions[d][1]
+                            << " "
+                            << localPositions[d][2]
+                            << nl;
+                    }
+                    os << endl;
                 }
-                os << endl;
 
             }
             // reset particle statistics
@@ -611,6 +617,33 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
             numberParticles_[facei][Pstream::myProcNo()].clear();
             positions_[facei][Pstream::myProcNo()].clear();
         }
+        if (outputFilePtr_.valid())
+        {
+            outputFilePtr_()
+                << time.timeName()
+                << tab << facei
+                << tab << faceMassTotal[facei]
+                << tab << faceMassFlowRate[facei]
+                << tab << faceMomTotal[facei]
+                << tab << faceMomRate[facei];
+                if(sampleParticles_)
+                {
+                    if (dv50[facei] < 0)
+                    {
+                        outputFilePtr_()
+                            << tab << "n/a"
+                            << tab << vel;
+                    }
+                    else
+                    {
+                        outputFilePtr_()
+                            << tab << dv50[facei]
+                            << tab << vel;
+                    }
+                }
+                outputFilePtr_() << endl;
+        }
+
     }
     sumAverageMFR /= sumArea;
     sumAverageMomRate /= sumArea;
@@ -620,9 +653,28 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
         << "    sum(total momentum) = " << sumTotalMom << nl
         << "    sum(area-weighted average mass flow rate) = " << sumAverageMFR << nl
         << "    sum(area-weighted average momentum rate) = " << sumAverageMomRate << nl
-        << "    sum(area) = " << sumArea << nl
-        << endl;
+        << "    sum(area) = " << sumArea << nl;
 
+    if(sampleParticles_)
+    {
+        forAll(faces_, facei)
+        {
+            if (dv50[facei] < 0)
+            {
+                Info << "    dv50[" << facei << "](m) = " 
+                     << "n/a" << nl;
+            }
+            else
+            {
+                Info << "    dv50[" << facei << "](m) = " 
+                     << dv50[facei] << nl;
+            }
+            //Info<< "    vel[" << facei << "](m/s) = " << 
+            //            faceMomRate[facei]/(faceMassFlowRate[facei]+SMALL)<< nl;
+        }
+    }
+
+    Info << endl;
 
     if (surfaceFormat_ != "none")
     {
@@ -728,6 +780,51 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     }
 }
 
+template<class CloudType>
+Foam::scalar Foam::ParticleCollectorFmg<CloudType>::computeDv50(const scalarList& d,const scalarList& np)
+{
+    if(d.size()<1)
+    {
+        return -1;
+    }
+    
+    SortableList< scalar > dsort;
+    dsort = 1.0*d;
+    dsort.sort();
+    scalarList r = dsort/2.;
+    scalarList volume = 4./3.*mathematical::pi*pow(r,3); // m3
+    scalarList cumVol(volume.size(),0.0);
+    labelList mapping = dsort.indices();
+    forAll(volume,i)
+    {
+        volume[i] *= np[mapping[i]];
+        // Info << "volume[" << i << "]: " << volume[i] << endl;
+    }
+    forAll(cumVol,i)
+    {
+        if(i==0)
+        {
+            cumVol[i] = volume[i];
+        }
+        else
+        {
+            cumVol[i] += volume[i]+cumVol[i-1];
+        }
+    }
+    // Info << cumVol << endl;
+    scalar v50 = 0.5*sum(volume);
+    scalar x(0.0);    
+    forAll(dsort,i)
+    {
+        if(cumVol[i]>v50)
+        {
+            x = dsort[i];
+            break;
+        }
+    }
+    return x;
+}
+
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
@@ -768,7 +865,8 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     velocityMagnitudes_(),
     numberParticles_(),
     positions_(),
-    sampleParticles_(this->coeffDict().lookupOrDefault("sampleParticles",false)),
+    sampleParticles_(this->coeffDict().lookupOrDefault("sampleParticles",true)),
+    writeParticles_(this->coeffDict().lookupOrDefault("writeParticles",false)),
     log_(this->coeffDict().lookup("log")),
     outputFilePtr_(),
     timeOld_(owner.mesh().time().value()),
@@ -884,6 +982,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     numberParticles_(pc.numberParticles_),
     positions_(pc.positions_),
     sampleParticles_(pc.sampleParticles_),
+    writeParticles_(pc.writeParticles_),
     log_(pc.log_),
     outputFilePtr_(),
     timeOld_(0.0),
@@ -1036,7 +1135,6 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
             {
                 keepParticle = false;
             }
-        //not needed? }
     }
 }
 

@@ -21,29 +21,31 @@ internalField   uniform 0;
 
 boundaryField
 {
-    "(top|side.*)"
+    "(outlet|sides)"
     {
         type            prghTotalHydrostaticPressure;
         p0              $internalField;
         value           $internalField;
     }
 
-    "(ground.*)"
+    walls
     {
         type            fixedFluxPressure;
         value           $internalField;
     }
 
-    burner
+    inlet
     {
-        type            zeroGradient;
+        type            fixedFluxPressure;
+        value           $internalField;
     }
 
-    "(region0_to.*)"
+    frontAndBack
     {
-        type            buoyantPressure;
-        value			$internalField;
+        type            fixedFluxPressure;
+        value           $internalField;
     }
+
 }
 
 // ************************************************************************* //

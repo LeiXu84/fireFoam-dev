@@ -61,7 +61,7 @@ divSchemes
         h               limitedLinear   1;
     };
     //div((muEff*dev2(grad(U).T()))) Gauss linear;
-    div((muEff*dev2(T(grad(U))))) Gauss linear;      
+    div(((rho*nuEff)*dev2(T(grad(U))))) Gauss linear;      
     div(phiU,p)     Gauss linear;
     div(Ji,Ii_h)    Gauss linearUpwind grad(Ii_h); // Gauss linear; //Gauss upwind;
 }
@@ -70,7 +70,7 @@ laplacianSchemes
 {
     //default         none;
     default         Gauss linear corrected;
-    laplacian(muEff,U) Gauss linear corrected;
+    laplacian(nuEff,U) Gauss linear corrected;
     laplacian(DkEff,k) Gauss linear corrected;
     laplacian(DBEff,B) Gauss linear corrected;
     laplacian(alphaEff,hs) Gauss linear corrected;

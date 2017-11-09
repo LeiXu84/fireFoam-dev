@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -29,7 +29,7 @@ deltaT          0.02;
 
 writeControl    adjustableRunTime;
 
-writeInterval   1.0;
+writeInterval   1;
 
 purgeWrite      0;
 
@@ -50,7 +50,7 @@ runTimeModifiable yes;
 
 adjustTimeStep  no;
 
-maxCo           5; //10.0;
+maxCo           1; //10.0;
 
 maxDeltaT       0.02;
 
@@ -62,25 +62,25 @@ libs
 
 functions
 {
-//    HRR
-//    {
-//        type            cellSource;
-//        functionObjectLibs ("libfieldFunctionObjects.so");
-//        enabled         true;
-//        writeControl    timeStep;  //writeTime;
-//        writeInterval  1;
-//        log             false;     //true;
-//        valueOutput     false;
-//        source          all;       //cellZone;
-//        sourceName      c0;
-//        operation       sum;
-//        fields
-//        (
-//            dQ
-//        );
-//    }
-//
-//    fieldMimMax
+    HRR
+    {
+        type            volFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl    timeStep;  //writeTime;
+        writeInterval   1;
+        log             false;     //true;
+        writeFields     false;
+        regionType      all;       //cellZone;
+        name            c0;
+        operation       sum;
+        fields
+        (
+            Qdot
+        );
+    }
+
+//    fieldMinMax
 //    {
 //        type            fieldMinMax;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
@@ -89,7 +89,7 @@ functions
 //        writeInterval  1;
 //	mode            magnitude;
 //        log             false; //true;
-//        valueOutput     false;
+//        writeFields     false;
 //        fields
 //        (
 //            T
@@ -105,16 +105,16 @@ functions
 //
 //    patchSides 
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
 //        writeControl    timeStep;
 //        writeInterval  1;
 //        //writeControl    writeTime;
 //        log             true;
-//        valueOutput     false;
-//        source          patch;
-//        sourceName      sides;
+//        writeFields     false;
+//        regionType      patch;
+//        name            sides;
 //        operation       sum;
 //        fields
 //        (
@@ -128,16 +128,16 @@ functions
 //
 //    patchOutlet 
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
 //        writeControl    timeStep;
 //        writeInterval  1;
 //        //writeControl    writeTime;
 //        log             true;
-//        valueOutput     false;
-//        source          patch;
-//        sourceName      outlet;
+//        writeFields     false;
+//        regionType      patch;
+//        name            outlet;
 //        operation       sum;
 //        fields
 //        (
@@ -151,16 +151,16 @@ functions
 //
 //    patchInlet 
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
 //        writeControl    timeStep;
 //        writeInterval  1;
 //        //writeControl    writeTime;
 //        log             true;
-//        valueOutput     false;
-//        source          patch;
-//        sourceName      inlet;
+//        writeFields     false;
+//        regionType      patch;
+//        name            inlet;
 //        operation       sum;
 //        fields
 //        (
@@ -238,45 +238,64 @@ functions
 //    }
 //*/
 //
-    fieldAverage1
-    {
-        type            fieldAverage;
-        // functionObjectLibs ( "libfieldFunctionObjects.so" );
-        enabled         true;
-        resetOnOutput   false;
-        resetOnRestart  true;
-        timeStart       20;
-        timeEnd         30;
-        writeControl    writeTime;
-        fields
-        (
+//    fieldAverage1
+//    {
+//        type            fieldAverage;
+//        functionObjectLibs ( "libfieldFunctionObjects.so" );
+//        enabled         true;
+//        writeControl    writeTime;
+//        fields
+//        (
 //            T
 //            {
 //                mean        on;
 //                prime2Mean  on;
 //                base        time;
 //            }
-
-            U
-            {
-                mean        on;
-                prime2Mean  off;
-                base        time;
-            }
-
+//
+//            U
+//            {
+//                mean        on;
+//                prime2Mean  off;
+//                base        time;
+//            }
+//
 //            ft
 //            {
 //                mean        on;
 //                prime2Mean  on;
 //                base        time;
 //            }
-
-//            dQ
+//
+//            Qdot
 //            {
 //                mean        on;
 //                prime2Mean  off;
 //                base        time;
 //            }
+//        );
+//    }
+
+    thrust
+    {
+        type            surfaceFieldValue;
+        functionObjectLibs ("libfieldFunctionObjects.so");
+        enabled         true;
+        writeControl    adjustableRunTime;
+        writeInterval   1;
+        log             true;
+        writeFields     false;
+        regionType      faceZone;
+        name            thrust;
+        operation       sum;
+        fields
+        (
+        );
+        // orientedFields needed in order to apply flipMap
+        orientedFields
+        (
+            phi
+            momentumY
         );
     }
 

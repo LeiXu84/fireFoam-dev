@@ -5,12 +5,13 @@
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-Build  : dev-tmp-5546fe444d54
+Build  : dev-tmp-0c4175bec707
 Exec   : fireFoam
-Date   : Jun 22 2017
-Time   : 00:18:09
+Date   : Aug 28 2017
+Time   : 16:35:25
 Host   : "master"
-PID    : 7108
+PID    : 21080
+I/O    : uncollated
 Case   : /shares/meredithk/fireFoam-dev-tmp/fireFoam/cases/steckler
 nProcs : 1
 sigFpe : Enabling floating point exception trapping (FOAM_SIGFPE).
@@ -18,8 +19,8 @@ fileModificationChecking : Monitoring run-time modified files using timeStampMas
 allowSystemOperations : Allowing user-supplied system call operations
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-FireFOAM Build Version:  b8573d5706995ee37f8e7af7d188cfd17e173d86
-FireFOAM Build Time Stamp:  Thu Jun 22 00:11:16 EDT 2017
+FireFOAM Build Version:  d773a7a97b35edb3f0f0b78bd30550cf9284da6a
+FireFOAM Build Time Stamp:  Mon Aug 28 16:14:33 EDT 2017
 ****************************************************
 Create time
 
@@ -223,7 +224,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0052595, Final residual = 8.764
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 8.5653e-08, global = -4.6658e-09, cumulative = -0.00013114
 smoothSolver:  Solving for k, Initial residual = 1, Final residual = 1.8232e-12, No Iterations 3
-ExecutionTime = 0.6 s  ClockTime = 1 s
+ExecutionTime = 0.69 s  ClockTime = 1 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 0 at location (-1.9 0.1 -1.9)
@@ -259,7 +260,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 7.5888e-05, Final residual = 7.16
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.4063e-07, global = -5.9939e-09, cumulative = -0.0001306
 smoothSolver:  Solving for k, Initial residual = 0.75499, Final residual = 1.7952e-09, No Iterations 3
-ExecutionTime = 0.77 s  ClockTime = 1 s
+ExecutionTime = 0.88 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 2081 at location (0.3 1.9 -1.1)
@@ -295,7 +296,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00028245, Final residual = 6.68
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.2825e-07, global = 8.9483e-09, cumulative = -0.00013001
 smoothSolver:  Solving for k, Initial residual = 0.47169, Final residual = 6.8888e-11, No Iterations 4
-ExecutionTime = 0.94 s  ClockTime = 1 s
+ExecutionTime = 1.07 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4508 at location (-0.3 0.1 0.1)
@@ -331,7 +332,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00036153, Final residual = 8.90
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.6578e-07, global = -1.23e-08, cumulative = -0.00012889
 smoothSolver:  Solving for k, Initial residual = 0.3518, Final residual = 4.9811e-10, No Iterations 4
-ExecutionTime = 1.11 s  ClockTime = 1 s
+ExecutionTime = 1.25 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4987 at location (-0.5 0.3 0.3)
@@ -367,7 +368,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00056949, Final residual = 6.81
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.2675e-07, global = 1.0408e-08, cumulative = -0.00012771
 smoothSolver:  Solving for k, Initial residual = 0.28984, Final residual = 2.4313e-09, No Iterations 4
-ExecutionTime = 1.28 s  ClockTime = 1 s
+ExecutionTime = 1.44 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 2531 at location (0.3 1.9 -0.9)
@@ -403,7 +404,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00069601, Final residual = 9.15
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.675e-07, global = -2.3477e-10, cumulative = -0.00012581
 smoothSolver:  Solving for k, Initial residual = 0.25126, Final residual = 8.0525e-09, No Iterations 4
-ExecutionTime = 1.46 s  ClockTime = 2 s
+ExecutionTime = 1.62 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4986 at location (-0.7 0.3 0.3)
@@ -439,7 +440,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00093967, Final residual = 9.84
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.8008e-07, global = 3.5901e-09, cumulative = -0.00011951
 smoothSolver:  Solving for k, Initial residual = 0.22464, Final residual = 4.6324e-10, No Iterations 5
-ExecutionTime = 1.62 s  ClockTime = 2 s
+ExecutionTime = 1.82 s  ClockTime = 2 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4985 at location (-0.9 0.3 0.3)
@@ -475,7 +476,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0012351, Final residual = 9.779
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.7941e-07, global = -1.8695e-08, cumulative = -0.00010624
 smoothSolver:  Solving for k, Initial residual = 0.20254, Final residual = 1.4647e-09, No Iterations 5
-ExecutionTime = 1.82 s  ClockTime = 2 s
+ExecutionTime = 2.01 s  ClockTime = 3 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 5436 at location (-0.7 0.3 0.5)
@@ -511,7 +512,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.001465, Final residual = 8.6561
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.5972e-07, global = -4.8828e-09, cumulative = -9.5112e-05
 smoothSolver:  Solving for k, Initial residual = 0.18392, Final residual = 3.8366e-09, No Iterations 5
-ExecutionTime = 2.01 s  ClockTime = 2 s
+ExecutionTime = 2.2 s  ClockTime = 3 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 5436 at location (-0.7 0.3 0.5)
@@ -547,7 +548,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.001719, Final residual = 8.2604
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.5243e-07, global = -1.0504e-08, cumulative = -8.2203e-05
 smoothSolver:  Solving for k, Initial residual = 0.16943, Final residual = 9.8822e-09, No Iterations 5
-ExecutionTime = 2.2 s  ClockTime = 2 s
+ExecutionTime = 2.38 s  ClockTime = 3 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4985 at location (-0.9 0.3 0.3)
@@ -583,7 +584,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0019089, Final residual = 7.633
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.4086e-07, global = 1.1584e-08, cumulative = -7.9279e-05
 smoothSolver:  Solving for k, Initial residual = 0.15678, Final residual = 1.0376e-09, No Iterations 6
-ExecutionTime = 3.4 s  ClockTime = 7 s +
+ExecutionTime = 3.31 s  ClockTime = 4 s +
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 4985 at location (-0.9 0.3 0.3)
@@ -619,7 +620,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0024683, Final residual = 6.926
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.4633e-07, global = 7.0053e-09, cumulative = -7.5677e-05
 smoothSolver:  Solving for k, Initial residual = 0.15546, Final residual = 4.7622e-09, No Iterations 6
-ExecutionTime = 3.64 s  ClockTime = 7 s
+ExecutionTime = 3.56 s  ClockTime = 5 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 5886 at location (-0.7 0.3 0.7)
@@ -655,7 +656,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0025251, Final residual = 9.381
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.3616e-07, global = 1.0981e-08, cumulative = -7.2867e-05
 smoothSolver:  Solving for k, Initial residual = 0.11959, Final residual = 6.8243e-10, No Iterations 6
-ExecutionTime = 3.84 s  ClockTime = 8 s
+ExecutionTime = 3.77 s  ClockTime = 5 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 5886 at location (-0.7 0.3 0.7)
@@ -691,7 +692,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0023321, Final residual = 8.216
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.2118e-07, global = 5.29e-09, cumulative = -7.0432e-05
 smoothSolver:  Solving for k, Initial residual = 0.11282, Final residual = 9.9625e-10, No Iterations 6
-ExecutionTime = 4.04 s  ClockTime = 8 s
+ExecutionTime = 3.99 s  ClockTime = 5 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 5886 at location (-0.7 0.3 0.7)
@@ -727,7 +728,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0027812, Final residual = 5.999
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 8.9332e-08, global = 1.1946e-08, cumulative = -6.7959e-05
 smoothSolver:  Solving for k, Initial residual = 0.1056, Final residual = 1.7393e-09, No Iterations 6
-ExecutionTime = 4.28 s  ClockTime = 8 s
+ExecutionTime = 4.2 s  ClockTime = 5 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 8569 at location (1.9 0.1 1.9)
@@ -763,7 +764,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0029142, Final residual = 6.327
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 6.4238e-08, global = 6.217e-09, cumulative = -6.6529e-05
 smoothSolver:  Solving for k, Initial residual = 0.079324, Final residual = 2.9482e-09, No Iterations 5
-ExecutionTime = 4.48 s  ClockTime = 8 s
+ExecutionTime = 4.4 s  ClockTime = 5 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 8569 at location (1.9 0.1 1.9)
@@ -799,7 +800,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0032522, Final residual = 7.715
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 9.8818e-08, global = -3.494e-10, cumulative = -5.6974e-05
 smoothSolver:  Solving for k, Initial residual = 0.082378, Final residual = 6.1342e-10, No Iterations 6
-ExecutionTime = 4.68 s  ClockTime = 8 s
+ExecutionTime = 4.6 s  ClockTime = 6 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -835,7 +836,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0042332, Final residual = 7.584
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.0237e-07, global = 1.8261e-08, cumulative = -5.6451e-05
 smoothSolver:  Solving for k, Initial residual = 0.0755, Final residual = 7.6705e-10, No Iterations 6
-ExecutionTime = 4.88 s  ClockTime = 9 s
+ExecutionTime = 4.78 s  ClockTime = 6 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -871,7 +872,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0036489, Final residual = 6.989
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 6.3664e-08, global = 4.0956e-09, cumulative = -5.9815e-05
 smoothSolver:  Solving for k, Initial residual = 0.053922, Final residual = 9.0082e-10, No Iterations 5
-ExecutionTime = 5.05 s  ClockTime = 9 s
+ExecutionTime = 4.97 s  ClockTime = 6 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -907,7 +908,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0049167, Final residual = 8.767
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.0792e-07, global = 1.2511e-08, cumulative = -5.1291e-05
 smoothSolver:  Solving for k, Initial residual = 0.057543, Final residual = 3.8367e-09, No Iterations 5
-ExecutionTime = 5.23 s  ClockTime = 9 s
+ExecutionTime = 5.15 s  ClockTime = 6 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -943,7 +944,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0049782, Final residual = 8.125
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.2267e-07, global = 1.7842e-08, cumulative = -6.4066e-05
 smoothSolver:  Solving for k, Initial residual = 0.052522, Final residual = 3.7431e-09, No Iterations 5
-ExecutionTime = 5.43 s  ClockTime = 9 s
+ExecutionTime = 5.34 s  ClockTime = 6 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -979,7 +980,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0027686, Final residual = 8.358
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 9.3407e-08, global = 9.6873e-09, cumulative = -7.2641e-05
 smoothSolver:  Solving for k, Initial residual = 0.03281, Final residual = 3.07e-09, No Iterations 4
-ExecutionTime = 5.61 s  ClockTime = 9 s
+ExecutionTime = 5.54 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -1015,7 +1016,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0022643, Final residual = 6.384
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 7.4786e-08, global = 2.4496e-09, cumulative = -7.8666e-05
 smoothSolver:  Solving for k, Initial residual = 0.031362, Final residual = 3.1126e-09, No Iterations 4
-ExecutionTime = 5.81 s  ClockTime = 10 s
+ExecutionTime = 5.73 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -2)
@@ -1051,7 +1052,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0025364, Final residual = 7.690
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 1.0107e-07, global = 3.1309e-09, cumulative = -8.5616e-05
 smoothSolver:  Solving for k, Initial residual = 0.02968, Final residual = 4.1469e-09, No Iterations 4
-ExecutionTime = 5.99 s  ClockTime = 10 s
+ExecutionTime = 5.93 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -1087,7 +1088,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0025465, Final residual = 5.147
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 7.9056e-08, global = 1.3002e-09, cumulative = -9.1083e-05
 smoothSolver:  Solving for k, Initial residual = 0.028443, Final residual = 4.9172e-09, No Iterations 4
-ExecutionTime = 6.17 s  ClockTime = 10 s
+ExecutionTime = 6.12 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -1123,7 +1124,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.0012869, Final residual = 8.920
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 5.2208e-08, global = 1.6942e-09, cumulative = -9.2985e-05
 smoothSolver:  Solving for k, Initial residual = 0.014235, Final residual = 2.2979e-09, No Iterations 3
-ExecutionTime = 6.35 s  ClockTime = 10 s
+ExecutionTime = 6.3 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -1159,7 +1160,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00072796, Final residual = 7.22
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 4.6138e-08, global = -3.4507e-09, cumulative = -9.3213e-05
 smoothSolver:  Solving for k, Initial residual = 0.014348, Final residual = 3.7038e-09, No Iterations 3
-ExecutionTime = 6.54 s  ClockTime = 10 s
+ExecutionTime = 6.49 s  ClockTime = 7 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -2)
@@ -1195,7 +1196,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00074142, Final residual = 9.26
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 5.3736e-08, global = 5.5158e-09, cumulative = -9.3933e-05
 smoothSolver:  Solving for k, Initial residual = 0.014537, Final residual = 5.8676e-09, No Iterations 3
-ExecutionTime = 6.71 s  ClockTime = 10 s
+ExecutionTime = 6.68 s  ClockTime = 8 s
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)
@@ -1231,7 +1232,7 @@ DICPCG:  Solving for p_rgh, Initial residual = 0.00086079, Final residual = 8.72
 diagonal:  Solving for rho, Initial residual = 0, Final residual = 0, No Iterations 0
 time step continuity errors : sum local = 4.775e-08, global = 3.3313e-09, cumulative = -9.4255e-05
 smoothSolver:  Solving for k, Initial residual = 0.014817, Final residual = 8.6092e-09, No Iterations 3
-ExecutionTime = 7.78 s  ClockTime = 15 s +
+ExecutionTime = 7.64 s  ClockTime = 9 s +
 
 fieldMinMax fieldMinMax write:
     min(T) = 298.15 in cell 19 at location (1.9 0.1 -1.9)

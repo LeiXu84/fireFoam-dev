@@ -1,7 +1,7 @@
 /*---------------------------------------------------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.0.0                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -28,11 +28,11 @@ FoamFile
         {
             gasHSource      no; //Energy source term due to pyrolysis gas
 
-            QrHSource       no; //Energy source term due in depht radiation
+            qrHSource       no; //Energy source term due in depht radiation
 
             filmCoupled     false;
 
-            radFluxName     Qr;
+            radFluxName     qr;
 
             minimumDelta    1e-6;
 

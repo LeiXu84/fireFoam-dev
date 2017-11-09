@@ -121,14 +121,23 @@ class fvDOM
         // Ptr List for energy fraction field for each wavelength
         PtrList<volScalarField> enFracLambda_; // ankur
 
+        //- Spectral-band-specific net radiative flux at boundaries summed over all rays
+        PtrList<volScalarField> qrLambda_;        
+
+        //- Spectral-band-specific incident radiative flux at boundaries summed over all rays
+        PtrList<volScalarField> qinLambda_;        
+
+        //- Spectral-band-specific emitted radiative flux at boundaries summed over all rays
+        PtrList<volScalarField> qemLambda_;
+
         //- Black body
         blackBodyEmission blackBody_;
 
         //- List of pointers to radiative intensity rays
         PtrList<radiativeIntensityRay> IRay_;
 
-        //- Convergence criterion
-        scalar convergence_;
+        //- Convergence tolerance
+        scalar tolerance_;
 
         //- Maximum number of iterations
         label maxIter_;
@@ -242,6 +251,15 @@ public:
             //- Const access to energy fraction for different bands
             inline const volScalarField& enFracLambda(const label lambdaI) const; // ankur
 
+            //- Const access to spectral-band-specific net radiative boundary flux field
+            inline const volScalarField& qrLambda(const label lambdaI) const;
+
+            //- Const access to spectral-band-specific incident radiative boundary flux field
+            inline const volScalarField& qinLambda(const label lambdaI) const;
+            
+            //- Const access to spectral-band-specific emitted radiative boundary flux field
+            inline const volScalarField& qemLambda(const label lambdaI) const;
+            
             //- Const access to temperature field
             inline const volScalarField& T() const; // ankur
 

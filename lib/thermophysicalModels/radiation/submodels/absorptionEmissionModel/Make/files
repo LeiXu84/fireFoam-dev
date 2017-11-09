@@ -1,5 +1,7 @@
 /*greyMeanAbsorptionEmissionSoot/greyMeanAbsorptionEmissionSoot.C*/
 /*greyMeanAbsorptionEmissionIgnSoot/greyMeanAbsorptionEmissionIgnSoot.C*/
+/*wsggSmithAbsorptionEmission/wsggSmithAbsorptionEmission.C*/
+spSootRadFracEmission/spSootRadFracEmission.C
 constRadFractionEmission/constRadFractionEmission.C
 localFuelRadFractionEmission/localFuelRadFractionEmission.C
 constRadFracWideBandEmission/constRadFracWideBandEmission.C

@@ -208,6 +208,8 @@ private:
         List <List<vectorList> > positions_;
         //- Flag for sampling particle diameter, velocity, etc.
         Switch sampleParticles_;
+        //- Flag for writing individual parcel info (diameter, velocity, etc.) to file 
+        Switch writeParticles_;
 
         //- Flag to indicate whether data should be written to file
         Switch log_;
@@ -265,6 +267,9 @@ protected:
 
         //- Write post-processing info
         void write();
+
+        //- Calculate dv50
+        scalar computeDv50(const scalarList& d,const scalarList& np);
 
 
 public:

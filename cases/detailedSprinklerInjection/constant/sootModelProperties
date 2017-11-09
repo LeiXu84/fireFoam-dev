@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -34,12 +34,12 @@ radSc_Ys_p 0.01;
 
 radSc_fPatch 
 (
-	"burner"
+    "burner"
 );
 
 radSc_pPatch
 (
-	"region0_to_panelRegion_panel"
+    "region0_to_panelRegion_panel"
 );
 
 sootTransport true;

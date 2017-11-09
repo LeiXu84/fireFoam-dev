@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -57,43 +57,42 @@ maxDeltaT       0.1;
 
 libs
 (
-    "libfvPatchFieldsPyrolysis.so"
-    // "libIOadiosWrite.so"
+    //"libfvPatchFieldsPyrolysis.so"
 );
 
 functions
-(
+{
 
     HRR
     {
-        type            cellSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            volFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  //outputTime;
-        outputInterval  1;
+        writeControl    timeStep;  //writeTime;
+        writeInterval  1;
         log             false;     
-        valueOutput     false;
-        source          all;       //cellZone;
-        sourceName      c0;
+        writeFields     false;
+        regionType      all;       //cellZone;
+        name            c0;
         operation       volIntegrate;
         fields
         (
-            dQ
+            Qdot
         );
     }
 
     // patch integration of phi, and HRR: panel
     patchPanel_xnorm_p 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_xnorm_p;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_xnorm_p;
         operation       sum;
         fields
         (
@@ -104,15 +103,15 @@ functions
 
     patchPanel_xnorm_m 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_xnorm_m;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_xnorm_m;
         operation       sum;
         fields
         (
@@ -123,15 +122,15 @@ functions
 
     patchPanel_ynorm_p 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_ynorm_p;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_ynorm_p;
         operation       sum;
         fields
         (
@@ -142,15 +141,15 @@ functions
 
     patchPanel_ynorm_m 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_ynorm_m;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_ynorm_m;
         operation       sum;
         fields
         (
@@ -161,15 +160,15 @@ functions
 
     patchPanel_znorm_p 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_znorm_p;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_znorm_p;
         operation       sum;
         fields
         (
@@ -180,15 +179,15 @@ functions
 
     patchPanel_znorm_m 
     {
-        type            faceSource;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        type            surfaceFieldValue;
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  10;
+        writeControl    timeStep;  
+        writeInterval  10;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_pyrolysisRegion_box_znorm_m;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_pyrolysisRegion_box_znorm_m;
         operation       sum;
         fields
         (
@@ -200,15 +199,15 @@ functions
 //    // cube01
 //    cube01_side1_sample1
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side1_sample1;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side1_sample1;
 //        operation       sum;
 //        fields
 //        (
@@ -218,15 +217,15 @@ functions
 //
 //    cube01_side1_sample2
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side1_sample2;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side1_sample2;
 //        operation       sum;
 //        fields
 //        (
@@ -236,15 +235,15 @@ functions
 //
 //    cube01_side1_sample3
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side1_sample3;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side1_sample3;
 //        operation       sum;
 //        fields
 //        (
@@ -254,15 +253,15 @@ functions
 //
 //    cube01_side1_sample4
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side1_sample4;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side1_sample4;
 //        operation       sum;
 //        fields
 //        (
@@ -272,15 +271,15 @@ functions
 //
 //    cube01_side2_sample1
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side2_sample1;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side2_sample1;
 //        operation       sum;
 //        fields
 //        (
@@ -290,15 +289,15 @@ functions
 //
 //    cube01_side2_sample2
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side2_sample2;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side2_sample2;
 //        operation       sum;
 //        fields
 //        (
@@ -308,15 +307,15 @@ functions
 //
 //    cube01_side2_sample3
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side2_sample3;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side2_sample3;
 //        operation       sum;
 //        fields
 //        (
@@ -326,15 +325,15 @@ functions
 //
 //    cube01_side2_sample4
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side2_sample4;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side2_sample4;
 //        operation       sum;
 //        fields
 //        (
@@ -344,15 +343,15 @@ functions
 //
 //    cube01_side3_sample1
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side3_sample1;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side3_sample1;
 //        operation       sum;
 //        fields
 //        (
@@ -362,15 +361,15 @@ functions
 //
 //    cube01_side3_sample2
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side3_sample2;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side3_sample2;
 //        operation       sum;
 //        fields
 //        (
@@ -380,15 +379,15 @@ functions
 //
 //    cube01_side3_sample3
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side3_sample3;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side3_sample3;
 //        operation       sum;
 //        fields
 //        (
@@ -398,15 +397,15 @@ functions
 //
 //    cube01_side3_sample4
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side3_sample4;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side3_sample4;
 //        operation       sum;
 //        fields
 //        (
@@ -416,15 +415,15 @@ functions
 //
 //    cube01_side4_sample1
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side4_sample1;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side4_sample1;
 //        operation       sum;
 //        fields
 //        (
@@ -434,15 +433,15 @@ functions
 //
 //    cube01_side4_sample2
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side4_sample2;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side4_sample2;
 //        operation       sum;
 //        fields
 //        (
@@ -452,15 +451,15 @@ functions
 //
 //    cube01_side4_sample3
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side4_sample3;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side4_sample3;
 //        operation       sum;
 //        fields
 //        (
@@ -470,15 +469,15 @@ functions
 //
 //    cube01_side4_sample4
 //    {
-//        type            faceSource;
+//        type            surfaceFieldValue;
 //        region          wallFilmRegion;
 //        functionObjectLibs ("libfieldFunctionObjects.so");
 //        enabled         true;
-//        outputControl   outputTime;
+//        writeControl    writeTime;
 //        log             false;
-//        valueOutput     false;
-//        source          faceZone;
-//        sourceName      cube01_side4_sample4;
+//        writeFields     false;
+//        regionType      faceZone;
+//        name            cube01_side4_sample4;
 //        operation       sum;
 //        fields
 //        (
@@ -489,17 +488,17 @@ functions
     fieldMinMax
     {
         type            fieldMinMax;
-        functionObjectLibs ("libfieldFunctionObjects.so");
+        //functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;
-        outputInterval  1;
+        writeControl    timeStep;
+        writeInterval  1;
         mode            magnitude;
         log             true;
-        valueOutput     false;
+        writeFields     false;
         fields
         (
             T
-            dQ
+            Qdot
             qrflamelet
         );
     }
@@ -510,7 +509,7 @@ functions
 //
 //        functionObjectLibs ("libsampling.so");
 //        enabled         true;
-//        outputControl   adjustableTime;
+//        writeControl    adjustableRunTime;
 //        writeInterval   5;
 //        interpolationScheme cellPoint;
 //        surfaceFormat vtk;
@@ -557,7 +556,7 @@ functions
 //
 //        functionObjectLibs ("libsampling.so");
 //        enabled         true;
-//        outputControl   adjustableTime;
+//        writeControl    adjustableRunTime;
 //        writeInterval   1;
 //        interpolationScheme cellPoint;
 //        surfaceFormat   vtk;
@@ -587,46 +586,5 @@ functions
 //
 //    }
 
-    // adiosData
-    // {
-    //     // Write the solution (Eulerian and Lagrangian fields)
-    //     // into an ADIOS container
-    //     type                adiosWrite;
-    //     
-    //     // Where to load it from
-    //     functionObjectLibs  ( "libIOadiosWrite.so" );
-    //     
-    //     // Volume fields to write
-    //     objectNames         ( U p T );
-    //     
-    //     // Kinematic clouds to write (leave blank to skip)
-    //     cloudNames          (  );
-    //     
-    //     // Attributes to write for particles. Valid choices are:
-    //     //  - origProc        = Original process (from where it was injected)
-    //     //  - origId          = ID on orignal process
-    //     //  - cell            = Current cell (on local process)
-    //     //  - currProc        = Current process
-    //     //  - rho             = Particle density
-    //     //  - d               = Particle diameter
-    //     //  - age             = Particle age
-    //     //  - position        = Position in space
-    //     //  - U               = Particle velocity
-    //     //  - Us              = Slip velocity Us = U - Uc
-    //     cloudAttribs        (  );
-    //     
-
-    //     // Output I/O method (e.g. MPI (default), POSIX, MPI_AGGREGATE)
-    //     // run 'adios_config -m' to see available methods
-    //     adiosMethod        MPI;
-
-    //     // Parameters for the selected method, default = ""
-    //     methodparams       "verbose=4";
-    //     
-    //     chunkSize           0;
-    //     // Write interval (in number of iterations)
-    //     writeInterval       5;
-    // }
-
-);
+}
 // ************************************************************************* //

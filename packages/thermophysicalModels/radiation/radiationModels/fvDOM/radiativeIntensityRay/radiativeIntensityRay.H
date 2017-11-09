@@ -118,7 +118,16 @@ private:
 
         //- My ray Id
         label myRayId_;
-
+        
+        //- qr for different spectral bands
+        PtrList<volScalarField> qrLambda_;
+                
+        //- qin for different spectral bands
+        PtrList<volScalarField> qinLambda_;
+        
+        //- qem for different spectral bands
+        PtrList<volScalarField> qemLambda_;
+        
 
     // Private Member Functions
 
@@ -198,6 +207,22 @@ public:
             //- Return const access to the boundary emmited heat flux
             inline const volScalarField& qem() const;
 
+            //- Return const access to the spectral-banded boundary heat fluxes
+            //--net flux
+            inline const volScalarField& qrLambda(const label lambdaI) const;
+            //--incident flux
+            inline const volScalarField& qinLambda(const label lambdaI) const;            
+            //--emitted flux
+            inline const volScalarField& qemLambda(const label lambdaI) const;
+            
+            //- Return non-const access to the spectral-banded boundary heat fluxes
+            //--net flux
+            inline volScalarField& qrLambda(const label lambdaI);
+            //--incident flux
+            inline volScalarField& qinLambda(const label lambdaI);            
+            //--emitted flux
+            inline volScalarField& qemLambda(const label lambdaI);
+            
             //- Return direction
             inline const vector& d() const;
 

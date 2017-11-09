@@ -4,6 +4,7 @@
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 
 #runApplication cleanCase
+foamCleanPolyMesh
 cleanTimeDirectories
 runApplication foamClearPolyMesh
 mv log.foamClearPolyMesh log.foamClearPolyMesh.primary

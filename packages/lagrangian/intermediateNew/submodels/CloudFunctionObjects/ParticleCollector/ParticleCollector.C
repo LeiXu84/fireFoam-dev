@@ -332,8 +332,9 @@ void Foam::ParticleCollector<CloudType>::collectParcelPolygon
         // Identify if point is within the bounds of the face. Create triangles
         // between the intersection point and each edge of the face. If all the
         // triangle normals point in the same direction as the face normal, then
-        // the particle is within the face. Note that testing the decomposed
-        // triangles in turn does not work due to ambiguity along the diagonals.
+        // the particle is within the face. Note that testing for pointHits on
+        // the face's decomposed triangles does not work due to ambiguity along
+        // the diagonals.
         const face& f = faces_[facei];
         const vector n = f.normal(points_);
         bool inside = true;
@@ -348,6 +349,7 @@ void Foam::ParticleCollector<CloudType>::collectParcelPolygon
             }
         }
 
+        // Add to the list of hits
         if (inside)
         {
             hitFaceIDs_.append(facei);
@@ -528,10 +530,7 @@ void Foam::ParticleCollector<CloudType>::write()
         mass_[facei] = 0.0;
         massTotal_[facei] = 0.0;
         massFlowRate_[facei] = 0.0;
-        collectedParticles0_[facei] = collectedParticles_[facei];
-        collectedParticles_[facei].clear();
     }
-
 }
 
 
@@ -569,9 +568,7 @@ Foam::ParticleCollector<CloudType>::ParticleCollector
     log_(this->coeffDict().lookup("log")),
     outputFilePtr_(),
     timeOld_(owner.mesh().time().value()),
-    hitFaceIDs_(),
-    collectedParticles_(),
-    collectedParticles0_()
+    hitFaceIDs_()
 {
     normal_ /= mag(normal_);
 
@@ -622,8 +619,6 @@ Foam::ParticleCollector<CloudType>::ParticleCollector
     mass_.setSize(faces_.size(), 0.0);
     massTotal_.setSize(faces_.size(), 0.0);
     massFlowRate_.setSize(faces_.size(), 0.0);
-    collectedParticles_.setSize(faces_.size());
-    collectedParticles0_.setSize(faces_.size());
 
     makeLogFile(faces_, points_, area_);
 }
@@ -656,9 +651,7 @@ Foam::ParticleCollector<CloudType>::ParticleCollector
     log_(pc.log_),
     outputFilePtr_(),
     timeOld_(0.0),
-    hitFaceIDs_(),
-    collectedParticles_(pc.collectedParticles_),
-    collectedParticles0_(pc.collectedParticles0_)
+    hitFaceIDs_()
 {}
 
 
@@ -686,21 +679,18 @@ void Foam::ParticleCollector<CloudType>::postMove
         return;
     }
 
-    // Slightly extend end position to avoid falling within tracking tolerances
-    const point position1 = position0 + 1.0001*(p.position() - position0);
-
     hitFaceIDs_.clear();
 
     switch (mode_)
     {
         case mtPolygon:
         {
-            collectParcelPolygon(position0, position1);
+            collectParcelPolygon(position0, p.position());
             break;
         }
         case mtConcentricCircle:
         {
-            collectParcelConcentricCircles(position0, position1);
+            collectParcelConcentricCircles(position0, p.position());
             break;
         }
         default:
@@ -740,40 +730,19 @@ void Foam::ParticleCollector<CloudType>::postMove
             }
         }
 
-        // If not previously collected, add mass contribution
-        Switch previouslyCollected = false;
-        forAll(collectedParticles0_[facei],i)
-        {
-            if (&p == collectedParticles0_[facei][i] )
-            {
-                previouslyCollected = true;
-                break;
-            }
-        }
-        forAll(collectedParticles_[facei],i)
-        {
-            if (&p == collectedParticles_[facei][i] )
-            {
-                previouslyCollected = true;
-                break;
-            }
-        }
-        if(!previouslyCollected)
-        {
-            collectedParticles_[facei].append(&p);
+        // Add mass contribution
+        mass_[facei] += m;
 
-            mass_[facei] += m;
-            if (nSector_ == 1)
-            {
-                mass_[facei + 1] += m;
-                mass_[facei + 2] += m;
-                mass_[facei + 3] += m;
-            }
+        if (nSector_ == 1)
+        {
+            mass_[facei + 1] += m;
+            mass_[facei + 2] += m;
+            mass_[facei + 3] += m;
+        }
 
-            if (removeCollected_)
-            {
-                keepParticle = false;
-            }
+        if (removeCollected_)
+        {
+            keepParticle = false;
         }
     }
 }

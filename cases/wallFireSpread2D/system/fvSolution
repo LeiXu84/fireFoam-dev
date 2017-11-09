@@ -59,6 +59,11 @@ solvers
         mergeLevels      1;
     };
 
+    ph_rgh
+    {
+        $p_rgh;
+    }
+
     Yi
     {
         solver          PBiCG;
@@ -181,6 +186,9 @@ PIMPLE
     nOuterCorrectors  1;
     nCorrectors       2;
     nNonOrthogonalCorrectors 0;
+
+    hydrostaticInitialization yes;
+    nHydrostaticCorrectors 5;
 }
 
 relaxationFactors

@@ -39,4 +39,5 @@ mv $TMP_FILE constant/filmRegion/polyMesh/boundary
 
 extrudeToRegionMesh -overwrite -dict system/extrudeToRegionMeshDictPyr 
 
+cp 0/ph_rgh.orig 0/ph_rgh
 

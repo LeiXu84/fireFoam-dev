@@ -103,6 +103,30 @@ inline const Foam::volScalarField& Foam::radiation::fvDOM::T() const
     return this->T_;
 }
 
+inline const Foam::volScalarField& Foam::radiation::fvDOM::qrLambda
+(
+    const label lambdaI_
+) const
+{
+    return qrLambda_[lambdaI_];
+}
+
+inline const Foam::volScalarField& Foam::radiation::fvDOM::qinLambda
+(
+    const label lambdaI_
+) const
+{
+    return qinLambda_[lambdaI_];
+}
+
+inline const Foam::volScalarField& Foam::radiation::fvDOM::qemLambda
+(
+    const label lambdaI_
+) const
+{
+    return qemLambda_[lambdaI_];
+}
+
 inline const Foam::volScalarField& Foam::radiation::fvDOM::G() const
 {
     return G_;

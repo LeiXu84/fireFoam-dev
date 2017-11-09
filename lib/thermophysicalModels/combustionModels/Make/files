@@ -11,6 +11,7 @@ eddyDissMultiFuelStreamModel/eddyDissMultiFuelStreamModels.C
 /*infinitelyFastChemistryExplicitIgn/infinitelyFastChemistryExplicitIgn.C*/
 
 eddyDissipationBertExtModel/eddyDissipationBertExtModels.C
+eddyDissipationFRVModel/eddyDissipationFRVModels.C
 
 LIB = $(FOAM_USER_LIBBIN)/libcombustionModelsEDC
 

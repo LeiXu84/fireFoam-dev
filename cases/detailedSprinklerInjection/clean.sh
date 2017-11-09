@@ -4,7 +4,9 @@
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 . $WM_PROJECT_DIR/bin/tools/CleanFunctions
 
-runApplication foamClearPolyMesh
+
+rm -fr log.*
+runApplication foamCleanPolyMesh
 rm -rf patch* 
 rm -f log.*
 rm -f outFlameHeight*

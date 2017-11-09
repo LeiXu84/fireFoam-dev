@@ -1,27 +1,19 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
-
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volVectorField;
-    object          U;
+    version     2.0;
+    format      ascii;
+    class       volVectorField;
+    location    "0";
+    object      U;
 }
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 
 dimensions      [0 1 -1 0 0 0 0];
 
@@ -29,30 +21,21 @@ internalField   uniform (0 0 0);
 
 boundaryField
 {
-    wall           
+    solid
     {
         type            fixedValue;
         value           $internalField;
     }
 
-    outlet         
+    "(outlet|side)"
     {
-        type            inletOutlet;
-        inletValue      $internalField;
+        type            pressureInletOutletVelocity;
         value           $internalField;
     } 
 
     ground          
     {
-        type            fixedValue;
-        value           $internalField;
-    }
-
-    side          
-    {
-        type            pressureInletOutletVelocity;
-	phi		phi;
-        value           $internalField;
+        type            noSlip;
     }
 
     frontAndBack
@@ -60,7 +43,7 @@ boundaryField
         type            empty;
     }
 
-    burner          
+    burner
     {
         type            flowRateInletVelocity;
         massFlowRate        0.002;    

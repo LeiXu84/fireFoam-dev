@@ -292,18 +292,15 @@ bool Foam::KinematicParcel<ParcelType>::move
         if (p.active())
         {
             // Track to the next face
-            p.trackToFace(f*s, f, td);
+            p.trackToFace(f*s, f);
         }
         else
         {
-            // Abandon the track, and move to the end of the sub-step. If the
-            // the mesh is moving, this will implicitly move the parcel.
-            if (mesh.moving())
-            {
-                WarningInFunction
-                    << "Tracking was abandoned on a moving mesh. Parcels may "
-                    << "move unphysically as a result." << endl;
-            }
+            // At present the only thing that sets active_ to false is a stick
+            // wall interaction. We want the position of the particle to remain
+            // the same relative to the face that it is on. The local
+            // coordinates therefore do not change. We still advance in time and
+            // perform the relevant interactions with the fixed particle.
             p.stepFraction() += f;
         }
 
@@ -323,9 +320,14 @@ bool Foam::KinematicParcel<ParcelType>::move
             p.calc(td, dt, celli);
         }
 
+        if (p.onFace() && td.keepParticle)
+        {
+            p.hitFace(s, td);
+        }
+
         if (p.onBoundaryFace() && td.keepParticle)
         {
-            if (isA<processorPolyPatch>(pbMesh[p.patch(p.face())]))
+            if (isA<processorPolyPatch>(pbMesh[p.patch()]))
             {
                 td.switchProcessor = true;
             }
@@ -333,27 +335,16 @@ bool Foam::KinematicParcel<ParcelType>::move
 
         p.age() += dt;
 
+        if (p.onFace())
+        {
+            td.cloud().functions().postFace(p, p.face(), td.keepParticle);
+        }
+
         td.cloud().functions().postMove(p, celli, dt, start, td.keepParticle);
     }
 
     return td.keepParticle;
 }
-
-
-template<class ParcelType>
-template<class TrackData>
-void Foam::KinematicParcel<ParcelType>::hitFace(TrackData& td)
-{
-    typename TrackData::cloudType::parcelType& p =
-        static_cast<typename TrackData::cloudType::parcelType&>(*this);
-
-    td.cloud().functions().postFace(p, p.face(), td.keepParticle);
-}
-
-
-template<class ParcelType>
-void Foam::KinematicParcel<ParcelType>::hitFace(int& td)
-{}
 
 
 template<class ParcelType>

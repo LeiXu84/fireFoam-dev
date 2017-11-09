@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.7.x                                 |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.com               |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -11,32 +11,44 @@ FoamFile
     format      ascii;
     class       volScalarField;
     location    "0";
-    object      Qr;
+    object      ph_rgh;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-dimensions      [1 0 -3 0 0 0 0];
+dimensions      [1 -1 -2 0 0 0 0];
 
 internalField   uniform 0;
 
 boundaryField
 {
-    panel_top
+    top
     {
-        type            zeroGradient;
+        type            fixedValue;
+        value           $internalField;
     }
 
-    region0_to_panelRegion_panel
+    sides
     {
-        type            mappedField;
-        sampleRegion    region0;
-        sampleMode      nearestPatchFace;
-        samplePatch     region0_to_panelRegion_panel;
-        offset          (0 0 0);
-        fieldName       Qr;
-        setAverage      no;
-        average         0;
-        value           uniform 0;
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+
+    base
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+
+    burner
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
+    }
+
+    "(region0_to.*)"
+    {
+        type            fixedFluxPressure;
+        value           $internalField;
     }
 }
 

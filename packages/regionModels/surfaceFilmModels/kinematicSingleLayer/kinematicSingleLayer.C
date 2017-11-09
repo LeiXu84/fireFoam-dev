@@ -84,6 +84,17 @@ void kinematicSingleLayer::correctThermoFields()
 }
 
 
+// kvm
+void kinematicSingleLayer::tabAdd(){
+    fmtab+="\t";
+    return;
+}
+
+void kinematicSingleLayer::tabSubtract(){
+    fmtab.erase(fmtab.length()-1,fmtab.length());
+    return;
+}
+
 void kinematicSingleLayer::resetPrimaryRegionSourceTerms()
 {
     if (debug)
@@ -208,7 +219,7 @@ tmp<volScalarField> kinematicSingleLayer::pp()
 
 void kinematicSingleLayer::correctAlpha()
 {
-    alpha_ == pos0(delta_ - deltaSmall_);
+    alpha_ == pos(delta_ - deltaSmall_);
 }
 
 

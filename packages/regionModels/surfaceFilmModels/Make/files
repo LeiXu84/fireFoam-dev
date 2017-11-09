@@ -4,6 +4,9 @@ surfaceFilmModel/surfaceFilmModelNew.C
 noFilm/noFilm.C
 kinematicSingleLayer/kinematicSingleLayer.C
 thermoSingleLayer/thermoSingleLayer.C
+thermoSingleLayerPw/thermoSingleLayerPw.C
+thermoSingleLayerFmBox/thermoSingleLayerFmBox.C
+thermoSingleLayerFmPanel/thermoSingleLayerFmPanel.C
 thermoSingleLayerRP/thermoSingleLayerRP.C
 thermoSingleLayerRollPaper/thermoSingleLayerRollPaper.C
 

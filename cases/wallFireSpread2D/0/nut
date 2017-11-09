@@ -1,45 +1,38 @@
-/*---------------------------------------------------------------------------*\
+/*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.4                                   |
-|   \\  /    A nd           | Web:      http://www.openfoam.org               |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.com                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 
 FoamFile
 {
-    version         2.0;
-    format          ascii;
-
-    root            "";
-    case            "";
-    instance        "";
-    local           "";
-
-    class           volScalarField;
-    object          alphaSgs;
+    version     2.0;
+    format      ascii;
+    class       volScalarField;
+    location    "0";
+    object          nut;
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 
-dimensions      [1 -1 -1 0 0 0 0];
+dimensions      [0 2 -1 0 0 0 0];
 
 internalField   uniform 0;
 
 boundaryField
 {
-    wall           
+    solid           
     {
         //type            zeroGradient;
-        //type            alphaSgsWallFunction;
-        //type            fixedValue;
-        type            alphaSgsFireWallFunction;
-        QcFlame         20000.0;
-        QcThreshold     2000.0;
-	value		uniform 0;
+        //type            muSgsWallFunction;
+        type            fixedValue;
+        value		uniform 0;
     }
-    outlet      
+
+    outlet          
     {
         type            zeroGradient;
     }
@@ -62,12 +55,9 @@ boundaryField
     region0_to_panelRegion_panel
     {
         //type            zeroGradient;
-        //type            alphaSgsWallFunction;
-        //type            fixedValue;
-        type            alphaSgsFireWallFunction;
-        QcFlame         20000.0;
-        QcThreshold     2000.0;
-	value		uniform 0;
+        //type            muSgsWallFunction;
+        type            fixedValue;
+        value		uniform 0;
     }
 
 }

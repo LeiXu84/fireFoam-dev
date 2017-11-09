@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                   |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -17,45 +17,43 @@ FoamFile
 
 dimensions      [0 0 0 0 0 0 0];
 
-internalField   uniform 0.0;
+internalField   uniform 0;
 
 boundaryField
 {
-    top
+    outlet
     {
         type            inletOutlet;
         inletValue      $internalField;
         value           $internalField;
     }
-    ground
+
+    sides
+    {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+    }
+
+    walls
     {
         type            zeroGradient;
     }
-    "(side.*)"
+    inlet
     {
-        type            inletOutlet;
-        inletValue      $internalField;
-        value           $internalField;
+        //type            zeroFlowRateAdvectiveDiffusive;
+        type            fixedValue;
+        value           uniform 0;
+/*
+        type            fixedValue;
+        value           uniform 0.0;
+*/
     }
 
-    burner          
+    frontAndBack
     {
-        type                totalFlowRateAdvectiveDiffusive;
-        massFluxFraction    0;
-        phi                 phi;
-        rho                 rho;
-        value               uniform 0;
+        type            zeroGradient;
     }
-
-    "(region0_to.*)"
-    {
-        type                totalFlowRateAdvectiveDiffusive;
-        massFluxFraction    0;
-        phi                 phi;
-        rho                 rho;
-        value               uniform 0;
-    }
-
 }
 
 

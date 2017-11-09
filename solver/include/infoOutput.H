@@ -56,7 +56,7 @@ if (mag(g).value() > 0.0)
 }
 
 
-hc = thermo.hc();  
+hc = thermo.hc();
 h = thermo.he() + hc;
 
 phiFt = mvConvection->interpolate(phi,ft)*phi

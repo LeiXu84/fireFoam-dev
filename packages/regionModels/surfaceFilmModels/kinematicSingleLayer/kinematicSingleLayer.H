@@ -46,6 +46,8 @@ SourceFiles
 #include "forceList.H"
 #include "filmTurbulenceModel.H"
 
+#define INFO Info << fmtab.c_str()
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -80,6 +82,10 @@ private:
 protected:
 
     // Protected data
+
+            string fmtab; // kvm
+            void tabAdd(); // kvm 
+            void tabSubtract(); // kvm
 
         // Solution parameters
 

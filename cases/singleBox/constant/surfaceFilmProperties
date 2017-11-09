@@ -11,7 +11,7 @@ FoamFile
     format      ascii;
     class       dictionary;
     location    "constant";
-    object      SurfaceFilmProperties;
+    object      surfaceFilmProperties;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -51,13 +51,13 @@ thermoSingleLayerCoeffs
     forces ( 
             // surfaceShear 
             thermocapillary 
-            contactAngle
+            distributionContactAngleFF
            );
 
-    contactAngleCoeffs
+    distributionContactAngleFFCoeffs
     {
         Ccf             0.016;//0.001;
-        contactAngleDistribution
+        distribution
         {
             type            normal;
             normalDistribution
@@ -103,15 +103,15 @@ thermoSingleLayerCoeffs
 
     partialWetting true;
     partialWettingCoeffs{
-        hydrophilic true;
+        hydrophilic               true;
         wetToggle                 0.5;
         dryToggle                 0.001;
         contactAngleMean          75;
         contactAngleStdDev        10;
         contactAngleMax           100;
         contactAngleMin           50;
-        contactAngleCoefficient   1.000;
-        criticalFilmThickness   criticalFilmThickness [ 0 1 0 0 0 ] 0.00020;
+        contactAngleCoefficient   1;
+        criticalFilmThickness     criticalFilmThickness [ 0 1 0 0 0 ] 0.00020;
     }
 
     radiationModel standardRadiation;//none;//

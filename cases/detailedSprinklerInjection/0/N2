@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                   |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -21,41 +21,35 @@ internalField   uniform 0.76699;
 
 boundaryField
 {
-    top
+    outlet
     {
-        type            inletOutlet;
-        inletValue      $internalField;
-        value           $internalField;
-    }
-    ground
-    {
-        type            zeroGradient;
-    }
-    "(side.*)"
-    {
-        type            inletOutlet;
-        inletValue      $internalField;
+        type            calculated;
         value           $internalField;
     }
 
-    burner          
+    sides
     {
-        type                totalFlowRateAdvectiveDiffusive;
-        massFluxFraction    0;
-        phi                 phi;
-        rho                 rho;
-        value               uniform 0;
+        type            calculated;
+        value           $internalField;
     }
 
-    "(region0_to.*)"
+    walls
     {
-        type                totalFlowRateAdvectiveDiffusive;
-        massFluxFraction    0;
-        phi                 phi;
-        rho                 rho;
-        value               uniform 0;
+        type            calculated;
+        value           $internalField;
     }
 
+    inlet
+    {
+        type            calculated;
+        value           $internalField;
+    }
+
+    frontAndBack
+    {
+        type            calculated;
+        value           $internalField;
+    }
 }
 
 

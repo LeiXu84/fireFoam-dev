@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  2.2.x                                 |
+|  \\    /   O peration     | Version:  dev                                   |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -43,7 +43,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_xnorm_p; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;
@@ -57,7 +57,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_xnorm_m; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;
@@ -71,7 +71,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_ynorm_p; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;
@@ -85,7 +85,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_ynorm_m; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;
@@ -99,7 +99,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_znorm_p; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;
@@ -113,7 +113,7 @@ boundaryField
         samplePatch     region0_to_pyrolysisRegion_box_znorm_m; // panel;
         flipNormals     yes;
         offset          (0 0 0);
-        fieldName       T;
+        field           T;
         setAverage      no;
         average         0;
         value           $internalField;

@@ -117,7 +117,10 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
     omega_(0.0),
     nLambda_(nLambda),
     ILambda_(nLambda),
-    myRayId_(rayId)
+    myRayId_(rayId),
+    qrLambda_(nLambda),
+    qinLambda_(nLambda),
+    qemLambda_(nLambda)    
 {
     scalar sinTheta = Foam::sin(theta);
     scalar cosTheta = Foam::cos(theta);
@@ -153,7 +156,7 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
         );
 
         // Check if field exists and can be read
-        if (IHeader.headerOk())
+        if (IHeader.typeHeaderOk<volScalarField>(true))
         {
             ILambda_.set
             (
@@ -193,6 +196,62 @@ Foam::radiation::radiativeIntensityRay::radiativeIntensityRay
                 new volScalarField(noReadHeader, IDefaultPtr())
             );
         }
+        
+        // Construct boundary fluxes for each band
+        // --net radiation
+   	    qrLambda_.set
+       	(
+            lambdaI,
+            new volScalarField
+            (
+                IOobject
+            	(
+                    "qrLambda_" + Foam::name(rayId) + "_" + Foam::name(lambdaI) ,
+                    mesh_.time().timeName(),
+            	    mesh_,
+            	    IOobject::NO_READ,
+            	    IOobject::NO_WRITE
+            	),
+           		qr_
+            )
+        );
+        
+        // --incident radiation
+        qinLambda_.set
+        (
+	        lambdaI,
+	        new volScalarField
+	        (
+	            IOobject
+	       	    (
+	      	        "qinLambda_" + Foam::name(rayId) + "_" + Foam::name(lambdaI) ,
+	       	        mesh_.time().timeName(),
+	       	        mesh_,
+	       	        IOobject::NO_READ,
+	       	        IOobject::NO_WRITE
+	       	    ),
+        	    qin_
+	        )
+    	);
+        
+        // --emitted radiation
+        qemLambda_.set
+    	(
+	        lambdaI,
+	        new volScalarField
+	        (
+	            IOobject
+	           	(
+	                "qemLambda_" + Foam::name(rayId) + "_" + Foam::name(lambdaI) ,
+	                mesh_.time().timeName(),
+	          	    mesh_,
+	           	    IOobject::NO_READ,
+	           	    IOobject::NO_WRITE
+	           	),
+            	qem_
+	        )
+	    );
+	          
     }
 }
 
@@ -207,8 +266,10 @@ Foam::radiation::radiativeIntensityRay::~radiativeIntensityRay()
 
 Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
 {
-    // Reset boundary heat flux to zero
+    // Reset boundary total heat fluxes to zero
     qr_.boundaryFieldRef() = 0.0;
+    qin_.boundaryFieldRef() = 0.0;
+    qem_.boundaryFieldRef() = 0.0;
 
     scalar maxResidual = -GREAT;
 
@@ -220,11 +281,11 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
         const surfaceScalarField Ji(dAve_ & mesh_.Sf());
 
         const volScalarField sigmaEff(scatter_.sigmaEff(lambdaI)); // ankur
+        // reset boundary spectral heat fluxes to zero
+        qrLambda_[lambdaI].boundaryFieldRef() = 0.0;
+        qinLambda_[lambdaI].boundaryFieldRef() = 0.0;
+        qemLambda_[lambdaI].boundaryFieldRef() = 0.0;
 
- 
-        //Info << " k: " << k << endl;
-        //Info << " sigma: " << sigmaEff << endl;
-        //Info << " aDisp: " << absorptionEmission_.aDisp(lambdaI) << endl;
         fvScalarMatrix IiEq
         (
             fvm::div(Ji, ILambda_[lambdaI], "div(Ji,Ii_h)")
@@ -233,7 +294,7 @@ Foam::scalar Foam::radiation::radiativeIntensityRay::correct()
         ==
             1.0/constant::mathematical::pi*omega_
            *(
-                // Remove aDisp from k
+                // Remove aDisp from k for gas emissivity
                 (k - absorptionEmission_.aDisp(lambdaI))
                 *physicoChemical::sigma*pow4(dom_.T())*dom_.enFracLambda(lambdaI) // ankur
                // *blackBody_.bLambda(lambdaI)   // ankur, the above expression computes banded emmision

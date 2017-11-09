@@ -1,8 +1,8 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  1.6                                   |
-|   \\  /    A nd           | Web:      http://www.OpenFOAM.org               |
+|  \\    /   O peration     | Version:  dev                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
 FoamFile
@@ -10,6 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       volScalarField;
+    location    "0";
     object      IDefault;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -20,47 +21,13 @@ internalField   uniform 0;
 
 boundaryField
 {
-    top
+    ".*"
     {
         type            greyDiffusiveRadiation;
         T               T;
-        emissivityMode  lookup; //solidThermo
-        emissivity      uniform 1.0;
-        value           uniform 0;
-    }
-    ground           
-    {
-        type            greyDiffusiveRadiation;
-        T               T;
-        emissivityMode  lookup; //solidThermo
-        emissivity      uniform 1.0;
-        value           uniform 0;
-    }
-    "(side.*)"
-    {
-        type            greyDiffusiveRadiation;
-        T               T;
-        emissivityMode  lookup; //solidThermo
-        emissivity      uniform 1.0;
-        value           uniform 0;
-    }
-    burner          
-    {
-        type            greyDiffusiveRadiation;
-        T               T;
-        emissivityMode  lookup; //solidThermo
-        emissivity      uniform 1.0;
-        value           uniform 0;
-    }
-    region0_to_filmRegion_coupledWall
-    {
-        type            greyDiffusiveRadiation;
-        T               T;
-        emissivityMode  solidRadiation; //lookup; 
-        emissivity      uniform 1.0;
+        emissivity      1.0;
         value           uniform 0;
     }
 }
 
 // ************************************************************************* //
-

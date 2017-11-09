@@ -32,10 +32,11 @@ boundaryField
     ".*"
     {
         type            calculated;
+        value           $internalField;
     }
 
 /*
-    wall           
+    solid           
     {
         type            zeroGradient;
     }

@@ -55,42 +55,15 @@ maxDi           0.25;
 
 maxDeltaT       0.01;
 
-libs
-(
-    "libfvPatchFieldsPyrolysis.so"
-);
-
 functions
-(
-/*
-    partialWriteRegion0
-    {
-        type            partialWrite;
-        // Where to load it from
-        functionObjectLibs ("libIOFunctionObjects.so");
-        outputControl   outputTime;
-        objectNames    (T ft);   // write specified objects every outputTime
-        writeInterval   5;      // write all objects every writeInterval
-    }
-
-    partialWritePyrolysisRegion
-    {
-        type            partialWrite;
-        // Where to load it from
-        functionObjectLibs ("libIOFunctionObjects.so");
-	region		panelRegion;
-        outputControl   outputTime;
-        objectNames    (T);   // write specified objects every outputTime
-        writeInterval   5;      // write all objects every writeInterval
-    }
-*/
+{
     probes
     {
         type            probes;
         functionObjectLibs ("libsampling.so");
-        outputControl   timeStep;
-        //outputInterval  10;
-        outputInterval  1;
+        writeControl    timeStep;
+        //writeInterval  10;
+        writeInterval  1;
         probeLocations
         (
             ( 0.0001 0.8 0.1 )
@@ -108,12 +81,12 @@ functions
         );
     }
 
-    probes
+    probes2
     {
         type            probes;
         functionObjectLibs ("libsampling.so");
-        outputControl   timeStep;
-        outputInterval  1;
+        writeControl    timeStep;
+        writeInterval  1;
         region        panelRegion;
         probeLocations
         (
@@ -130,10 +103,10 @@ functions
     {
         type            patchProbes;
         functionObjectLibs ("libsampling.so");
-        outputControl   timeStep;
-        outputInterval  1;
-        region        panelRegion;
-        patchName      region0_to_panelRegion_panel;
+        writeControl    timeStep;
+        writeInterval   1;
+        region          panelRegion;
+        patchName       region0_to_panelRegion_panel;
         probeLocations
         (
             ( 0 0.225 0.1 )
@@ -148,13 +121,13 @@ functions
         );
     }
 
-    patchProbes
+    patchProbes2
     {
         type            patchProbes;
         functionObjectLibs ("libsampling.so");
-        outputControl   timeStep;
-        outputInterval  1;
-        patchName      region0_to_panelRegion_panel;
+        writeControl    timeStep;
+        writeInterval   1;
+        patchName       region0_to_panelRegion_panel;
         probeLocations
         (
             ( 0 0.225 0.1 )
@@ -165,10 +138,9 @@ functions
         fields
         (
             T
-            Qr
-            Qin
-            Qem
-            //wallConvectiveHeatFlux
+            qr
+            qin
+            qem
             convectiveHeatFlux_L
             convectiveHeatFlux_T
             QcWallFunction
@@ -179,33 +151,33 @@ functions
 
     HRR
     {
-        type            cellSource;
+        type            volFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  //outputTime;
-        outputInterval  1;
+        writeControl    timeStep;  //writeTime;
+        writeInterval  1;
         log             false;     
-        valueOutput     false;
-        source          all;       //cellZone;
-        sourceName      c0;
+        writeFields     false;
+        regionType      all;       //cellZone;
+        name            c0;
         operation       volIntegrate;
         fields
         (
-            dQ
+            Qdot
         );
     }
 
     patchBurner 
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep; 
-        outputInterval  1;
+        writeControl    timeStep; 
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      burner;
+        writeFields     false;
+        regionType      patch;
+        name            burner;
         operation       sum;
         fields
         (
@@ -216,15 +188,15 @@ functions
 
     patchPanel 
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_panelRegion_panel;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_panelRegion_panel;
         operation       sum;
         fields
         (
@@ -235,15 +207,15 @@ functions
 
     patchOutlet 
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep; 
-        outputInterval  1;
+        writeControl    timeStep; 
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      outlet;
+        writeFields     false;
+        regionType      patch;
+        name            outlet;
         operation       sum;
         fields
         (
@@ -254,16 +226,16 @@ functions
 
     patchPanelSolidRegion 
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
         region          panelRegion;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_panelRegion_panel;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_panelRegion_panel;
         operation       sum;
         fields
         (
@@ -273,141 +245,141 @@ functions
 
     patchPanelQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_panelRegion_panel;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_panelRegion_panel;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchWallQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      wall;
+        writeFields     false;
+        regionType      patch;
+        name            solid;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchSideQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      side;
+        writeFields     false;
+        regionType      patch;
+        name            side;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchBurnerQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      burner;
+        writeFields     false;
+        regionType      patch;
+        name            burner;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchOutletQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      outlet;
+        writeFields     false;
+        regionType      patch;
+        name            outlet;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchGroundQr
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      ground;
+        writeFields     false;
+        regionType      patch;
+        name            ground;
         operation       areaIntegrate;
         fields
         (
-            Qr
+            qr
         );
     }
 
     patchPanelQin
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_panelRegion_panel;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_panelRegion_panel;
         operation       areaIntegrate;
         fields
         (
-            Qin
+            qin
         );
     }
 
     patchPanelConvectiveHeatFlux
     {
-        type            faceSource;
+        type            surfaceFieldValue;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;  
-        outputInterval  1;
+        writeControl    timeStep;  
+        writeInterval  1;
         log             false;
-        valueOutput     false;
-        source          patch;
-        sourceName      region0_to_panelRegion_panel;
+        writeFields     false;
+        regionType      patch;
+        name            region0_to_panelRegion_panel;
         operation       areaIntegrate;
         fields
         (
@@ -423,11 +395,11 @@ functions
         type            fieldMinMax;
         functionObjectLibs ("libfieldFunctionObjects.so");
         enabled         true;
-        outputControl   timeStep;
-        outputInterval  1;
-	mode            magnitude;
+        writeControl    timeStep;
+        writeInterval  1;
+        mode            magnitude;
         log             true; //false; //true;
-        valueOutput     false;
+        writeFields     false;
         fields
         (
             T
@@ -440,9 +412,9 @@ functions
 
         functionObjectLibs ("libsampling.so");
         enabled         true;
-        outputControl   adjustableTime; //outputTime;
-        outputInterval  1;
-        writeInterval   0.2;  //(adjustableTime, runTime, clockTime, cpuTime)
+        writeControl    adjustableRunTime; //writeTime;
+        writeInterval  1;
+        writeInterval   0.2;  //(adjustableRunTime, runTime, clockTime, cpuTime)
         interpolationScheme cellPoint;
         surfaceFormat vtk;
         //region          panelRegion;
@@ -454,9 +426,9 @@ functions
             //wallConvectiveHeatFlux
             convectiveHeatFlux_L
             convectiveHeatFlux_T
-            Qin
-            Qr
-            Qem
+            qin
+            qr
+            qem
             QcWallFunction
         );
 
@@ -469,5 +441,5 @@ functions
             }
         );
     }
-);
+}
 // ************************************************************************* //
