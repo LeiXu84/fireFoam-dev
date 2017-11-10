@@ -543,6 +543,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
 
             Pstream::gatherList(diameters_[facei]);
             Pstream::gatherList(velocityMagnitudes_[facei]);
+            Pstream::gatherList(normalVelocityMagnitudes_[facei]);
             Pstream::gatherList(numberParticles_[facei]);
             Pstream::gatherList(positions_[facei]);
 
@@ -551,12 +552,14 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                 // create a single list of each property
                 scalarList localDiameters;
                 scalarList localVelocityMagnitudes;
+                scalarList localNormalVelocityMagnitudes;
                 scalarList localNumberParticles;
                 vectorList localPositions;
                 for(label proc=0;proc<Pstream::nProcs();proc++)
                 {
                     localDiameters.append(diameters_[facei][proc]); 
                     localVelocityMagnitudes.append(velocityMagnitudes_[facei][proc]); 
+                    localNormalVelocityMagnitudes.append(normalVelocityMagnitudes_[facei][proc]); 
                     localNumberParticles.append(numberParticles_[facei][proc]); 
                     localPositions.append(positions_[facei][proc]); 
                 }
@@ -598,6 +601,8 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                             << " "
                             << localVelocityMagnitudes[d]
                             << " "
+                            << localNormalVelocityMagnitudes[d]
+                            << " "
                             << localNumberParticles[d]
                             << " "
                             << localPositions[d][0]
@@ -614,6 +619,7 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
             // reset particle statistics
             diameters_[facei][Pstream::myProcNo()].clear();
             velocityMagnitudes_[facei][Pstream::myProcNo()].clear();
+            normalVelocityMagnitudes_[facei][Pstream::myProcNo()].clear();
             numberParticles_[facei][Pstream::myProcNo()].clear();
             positions_[facei][Pstream::myProcNo()].clear();
         }
@@ -628,18 +634,9 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
                 << tab << faceMomRate[facei];
                 if(sampleParticles_)
                 {
-                    if (dv50[facei] < 0)
-                    {
-                        outputFilePtr_()
-                            << tab << "n/a"
-                            << tab << vel;
-                    }
-                    else
-                    {
-                        outputFilePtr_()
-                            << tab << dv50[facei]
-                            << tab << vel;
-                    }
+                    outputFilePtr_()
+                        << tab << dv50[facei]
+                        << tab << vel;
                 }
                 outputFilePtr_() << endl;
         }
@@ -659,16 +656,8 @@ void Foam::ParticleCollectorFmg<CloudType>::write()
     {
         forAll(faces_, facei)
         {
-            if (dv50[facei] < 0)
-            {
-                Info << "    dv50[" << facei << "](m) = " 
-                     << "n/a" << nl;
-            }
-            else
-            {
-                Info << "    dv50[" << facei << "](m) = " 
-                     << dv50[facei] << nl;
-            }
+            Info << "    dv50[" << facei << "](m) = " 
+                 << dv50[facei] << nl;
             //Info<< "    vel[" << facei << "](m/s) = " << 
             //            faceMomRate[facei]/(faceMassFlowRate[facei]+SMALL)<< nl;
         }
@@ -785,7 +774,7 @@ Foam::scalar Foam::ParticleCollectorFmg<CloudType>::computeDv50(const scalarList
 {
     if(d.size()<1)
     {
-        return -1;
+        return 0;
     }
     
     SortableList< scalar > dsort;
@@ -863,6 +852,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     momRate_(),
     diameters_(),
     velocityMagnitudes_(),
+    normalVelocityMagnitudes_(),
     numberParticles_(),
     positions_(),
     sampleParticles_(this->coeffDict().lookupOrDefault("sampleParticles",true)),
@@ -935,6 +925,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
 
     diameters_.setSize(faces_.size());
     velocityMagnitudes_.setSize(faces_.size());
+    normalVelocityMagnitudes_.setSize(faces_.size());
     numberParticles_.setSize(faces_.size());
     positions_.setSize(faces_.size());
 
@@ -942,6 +933,7 @@ Foam::ParticleCollectorFmg<CloudType>::ParticleCollectorFmg
     {
         diameters_[facei].setSize(Pstream::nProcs());
         velocityMagnitudes_[facei].setSize(Pstream::nProcs());
+        normalVelocityMagnitudes_[facei].setSize(Pstream::nProcs());
         numberParticles_[facei].setSize(Pstream::nProcs());
         positions_[facei].setSize(Pstream::nProcs());
     }
@@ -1050,29 +1042,18 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
         scalar np = p.nParticle();
         vector position = p.position();
 
-        /*cout << "diameter " << d << " velocity " << u << " nParticle " << np << "\n";*/
-        // Info << "p.origId(): " << p.origId() << endl;
-
-        if(sampleParticles_)
-        {
-            diameters_[facei][Pstream::myProcNo()].append(d);
-            velocityMagnitudes_[facei][Pstream::myProcNo()].append(u);
-            numberParticles_[facei][Pstream::myProcNo()].append(np);
-            positions_[facei][Pstream::myProcNo()].append(position);
-        }
-
         scalar Unormal(0);
         vector Uhat = p.U();
         switch (mode_)
         {
             case mtPolygon:
             {
-                Unormal = Uhat & normal_[facei];
+                Unormal = Uhat & normal_[facei]/mag(normal_[facei]);
                 break;
             }
             case mtConcentricCircle:
             {
-                Unormal = Uhat & normal_[0];
+                Unormal = Uhat & normal_[0]/mag(normal_[0]);
                 break;
             }
             default:
@@ -1089,6 +1070,19 @@ void Foam::ParticleCollectorFmg<CloudType>::postMove
                 m = -m;
             }
         }
+
+        // cout << "diameter " << d << " velocity " << u << " Unormal " << Unormal << " Uhat " << Uhat[0] <<" Uhat " << Uhat[1] <<  " Uhat " << Uhat[2] << " normal " << normal_[0][0] <<" normal " << normal_[0][1] <<  " normal " << normal_[0][2] << " nParticle " << np << "\n";
+        // Info << "p.origId(): " << p.origId() << endl;
+
+        if(sampleParticles_)
+        {
+            diameters_[facei][Pstream::myProcNo()].append(d);
+            velocityMagnitudes_[facei][Pstream::myProcNo()].append(u);
+            normalVelocityMagnitudes_[facei][Pstream::myProcNo()].append(Unormal);
+            numberParticles_[facei][Pstream::myProcNo()].append(np);
+            positions_[facei][Pstream::myProcNo()].append(position);
+        }
+
 
         //not needed? // If not previously collected, add mass contribution
         //not needed? Switch previouslyCollected = false;

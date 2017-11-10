@@ -204,6 +204,7 @@ private:
         //- particle sampling
         List <List<scalarList> > diameters_;
         List <List<scalarList> > velocityMagnitudes_;
+        List <List<scalarList> > normalVelocityMagnitudes_;
         List <List<scalarList> > numberParticles_;
         List <List<vectorList> > positions_;
         //- Flag for sampling particle diameter, velocity, etc.
